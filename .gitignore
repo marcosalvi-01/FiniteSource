@@ -7,8 +7,16 @@
 /.idea/workspace.xml
 /.idea/navEditor.xml
 /.idea/assetWizardSettings.xml
+/build/generate-resources/main/.openapi-generator
+/build/generate-resources/main/docs
+/build/generate-resources/main/gradle
+/build/generate-resources/main/.openapi-generator-ignore
+/build/generate-resources/main/build.gradle
+/build/generate-resources/main/settings.gradle
+/build/generate-resources/main/gradlew
+/build/generate-resources/main/gradlew.bat
+/build/generate-resources/main/readme.md
 .DS_Store
-/build
 /captures
 .externalNativeBuild
 .cxx

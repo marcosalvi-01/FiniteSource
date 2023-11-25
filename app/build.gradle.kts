@@ -18,7 +18,6 @@ android {
 
 		testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
 	}
-
 	buildTypes {
 		release {
 			isMinifyEnabled = false
@@ -34,6 +33,14 @@ android {
 	}
 	kotlinOptions {
 		jvmTarget = "1.8"
+	}
+	sourceSets {
+		sourceSets {
+			getByName("main").java.srcDirs("${rootDir}/build/generate-resources/main/src")
+		}
+	}
+	tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile>().configureEach {
+		dependsOn("openApiGenerate")
 	}
 }
 
@@ -54,6 +61,16 @@ dependencies {
 	val lifecycleVersion = "2.6.2"
 	implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:$lifecycleVersion")
 	implementation("androidx.lifecycle:lifecycle-livedata-ktx:$lifecycleVersion")
+
+	implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8:1.9.10")
+	implementation("org.jetbrains.kotlin:kotlin-reflect:1.9.10")
+	implementation("com.squareup.moshi:moshi-kotlin:1.15.0")
+	implementation("com.squareup.moshi:moshi-adapters:1.15.0")
+	implementation("com.squareup.okhttp3:logging-interceptor:4.12.0")
+	implementation("com.squareup.retrofit2:retrofit:2.9.0")
+	implementation("com.squareup.retrofit2:converter-moshi:2.9.0")
+	implementation("com.squareup.retrofit2:converter-scalars:2.9.0")
+	testImplementation("io.kotlintest:kotlintest-runner-junit5:3.4.2")
 
 	// other
 	implementation("androidx.core:core-ktx:1.12.0")

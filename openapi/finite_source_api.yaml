@@ -1,0 +1,662 @@
+openapi: 3.0.0
+info:
+  version: 1.0.0
+  title: INGV Finite Source Catalog
+  description: An access point to a catalog containing scientific data about international earthquakes.
+servers:
+  - url: https://transit.rm.ingv.it/files/sar/V1/
+tags:
+  - name: Configuration files
+    description: "The configuration files contain the list of the available providers for the scenarios, the color palette used to represent the slip in the finite source data and some general data about the whole API."
+  - name: Catalog
+    description: "The catalog contains a folder for each event named using the event id. Each folder contains the products of the event."
+  - name: Event
+    description: "The event folder contains a JSON file with some details about the event and a folder for each product available for the event."
+  - name: Finite source
+    description: "The finite source product is the central product of the catalog. It contains both images and texts describing the finite source of the event. It also contains a GeoJson file with the finite source data and a .zip file with all the data used to create the images and texts. If for an event the finite source product is not available, the folder is not present."
+  - name: Scenarios
+    description: "The scenarios product is a collection of preliminar scenarios of the event. Each scenario is identified by its provider. Each scenario can contain images and texts describing the scenario. If for an event the scenarios product is not available, the folder is not present."
+  - name: Footprint
+    description: "The footprint product contains the image and the description of the footprint of the event. If for an event the footprint product is not available, the folder is not present."
+  - name: Finite source Android App
+    description: "The Finite source Android App is an Android application that allows to visualize the finite source and the other product of an the event on a map. In this folder there are custom JSON files containing the same data in the catalog but in a format to make the visualization on the map easier and faster."
+
+components:
+  parameters:
+    EventId:
+      name: eventId
+      in: path
+      required: true
+      description: The id of the event.
+      example: "202310070712_01"
+      schema:
+        type: string
+        example: "201511170710_01"
+    Language:
+      name: language
+      in: path
+      required: true
+      description: The language of the description.
+      example: "it"
+      schema:
+        type: string
+        example: "it"
+        enum: [it, en]
+    FocalPlane:
+      name: focalPlane
+      in: path
+      required: true
+      description: The focal plane of the finite source.
+      example: FP1
+      schema:
+        type: string
+        example: FP1
+        enum: [FP1, FP2]
+    ScenarioId:
+      name: scenarioId
+      in: path
+      required: true
+      description: The id of the scenario.
+      example: USGS
+      schema:
+        type: string
+        example: USGS
+    GeoJsonFileName:
+      name: geoJsonFileName
+      in: path
+      required: true
+      description: The name of the GeoJson file. It is found in the config/GenericConfig.json file.
+      example: finite_source.json
+      schema:
+        type: string
+        example: finite_source.json
+
+  schemas:
+    id_event:
+      type: string
+      description: Unique identifier of the event
+      example: "201504250611_01"
+    name:
+      type: string
+      description: The name of the event
+      example: "Costa Greca Ionica (GRECIA)"
+    bounding_box:
+      type: array
+      items:
+        type: string
+      minItems: 4
+      maxItems: 4
+      example: [38.37522, 20.42148, 38.77527, 20.60164]
+      description: "The bounding box of the event. The order of the coordinates is: South, West, North, East."
+
+paths:
+  # Configuration files
+  /config/FocalMechanismProviders.json:
+    get:
+      tags:
+        - Configuration files
+      summary: The list of the possible providers for the scenarios of an event
+      description: "The list of the possible providers for the scenarios of an event. The providers are identified by their id."
+      responses:
+        "200":
+          description: Successful operation
+          content:
+            json:
+              schema:
+                type: array
+                items:
+                  properties:
+                    id:
+                      type: string
+                      example: GFZ
+                      description: The id of the provider.
+                    name:
+                      type: string
+                      example: Geofon GFZ
+                      description: The name of the provider.
+                    url:
+                      type: string
+                      format: url
+                      example: https://geofon.gfz-potsdam.de/
+                      description: The URL of the provider.
+  /config/slip_color_palette.json:
+    get:
+      tags:
+        - Configuration files
+      summary: The color palette used to represent the slip in the finite source data
+      description: "The color palette used to represent the slip in the finite source data. The color palette is an array of hexadecimal colors including the alpha value. The first color is used for the slip value 0, the last color is used for the slip value 1. The colors in between are used for the intermediate values."
+      responses:
+        "200":
+          description: Successful operation
+          content:
+            json:
+              schema:
+                # TODO: make sure that the schema is correct
+                type: array
+                items:
+                  type: string
+                  minimum: 256
+                  maximum: 256
+                  example: "#FF830000"
+                  description: The color in hexadecimal format including the alpha value.
+  /config/GeneralConfig.json:
+    get:
+      tags:
+        - Configuration files
+      summary: A JSON file that contains some general data about the whole API
+      description: "The configuration contains the list of the available languages, the URL of the INGV server to append the INGV event id, the name of the GeoJson file containing the finite source data to plot on a map, the version of the color palette used to represent the slip in the finite source data and the list of the id of the possible available products for the events in the catalog. "
+      responses:
+        "200":
+          description: Successful operation
+          content:
+            json:
+              schema:
+                type: object
+                properties:
+                  languages:
+                    type: array
+                    example: [it, en]
+                    items:
+                      type: string
+                      description: The list of the available languages.
+                  server_ingv_it:
+                    type: string
+                    format: url
+                    example: http://terremoti.ingv.it/event/
+                    description: The URL of the INGV server to append the INGV event id.
+                  server_ingv_en:
+                    type: string
+                    format: url
+                    example: http://terremoti.ingv.it/en/event/
+                    description: The URL of the INGV server to append the INGV event id.
+                  source_geojson:
+                    type: string
+                    example: Finite_source.json
+                    description: The name of the GeoJson file containing the finite source data to plot on a map.
+                  slip_palette_version:
+                    type: integer
+                    example: 1
+                    description: The version of the color palette used to represent the slip in the finite source data. This is useful to force the update of the color palette in the client.
+                  products_list:
+                    type: array
+                    example: [finitesource, scenarios, footprint]
+                    description: The list of the id of the possible available products for the events in the catalog.
+                    items:
+                      type: string
+  # Catalog
+  /Catalog/event_list.json:
+    # TODO: make sure that the schema is correct, maybe we also need the ingv id (might be useful for the web page)
+    get:
+      tags:
+        - Catalog
+      summary: The list of the events in the catalog
+      description: "The list of the events in the catalog. The list is a JSON file containing an array with all the id of the events in the catalog."
+      responses:
+        "200":
+          description: Successful operation
+          content:
+            json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/id_event"
+  # Event
+  /Catalog/{eventId}/event_details.json:
+    get:
+      tags:
+        - Event
+      summary: The details of the event
+      description: All the details of the event like the id, the date, the magnitude, the depth, the location, the number of the scenarios and the number of the finite sources.
+      parameters:
+        - $ref: "#/components/parameters/EventId"
+      responses:
+        "200":
+          description: Successful operation
+          content:
+            json:
+              schema:
+                type: object
+                properties:
+                  name:
+                    type: string
+                    example: "Costa Greca Ionica (GRECIA)"
+                    description: The name of the event.
+                  id:
+                    $ref: "#/components/schemas/id_event"
+                  longitude:
+                    $ref: "https://ingv.github.io/openapi/definitions.yaml#/components/schemas/longitude"
+                  latitude:
+                    $ref: "https://ingv.github.io/openapi/definitions.yaml#/components/schemas/latitude"
+                  depth:
+                    $ref: "https://ingv.github.io/openapi/definitions.yaml#/components/schemas/depth"
+                  occuring_time:
+                    $ref: "https://ingv.github.io/openapi/definitions.yaml#/components/schemas/origin__ot"
+                  magnitude:
+                    $ref: "https://ingv.github.io/openapi/definitions.yaml#/components/schemas/magnitude"
+                    example: 6.5
+                  mag_type:
+                    $ref: "https://ingv.github.io/openapi/definitions.yaml#/components/schemas/type_magnitude__name"
+                  bounding_box:
+                    $ref: "#/components/schemas/bounding_box"
+                  products:
+                    type: array
+                    items:
+                      type: string
+                    minItems: 1
+                    example: [finitesource, scenarios, footprint]
+                    description: "The list of the id of the available products for the event."
+                  id_ingv:
+                    $ref: "https://ingv.github.io/openapi/definitions.yaml#/components/schemas/id"
+                  focal_plane:
+                    type: integer
+                    format: number
+                    example: 1
+                    minimum: 0
+                    maximum: 2
+                    description: "The number of focal planes available for the event. 0: both FP1 and FP2 available, 1: only FP1 available, 2: only FP2 available"
+  # Finite source
+  /Catalog/{eventId}/INVERSE/InversionDescription_{language}.txt:
+    get:
+      tags:
+        - Finite source
+      summary: The description of the finite source of the event
+      description: "The description of the finite source of the event. The description is a text file."
+      parameters:
+        - $ref: "#/components/parameters/EventId"
+        - $ref: "#/components/parameters/Language"
+      responses:
+        "200":
+          description: Successful operation
+          content:
+            text/plain:
+              schema:
+                type: string
+                format: binary
+                description: The description of the finite source of the event.
+  /Catalog/{eventId}/INVERSE/{focalPlane}/finite_source_details.json:
+    get:
+      summary: The details of the finite source of the event
+      description: "The details of the finite source of the event. The details are the same for both the focal planes."
+      tags:
+        - Finite source
+      parameters:
+        - $ref: "#/components/parameters/EventId"
+        - $ref: "#/components/parameters/FocalPlane"
+      responses:
+        "200":
+          description: Successful operation
+          content:
+            json:
+              schema:
+                type: object
+                properties:
+                  last_updated:
+                    $ref: "https://ingv.github.io/openapi/definitions.yaml#/components/schemas/modified"
+                  maximum_slip:
+                    type: number
+                    format: double
+                    example: 1.823
+                    description: The maximum slip value of the finite source of the event in meters.
+                  minimum_slip:
+                    type: number
+                    format: double
+                    example: 0.000
+                    description: The minimum slip value of the finite source of the event in meters.
+  /Catalog/{eventId}/INVERSE/{focalPlane}/data_and_model.zip:
+    get:
+      tags:
+        - Finite source
+      summary: The original data used to create the finite source of the event
+      description: "The original data used to create the finite source of the event. The data is contained in a .zip file."
+      parameters:
+        - $ref: "#/components/parameters/EventId"
+        - $ref: "#/components/parameters/FocalPlane"
+      responses:
+        "200":
+          description: Successful operation
+          content:
+            application/zip:
+              schema:
+                type: string
+                format: binary
+                description: The data and the model used to create the finite source of the event.
+  /Catalog/{eventId}/INVERSE/{focalPlane}/SOURCES/{geoJsonFileName}.json:
+    get:
+      tags:
+        - Finite source
+      summary: The finite source of the event
+      description: "The finite source of the event. The finite source is a GeoJson file. The GeoJson file contains a FeatureCollection with a Feature for each polygon of the finite source. Every Polygon has two properties, the slip and the rake. The GeoJson also contains the trace of the fault as a MultiLineString. The properties of the trace are empty."
+      parameters:
+        - $ref: "#/components/parameters/EventId"
+        - $ref: "#/components/parameters/FocalPlane"
+        - name: geoJsonFileName
+          in: path
+          required: true
+          description: The name of the GeoJson file. It is found in the /config/GeneralConfig.json file. It is the same for all the events.
+          example: finite_source.json
+          schema:
+            type: string
+            example: finite_source.json
+      responses:
+        "200":
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  type:
+                    type: string
+                    example: FeatureCollection
+                    description: The type of the GeoJson file.
+                  features:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        type:
+                          type: string
+                          example: Feature
+                          description: The type of the GeoJson feature.
+                        geometry:
+                          type: object
+                          properties:
+                            type:
+                              type: string
+                              example: Polygon
+                              description: The type of the GeoJson geometry.
+                            coordinates:
+                              type: array
+                              items:
+                                type: array
+                                items:
+                                  type: number
+                                  format: double
+                                  description: The coordinates of the polygon.
+                                  example: [85.745, 27.459, -7240.800]
+                        properties:
+                          type: object
+                          properties:
+                            slip_m:
+                              type: number
+                              format: double
+                              nullable: true
+                              description: The slip value of the polygon in meters.
+                              example: 1.028
+                            rake_d:
+                              type: number
+                              format: double
+                              nullable: true
+                              description: The rake value of the polygon.
+                              example: 137.44
+  /Catalog/{eventId}/INVERSE/{focalPlane}/GRAPHICS/MainInversionMap.jpg:
+    get:
+      tags:
+        - Finite source
+      summary: The main inversion map of the finite source of the event
+      description: "The main inversion map of the finite source of the event. The image is a JPEG file."
+      parameters:
+        - $ref: "#/components/parameters/EventId"
+        - $ref: "#/components/parameters/FocalPlane"
+      responses:
+        "200":
+          description: Successful operation
+          content:
+            image/jpeg:
+              schema:
+                type: string
+                format: binary
+                description: The main inversion map of the finite source of the event.
+  /Catalog/{eventId}/INVERSE/{focalPlane}/GRAPHICS/SlipDistribution.jpg:
+    get:
+      tags:
+        - Finite source
+      summary: The slip distribution of the finite source of the event
+      description: "The slip distribution of the finite source of the event. The image is a JPEG file."
+      parameters:
+        - $ref: "#/components/parameters/EventId"
+        - $ref: "#/components/parameters/FocalPlane"
+      responses:
+        "200":
+          description: Successful operation
+          content:
+            image/jpeg:
+              schema:
+                type: string
+                format: binary
+                description: The slip distribution of the finite source of the event.
+  ? /Catalog/{eventId}/INVERSE/{focalPlane}/GRAPHICS/ResultDescription_{language}.txt
+  : get:
+      tags:
+        - Finite source
+      summary: The description of the images of the finite source of the event
+      description: "The description of the images of the finite source of the event. The description is a text file."
+      parameters:
+        - $ref: "#/components/parameters/EventId"
+        - $ref: "#/components/parameters/FocalPlane"
+        - $ref: "#/components/parameters/Language"
+      responses:
+        "200":
+          description: Successful operation
+          content:
+            text/plain:
+              schema:
+                type: string
+                format: binary
+                description: The description of the images of the finite source of the event.
+  # Scenarios
+  /Catalog/{eventId}/FOC_MECH_FOW/FocMechFowDescription_{language}.txt:
+    get:
+      tags:
+        - Scenarios
+      summary: The description of the scenarios of the event
+      description: "The description of the scenarios of the event. The description is a text file."
+      parameters:
+        - $ref: "#/components/parameters/EventId"
+        - $ref: "#/components/parameters/Language"
+      responses:
+        "200":
+          description: Successful operation
+          content:
+            text/plain:
+              schema:
+                type: string
+                format: binary
+                description: The description of the scenarios of the event.
+  /Catalog/{eventId}/FOC_MECH_FOW/scenario_details.json:
+    get:
+      summary: The details of the scenario product for the event
+      description: "The details of the scenario product for the event."
+      tags:
+        - Scenarios
+      parameters:
+        - $ref: "#/components/parameters/EventId"
+      responses:
+        "200":
+          description: Successful operation
+          content:
+            json:
+              schema:
+                type: object
+                properties:
+                  last_updated:
+                    $ref: "https://ingv.github.io/openapi/definitions.yaml#/components/schemas/modified"
+                  providers:
+                    type: array
+                    items:
+                      type: string
+                    minItems: 1
+                    example: [GFZ, USGS, INGV]
+                    description: "The list of the id of the available providers for the scenario."
+  ? /Catalog/{eventId}/FOC_MECH_FOW/{scenarioId}/{focalPlane}/graphics/DisplacementMap.jpg
+  : get:
+      tags:
+        - Scenarios
+      summary: The displacement map of the scenario of the event
+      description: "The displacement map of the scenario of the event. The image is a JPEG file. This file might not be available for all the events. If this file is available, the displacement map description is also available."
+      parameters:
+        - $ref: "#/components/parameters/EventId"
+        - $ref: "#/components/parameters/ScenarioId"
+        - $ref: "#/components/parameters/FocalPlane"
+      responses:
+        "200":
+          description: Successful operation
+          content:
+            image/jpeg:
+              schema:
+                type: string
+                format: binary
+                description: The displacement map of the scenario of the event.
+  ? /Catalog/{eventId}/FOC_MECH_FOW/{scenarioId}/{focalPlane}/graphics/PredictedFringes.jpg
+  : get:
+      tags:
+        - Scenarios
+      summary: The predicted fringes of the scenario of the event
+      description: "The predicted fringes of the scenario of the event. The image is a JPEG file. This file might not be available for all the events. If this file is available, the predicted fringes description is also available."
+      parameters:
+        - $ref: "#/components/parameters/EventId"
+        - $ref: "#/components/parameters/ScenarioId"
+        - $ref: "#/components/parameters/FocalPlane"
+      responses:
+        "200":
+          description: Successful operation
+          content:
+            image/jpeg:
+              schema:
+                type: string
+                format: binary
+                description: The predicted fringes of the scenario of the event.
+  ? /Catalog/{eventId}/FOC_MECH_FOW/{scenarioId}/{focalPlane}/graphics/DisplacementMap_{language}.txt
+  : get:
+      tags:
+        - Scenarios
+      summary: The description of the displacement map of the scenario of the event
+      description: "The description of the displacement map of the scenario of the event. The description is a text file. This file might not be available for all the events. If this file is available, the displacement map image is also available."
+      parameters:
+        - $ref: "#/components/parameters/EventId"
+        - $ref: "#/components/parameters/ScenarioId"
+        - $ref: "#/components/parameters/FocalPlane"
+        - $ref: "#/components/parameters/Language"
+      responses:
+        "200":
+          description: Successful operation
+          content:
+            text/plain:
+              schema:
+                type: string
+                format: binary
+                description: The description of the displacement map of the scenario of the event.
+  ? /Catalog/{eventId}/FOC_MECH_FOW/{scenarioId}/{focalPlane}/graphics/PredictedFringes_{language}.txt
+  : get:
+      tags:
+        - Scenarios
+      summary: The description of the predicted fringes of the scenario of the event
+      description: "The description of the predicted fringes of the scenario of the event. The description is a text file. This file might not be available for all the events. If this file is available, the predicted fringes image is also available."
+      parameters:
+        - $ref: "#/components/parameters/EventId"
+        - $ref: "#/components/parameters/ScenarioId"
+        - $ref: "#/components/parameters/FocalPlane"
+        - $ref: "#/components/parameters/Language"
+      responses:
+        "200":
+          description: Successful operation
+          content:
+            text/plain:
+              schema:
+                type: string
+                format: binary
+                description: The description of the predicted fringes of the scenario of the event.
+  # Footprint
+  /Catalog/{eventId}/ANCILLARY/footprints_details.json:
+    get:
+      summary: The details of the footprint product for the event
+      description: "The details of the footprint product for the event."
+      tags:
+        - Footprint
+      parameters:
+        - $ref: "#/components/parameters/EventId"
+      responses:
+        "200":
+          description: Successful operation
+          content:
+            json:
+              schema:
+                type: object
+                properties:
+                  last_updated:
+                    $ref: "https://ingv.github.io/openapi/definitions.yaml#/components/schemas/modified"
+  /Catalog/{eventId}/ANCILLARY/SentinelFootprint.jpg:
+    get:
+      tags:
+        - Footprint
+      summary: The image for the footprint of the event
+      description: "The image for the footprint of the event. The image is a JPEG file."
+      parameters:
+        - $ref: "#/components/parameters/EventId"
+      responses:
+        "200":
+          description: Successful operation
+          content:
+            image/jpeg:
+              schema:
+                type: string
+                format: binary
+                description: The footprint of the event.
+  /Catalog/{eventId}/ANCILLARY/FootprintDescription_{language}.txt:
+    get:
+      tags:
+        - Footprint
+      summary: The description of the footprint of the event
+      description: "The description of the footprint of the event. The description is a text file."
+      parameters:
+        - $ref: "#/components/parameters/EventId"
+        - $ref: "#/components/parameters/Language"
+      responses:
+        "200":
+          description: Successful operation
+          content:
+            text/plain:
+              schema:
+                type: string
+                format: binary
+                description: The description of the footprint of the event.
+  # Finite source Android App
+  /Finite_source_app/app.json:
+    get:
+      summary: A JSON file that contains all the data necessary to the initial visualization of the events on the map
+      description: "A JSON file that contains all the data necessary to the initial visualization of the events on the map. The JSON file contains an array of objects. Each object contains the data of an event. The data in this file is the same as the data in the catalog but put together to avoid multiple requests to the server."
+      tags:
+        - Finite source Android App
+      responses:
+        "200":
+          description: Successful operation
+          content:
+            json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    id_event:
+                      $ref: "#/components/schemas/id_event"
+                    name:
+                      $ref: "#/components/schemas/name"
+                    occuring_time:
+                      $ref: "https://ingv.github.io/openapi/definitions.yaml#/components/schemas/origin__ot"
+                    longitude:
+                      $ref: "https://ingv.github.io/openapi/definitions.yaml#/components/schemas/longitude"
+                    latitude:
+                      $ref: "https://ingv.github.io/openapi/definitions.yaml#/components/schemas/latitude"
+                    depth:
+                      $ref: "https://ingv.github.io/openapi/definitions.yaml#/components/schemas/depth"
+                    bounding_box:
+                      $ref: "#/components/schemas/bounding_box"
+                    finite_source_last_updated:
+                      nullable: true
+                      description: The date of the last update of the product or the date of the time it was published if never updated. If the product is not available, this field is null.
+                      type: string
+                      format: date-time
+                      example: "2016-06-22T16:52:06.260Z"
+                    magnitude:
+                      $ref: "https://ingv.github.io/openapi/definitions.yaml#/components/schemas/magnitude"
+                      example: 6.5
