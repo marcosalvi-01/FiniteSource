@@ -6,7 +6,6 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.ViewModelProvider
 import com.example.finitesource.viewmodels.EarthquakesViewModel
 import dagger.hilt.android.AndroidEntryPoint
-import main.kotlin.org.openapitools.client.infrastructure.ApiClient
 
 @AndroidEntryPoint
 class MainActivity : AppCompatActivity() {

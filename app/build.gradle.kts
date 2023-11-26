@@ -3,6 +3,7 @@ plugins {
 	id("org.jetbrains.kotlin.android")
 	id("com.google.devtools.ksp")
 	id("com.google.dagger.hilt.android")
+	id("org.openapi.generator")
 }
 
 android {
@@ -35,12 +36,7 @@ android {
 		jvmTarget = "1.8"
 	}
 	sourceSets {
-		sourceSets {
-			getByName("main").java.srcDirs("${rootDir}/build/generate-resources/main/src")
-		}
-	}
-	tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile>().configureEach {
-		dependsOn("openApiGenerate")
+		getByName("main").java.srcDirs("${buildDir}/generate-resources/main/src")
 	}
 }
 
@@ -83,3 +79,12 @@ dependencies {
 	androidTestImplementation("androidx.test.ext:junit:1.1.5")
 	androidTestImplementation("androidx.test.espresso:espresso-core:3.5.1")
 }
+
+
+openApiGenerate {
+	inputSpec.set("$rootDir/openapi/finite_source_api.yaml")
+	generatorName.set("kotlin")
+	library.set("jvm-retrofit2")
+}
+
+// TODO find a way to run this task automatically before compilation
