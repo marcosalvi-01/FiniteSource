@@ -1,4 +1,4 @@
-package com.example.finitesource.data
+package com.example.finitesource.data.earthquake
 
 import androidx.room.Dao
 import androidx.room.Insert

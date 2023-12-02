@@ -1,5 +1,8 @@
 package com.example.finitesource.data
 
+import com.example.finitesource.data.earthquake.Earthquake
+import com.example.finitesource.data.earthquake.EarthquakeDetails
+import com.example.finitesource.data.earthquake.Footprints
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertThrows
 import org.junit.Test
@@ -28,9 +31,11 @@ internal class EarthquakeTest {
 				"201504250611_01",
 				"Nepal",
 				Calendar.getInstance(),
-				null,
-				null,
-				Footprint("201504250611_01"),
+				EarthquakeDetails(
+					null,
+					null,
+					Footprints("", ""),
+				)
 			)
 		}
 

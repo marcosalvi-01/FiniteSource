@@ -87,7 +87,7 @@ openApiGenerate {
 	generatorName.set("kotlin")
 	library.set("jvm-retrofit2")
 }
-// TODO find a way to run this task automatically before compilation
+
 tasks.preBuild {
 	dependsOn("openApiGenerate")
 }

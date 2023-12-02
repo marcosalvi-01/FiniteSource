@@ -2,7 +2,7 @@ package com.example.finitesource.di
 
 import android.content.Context
 import com.example.finitesource.data.AppDatabase
-import com.example.finitesource.data.EarthquakeDao
+import com.example.finitesource.data.earthquake.EarthquakeDao
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn

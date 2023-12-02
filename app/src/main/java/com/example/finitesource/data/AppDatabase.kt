@@ -5,33 +5,17 @@ import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
-import androidx.sqlite.db.SupportSQLiteDatabase
-import java.util.Calendar
+import com.example.finitesource.data.earthquake.Earthquake
+import com.example.finitesource.data.earthquake.EarthquakeDao
+import com.example.finitesource.data.earthquake.focalplane.ScenarioType
 
-@Database(entities = [Earthquake::class, FocalPlane::class, Footprint::class], version = 1)
+@Database(
+	entities = [Earthquake::class, ScenarioType::class],
+	version = 2,
+)
 @TypeConverters(Converters::class)
 abstract class AppDatabase : RoomDatabase() {
 	abstract fun earthquakeDao(): EarthquakeDao
-
-	private class EarthquakeDatabaseCallback : Callback() {
-		override fun onOpen(db: SupportSQLiteDatabase) {
-			super.onOpen(db)
-			// Update the database using the data from the API
-			instance?.let { database ->
-				// TODO
-				database.earthquakeDao().insert(
-					Earthquake(
-						"1",
-						"2021-01-01T00:00:00.000Z",
-						Calendar.getInstance(),
-						FP1("1"),
-						null,
-						Footprint("1")
-					)
-				)
-			}
-		}
-	}
 
 	companion object {
 		@Volatile
@@ -42,7 +26,7 @@ abstract class AppDatabase : RoomDatabase() {
 				context,
 				AppDatabase::class.java,
 				"earthquake_database"
-			).addCallback(EarthquakeDatabaseCallback())
+			).fallbackToDestructiveMigration()
 				.build().also { instance = it }
 		}
 	}
