@@ -8,6 +8,7 @@ import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
+import org.openapitools.client.infrastructure.ApiClient
 import javax.inject.Singleton
 
 @InstallIn(SingletonComponent::class)
@@ -25,4 +26,8 @@ class DatabaseModule {
 		return appDatabase.earthquakeDao()
 	}
 
+	@Provides
+	fun provideApiClient(): ApiClient {
+		return ApiClient()
+	}
 }

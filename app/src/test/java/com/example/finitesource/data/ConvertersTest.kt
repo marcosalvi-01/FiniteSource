@@ -17,12 +17,12 @@ internal class ConvertersTest {
 	}
 
 	@Test
-	fun calendarToDatestamp() {
+	fun `test Calendar to Timestamp`() {
 		assertEquals(cal.timeInMillis, Converters().calendarToDatestamp(cal))
 	}
 
 	@Test
-	fun datestampToCalendar() {
+	fun `test Timestamp to Calendar`() {
 		assertEquals(Converters().datestampToCalendar(cal.timeInMillis), cal)
 	}
 }

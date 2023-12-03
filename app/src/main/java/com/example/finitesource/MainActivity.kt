@@ -27,6 +27,7 @@ class MainActivity : AppCompatActivity() {
 					"Failed to update earthquakes",    // TODO: use snackbar
 					Toast.LENGTH_SHORT
 				).show()
+			Log.d("MainActivity", "Updates: $it")
 		}
 
 		earthquakesViewModel.earthquakes.observe(this) {

@@ -5,16 +5,17 @@ import com.example.finitesource.data.earthquake.EarthquakeDao
 import com.example.finitesource.data.earthquake.EarthquakeUpdates
 import com.example.finitesource.data.earthquake.toEarthquake
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.withContext
 import org.openapitools.client.apis.FiniteSourceAndroidAppApi
 import org.openapitools.client.infrastructure.ApiClient
-import retrofit2.HttpException
 import retrofit2.Response
-import java.io.IOException
 import javax.inject.Inject
 
-class EarthquakesRepository @Inject constructor(private val earthquakeDao: EarthquakeDao) {
+class EarthquakesRepository @Inject constructor(
+	private val earthquakeDao: EarthquakeDao,
+	private val apiClient: ApiClient
+) {
 
 	fun getAll() = earthquakeDao.getAll()
 	fun getById(id: String) = earthquakeDao.getById(id)
@@ -23,11 +24,11 @@ class EarthquakesRepository @Inject constructor(private val earthquakeDao: Earth
 	// returns the differences that are supposed to be shown to the user
 	suspend fun updateEarthquakes(): EarthquakeUpdates? {
 		// build the request
-		val request = ApiClient()
+		val request = apiClient
 			.createService(FiniteSourceAndroidAppApi::class.java)
 			.finiteSourceAppAppJsonGet()
 		// make a network call to get the latest data
-		val response = safeApiCall {
+		val response = apiCall {
 			request.execute()
 		}
 		// initialize the updates
@@ -37,16 +38,16 @@ class EarthquakesRepository @Inject constructor(private val earthquakeDao: Earth
 			// if the network call was successful, compare the data
 			is Resource.Success -> {
 				// get the saved earthquakes
-				earthquakeDao.getAll().collectLatest { savedEarthquakes ->
-					// map the loaded earthquakes to the database model
-					val loadedEarthquakes = response.data!!.mapNotNull { toEarthquake(it) }
-					// get the differences
-					updates = getDifferences(loadedEarthquakes, savedEarthquakes)
-					// if there are any updates
-					if (updates!!.hasUpdates())
-					// update the database
-						earthquakeDao.upsertAll(loadedEarthquakes)
-				}
+				val savedEarthquakes = earthquakeDao.getAll().first()
+				// map the loaded earthquakes to the database model
+				val loadedEarthquakes = response.data!!.mapNotNull { toEarthquake(it) }
+				// get the differences
+				updates = getDifferences(loadedEarthquakes, savedEarthquakes)
+				// if there are any updates
+				if (updates.hasUpdates())
+				// update the database
+					earthquakeDao.upsertAll(loadedEarthquakes)
+
 			}
 
 			else -> {
@@ -60,9 +61,9 @@ class EarthquakesRepository @Inject constructor(private val earthquakeDao: Earth
 		@Volatile
 		private var instance: EarthquakesRepository? = null
 
-		fun getInstance(earthquakeDao: EarthquakeDao) =
+		fun getInstance(earthquakeDao: EarthquakeDao, apiClient: ApiClient) =
 			instance ?: synchronized(this) {
-				instance ?: EarthquakesRepository(earthquakeDao).also { instance = it }
+				instance ?: EarthquakesRepository(earthquakeDao, apiClient).also { instance = it }
 			}
 	}
 }
@@ -77,12 +78,15 @@ private fun getDifferences(
 	val oldIds = savedEarthquakes.map { it.id }
 	val newEarthquakes = newIds.filter { it !in oldIds }
 
-	// Check for wich events the finite source has been updated
+	// Check for which events the finite source has been updated
 	val updatedEarthquakes = loadedEarthquakes.filter { new ->
 		savedEarthquakes.any { old ->
-			new.id == old.id && new.finiteSourceLastUpdate?.after(
-				old.finiteSourceLastUpdate
-			) ?: false
+			// if the ids are not the same, skip
+			if (new.id != old.id) return@any false
+			// if the old event has no finite source, but the new one has one, return true
+			if (old.finiteSourceLastUpdate == null && new.finiteSourceLastUpdate != null) return@any true
+			// if the new event has a finite source more recent than the old one, return true, false otherwise
+			new.finiteSourceLastUpdate?.after(old.finiteSourceLastUpdate) ?: false
 		}
 	}
 
@@ -95,21 +99,23 @@ private fun getDifferences(
 	)
 }
 
-// Function to make a safe api call
-private suspend fun <T> safeApiCall(apiToBeCalled: suspend () -> Response<T>): Resource<T> {
+// function to make a network call and return a Resource in a coroutine
+private suspend fun <T> safeApiCall(apiToBeCalled: () -> Response<T>): Resource<T> {
 	return withContext(Dispatchers.IO) {
-		try {
-			val response: Response<T> = apiToBeCalled()
-			if (response.isSuccessful)
-				Resource.Success(data = response.body()!!)
-			else
-				Resource.Error(errorMessage = "Something went wrong")
-		} catch (e: HttpException) {
-			Resource.Error(errorMessage = e.message ?: "Something went wrong")
-		} catch (e: IOException) {
-			Resource.Error("Please check your network connection")
-		} catch (e: Exception) {
+		apiCall(apiToBeCalled)
+	}
+}
+
+// function to make a network call and return a Resource
+private fun <T> apiCall(apiToBeCalled: () -> Response<T>): Resource<T> {
+	return try {
+		val response: Response<T> = apiToBeCalled()
+		if (response.isSuccessful)
+			Resource.Success(data = response.body()!!)
+		else
 			Resource.Error(errorMessage = "Something went wrong")
-		}
+		// TODO handle errors
+	} catch (e: Exception) {
+		Resource.Error(errorMessage = "Something went wrong")
 	}
 }

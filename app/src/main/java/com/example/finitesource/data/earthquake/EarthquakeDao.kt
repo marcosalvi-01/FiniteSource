@@ -19,4 +19,7 @@ interface EarthquakeDao {
 
 	@Insert
 	fun insert(earthquake: Earthquake)
+
+	@Insert
+	fun insertAll(earthquakes: List<Earthquake>)
 }

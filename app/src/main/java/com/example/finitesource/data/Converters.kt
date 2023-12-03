@@ -1,6 +1,6 @@
 package com.example.finitesource.data
 
-import android.icu.util.Calendar
+import java.util.Calendar
 import androidx.room.TypeConverter
 import com.example.finitesource.data.earthquake.focalplane.Scenario
 import com.example.finitesource.data.earthquake.focalplane.ScenarioType
