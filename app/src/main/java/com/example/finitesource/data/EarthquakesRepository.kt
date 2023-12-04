@@ -31,8 +31,6 @@ class EarthquakesRepository @Inject constructor(
 		val response = apiCall {
 			request.execute()
 		}
-		// initialize the updates
-		var updates: EarthquakeUpdates? = null
 		// use the response
 		when (response) {
 			// if the network call was successful, compare the data
@@ -42,19 +40,19 @@ class EarthquakesRepository @Inject constructor(
 				// map the loaded earthquakes to the database model
 				val loadedEarthquakes = response.data!!.mapNotNull { toEarthquake(it) }
 				// get the differences
-				updates = getDifferences(loadedEarthquakes, savedEarthquakes)
+				val updates = getDifferences(loadedEarthquakes, savedEarthquakes)
 				// if there are any updates
 				if (updates.hasUpdates())
 				// update the database
 					earthquakeDao.upsertAll(loadedEarthquakes)
-
+				return updates
 			}
 
 			else -> {
 				// if the network call failed, return null
+				return null
 			}
 		}
-		return updates
 	}
 
 	companion object {
