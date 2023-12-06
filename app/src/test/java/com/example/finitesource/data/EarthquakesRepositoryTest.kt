@@ -174,7 +174,7 @@ class EarthquakesRepositoryTest {
 
 	// function to create a mockk of the database that returns the test earthquakes
 	private fun mockkEarthquakeRepository(testEarthquakes: List<Earthquake>): EarthquakesRepository {
-		val mockEarthquakeDao = mockk<EarthquakeDao>()
+		val mockEarthquakeDao = mockk<EarthquakeDao>(relaxed = true)
 		every { mockEarthquakeDao.getAll() } returns flow { emit(testEarthquakes) }
 		every { mockEarthquakeDao.upsertAll(any()) } returns Unit
 		every { mockEarthquakeDao.getById(any()) } returns flow {

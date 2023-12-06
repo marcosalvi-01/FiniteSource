@@ -30,10 +30,14 @@ class MainActivity : AppCompatActivity() {
 			Log.d("MainActivity", "Updates: $it")
 		}
 
-		earthquakesViewModel.earthquakes.observe(this) {
-			Log.d("MainActivity", "Earthquakes: ${it.size}")
-			if (it.isNotEmpty())
-				earthquakesViewModel.selectEarthquake(it[0])
+		earthquakesViewModel.earthquakes.observe(this) { earthquakes ->
+			Log.d("MainActivity", "Earthquakes: ${earthquakes.size}")
+			if (earthquakes.isNotEmpty())
+				earthquakesViewModel.selectEarthquake(
+					earthquakes.first {
+						it.id == "202310110041_01"
+					}
+				)
 		}
 
 		earthquakesViewModel.uiState.observe(this) {

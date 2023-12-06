@@ -34,6 +34,10 @@ class EarthquakesViewModel @Inject constructor(
 			emit(repository.updateEarthquakes())
 		}
 
+	/**
+	 * Selects the earthquake and loads its details if necessary.
+	 * It throws an exception if there is an error loading the details.
+	 */
 	fun selectEarthquake(_earthquake: Earthquake, _focalPlaneType: FocalPlaneType? = null) {
 		// if the earthquake is already selected, do nothing
 		if (_earthquake == _uiState.value?.selectedEarthquake)
@@ -48,6 +52,7 @@ class EarthquakesViewModel @Inject constructor(
 				_uiState.postValue(UiState(earthquake, focalPlaneType, true))
 				// load the details
 				earthquake = repository.loadEarthquakeDetails(earthquake.id)
+					?: throw Exception("Failed to load earthquake details")
 				// if the focal plane type is not specified, use the default one
 				focalPlaneType =
 					_focalPlaneType ?: earthquake.details!!.getDefaultFocalPlane().focalPlaneType

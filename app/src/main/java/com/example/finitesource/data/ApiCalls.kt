@@ -4,6 +4,8 @@ import com.example.finitesource.data.earthquake.Earthquake
 import com.example.finitesource.data.earthquake.Footprints
 import com.example.finitesource.data.earthquake.focalplane.FiniteSource
 import com.example.finitesource.data.earthquake.focalplane.FocalPlaneType
+import com.example.finitesource.data.earthquake.focalplane.Scenario
+import com.example.finitesource.data.earthquake.focalplane.ScenarioType
 import com.example.finitesource.data.earthquake.focalplane.Scenarios
 import com.example.finitesource.getLocaleSuffix
 import kotlinx.coroutines.Dispatchers
@@ -16,41 +18,59 @@ import retrofit2.Call
 import javax.inject.Inject
 
 class ApiCalls @Inject constructor(private val apiClient: ApiClient) {
+
+	private val finiteSourceService = apiClient.createService(FiniteSourceApi::class.java)
+
 	// loads the finite source
 	fun getFiniteSource(earthquake: Earthquake, focalPlaneType: FocalPlaneType): FiniteSource? {
-		val finiteSourceService = apiClient.createService(FiniteSourceApi::class.java)
-		try {
-			return FiniteSource(
-				// inversion description
+		return try {
+			val inversionDescription =
 				finiteSourceService.catalogEventIdINVERSEInversionDescriptionLanguageTxtGet(
 					earthquake.id,
 					getLocaleSuffix()
-				).executeApiCall().string(),
-				// result description
+				).executeApiCall().string()
+
+			val resultDescription =
 				finiteSourceService.catalogEventIdINVERSEFocalPlaneGRAPHICSResultDescriptionLanguageTxtGet(
 					earthquake.id,
 					focalPlaneType.name,
 					getLocaleSuffix()
-				).executeApiCall().string(),
-				// main inversion map image url
+				).executeApiCall().string()
+
+			val mainInversionMapImageUrl =
 				finiteSourceService.catalogEventIdINVERSEFocalPlaneGRAPHICSMainInversionMapJpgGet(
 					earthquake.id,
 					getLocaleSuffix()
-				).request().url.toString(),
-				// slip distribution image url
+				).request().url.toString()
+
+			val slipDistributionImageUrl =
 				finiteSourceService.catalogEventIdINVERSEFocalPlaneGRAPHICSMainInversionMapJpgGet(
 					earthquake.id,
 					getLocaleSuffix()
-				).request().url.toString(),
+				).request().url.toString()
+
+			FiniteSource(
+				inversionDescription,
+				resultDescription,
+				mainInversionMapImageUrl,
+				slipDistributionImageUrl
 			)
 		} catch (e: Exception) {
-			// TODO handle the error
-			return null
+			e.printStackTrace()
+			null
 		}
 	}
 
 	fun getScenarios(earthquake: Earthquake, focalPlaneType: FocalPlaneType): Scenarios? {
-		return null
+		// TODO
+		return Scenarios(
+			listOf(
+				Scenario(
+					ScenarioType("1", "2", "3"),
+					"4", "5", "6", "7"
+				)
+			)
+		)
 	}
 
 	fun getFootprints(earthquake: Earthquake): Footprints {

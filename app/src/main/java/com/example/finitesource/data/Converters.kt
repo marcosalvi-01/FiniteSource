@@ -27,7 +27,9 @@ class Converters {
 	}
 
 	@TypeConverter
-	fun scenarioToString(scenario: Scenario): String = scenario.toString()
+	fun scenarioToString(scenario: Scenario): String {
+		return scenario.toString()
+	}
 
 	@TypeConverter
 	fun stringToScenario(value: String): Scenario {
