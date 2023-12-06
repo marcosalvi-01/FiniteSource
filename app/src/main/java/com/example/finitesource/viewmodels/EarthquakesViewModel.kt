@@ -38,8 +38,8 @@ class EarthquakesViewModel @Inject constructor(
 		// if the earthquake is already selected, do nothing
 		if (_earthquake == _uiState.value?.selectedEarthquake)
 			return
-		var focalPlaneType = _focalPlaneType
 		var earthquake = _earthquake
+		var focalPlaneType: FocalPlaneType? = null
 		// select the earthquake
 		// if the selected earthquake doesn't have the details
 		if (earthquake.details == null) {
@@ -48,15 +48,18 @@ class EarthquakesViewModel @Inject constructor(
 				_uiState.postValue(UiState(earthquake, focalPlaneType, true))
 				// load the details
 				earthquake = repository.loadEarthquakeDetails(earthquake.id)
-				// see what focal planes are available
-				if (focalPlaneType == null)
-				// select the default one
-					focalPlaneType = earthquake.details!!.getDefaultFocalPlane().focalPlaneType
+				// if the focal plane type is not specified, use the default one
+				focalPlaneType =
+					_focalPlaneType ?: earthquake.details!!.getDefaultFocalPlane().focalPlaneType
 				// set the state
 				_uiState.postValue(UiState(earthquake, focalPlaneType, false))
 			}
-		} else
-		// if the selected earthquake has the details, set the state
+		} else {
+			// if the focal plane type is not specified, use the default one
+			focalPlaneType =
+				_focalPlaneType ?: earthquake.details!!.getDefaultFocalPlane().focalPlaneType
+			// if the selected earthquake has the details, set the state
 			_uiState.value = UiState(earthquake, focalPlaneType, false)
+		}
 	}
 }

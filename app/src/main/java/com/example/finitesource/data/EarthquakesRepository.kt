@@ -23,33 +23,26 @@ class EarthquakesRepository @Inject constructor(
 	// loads the latest data from the finite source api and compares it to the saved data
 	// returns the differences that are supposed to be shown to the user
 	suspend fun updateEarthquakes(): EarthquakeUpdates? {
+		// TODO remove this, just for debugging
+		earthquakeDao.deleteAll()
+
 		// build the request
 		val request = apiClient
 			.createService(FiniteSourceAndroidAppApi::class.java)
 			.finiteSourceAppAppJsonGet()
-		// make a network call to get the latest data
-		// use the response
-		when (val response = request.executeApiCall()) {
-			// if the network call was successful, compare the data
-			is Resource.Success -> {
-				// get the saved earthquakes
-				val savedEarthquakes = earthquakeDao.getAll().first()
-				// map the loaded earthquakes to the database model
-				val loadedEarthquakes = response.data!!.mapNotNull { toEarthquake(it) }
-				// get the differences
-				val updates = getDifferences(loadedEarthquakes, savedEarthquakes)
-				// if there are any updates
-				if (updates.hasUpdates())
-				// update the database
-					earthquakeDao.upsertAll(loadedEarthquakes)
-				return updates
-			}
-
-			else -> {
-				// if the network call failed, return null
-				return null
-			}
-		}
+		// execute the request, return null if it fails
+		val response = request.executeApiCall() ?: return null
+		// get the saved earthquakes
+		val savedEarthquakes = earthquakeDao.getAll().first()
+		// map the loaded earthquakes to the database model
+		val loadedEarthquakes = response.mapNotNull { toEarthquake(it) }
+		// get the differences
+		val updates = getDifferences(loadedEarthquakes, savedEarthquakes)
+		// if there are any updates
+		if (updates.hasUpdates())
+		// update the database
+			earthquakeDao.upsertAll(loadedEarthquakes)
+		return updates
 	}
 
 	suspend fun loadEarthquakeDetails(id: String): Earthquake {
@@ -65,47 +58,21 @@ class EarthquakesRepository @Inject constructor(
 		var fp2: FocalPlane? = null
 
 		// load the event details
-		when (val eventDetailsResponse = apiCalls.getEventDetails(earthquake.id)) {
-			is Resource.Success -> {
-				val eventDetails = eventDetailsResponse.data!!
-				// load the focal planes
-				when (eventDetails.focalPlane) {
-					0 -> {    // both focal planes
-						// load both focal planes
-						fp1 = FocalPlane(
-							FocalPlaneType.FP1,
-							apiCalls.getScenarios(earthquake, FocalPlaneType.FP1),
-							apiCalls.getFiniteSource(earthquake, FocalPlaneType.FP1)
-						)
-						fp2 = FocalPlane(
-							FocalPlaneType.FP2,
-							apiCalls.getScenarios(earthquake, FocalPlaneType.FP2),
-							apiCalls.getFiniteSource(earthquake, FocalPlaneType.FP2)
-						)
-					}
+		val eventDetailsResponse = apiCalls.getEventDetails(earthquake.id)
+		val eventDetails = eventDetailsResponse!!
+		// load the focal planes
+		when (eventDetails.focalPlane) {
+			0 -> {    // FP1 and FP2
+				fp1 = buildFocalPlane(earthquake, FocalPlaneType.FP1, apiCalls)
+				fp2 = buildFocalPlane(earthquake, FocalPlaneType.FP2, apiCalls)
+			}
 
-					1 -> {    // FP1
-						// load only FP1
-						fp1 = FocalPlane(
-							FocalPlaneType.FP1,
-							apiCalls.getScenarios(earthquake, FocalPlaneType.FP1),
-							apiCalls.getFiniteSource(earthquake, FocalPlaneType.FP1)
-						)
-					}
+			1 -> {    // FP1
+				fp1 = buildFocalPlane(earthquake, FocalPlaneType.FP1, apiCalls)
+			}
 
-					2 -> {    // FP2
-						// load only FP2
-						fp2 = FocalPlane(
-							FocalPlaneType.FP2,
-							apiCalls.getScenarios(earthquake, FocalPlaneType.FP2),
-							apiCalls.getFiniteSource(earthquake, FocalPlaneType.FP2)
-						)
-					}
-
-					else -> {
-						// TODO handle errors
-					}
-				}
+			2 -> {    // FP2
+				fp2 = buildFocalPlane(earthquake, FocalPlaneType.FP2, apiCalls)
 			}
 
 			else -> {
@@ -136,6 +103,19 @@ class EarthquakesRepository @Inject constructor(
 				instance ?: EarthquakesRepository(earthquakeDao, apiClient).also { instance = it }
 			}
 	}
+}
+
+// helper function to load the products of an earthquake in a specific focal plane
+private fun buildFocalPlane(
+	earthquake: Earthquake,
+	focalPlaneType: FocalPlaneType,
+	apiCalls: ApiCalls
+): FocalPlane {
+	return FocalPlane(
+		focalPlaneType,
+		apiCalls.getScenarios(earthquake, focalPlaneType),
+		apiCalls.getFiniteSource(earthquake, focalPlaneType)
+	)
 }
 
 // function to get the differences between the old and the new data

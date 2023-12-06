@@ -7,7 +7,7 @@ import com.example.finitesource.data.earthquake.focalplane.FocalPlane
 data class EarthquakeDetails(
 	@Embedded(prefix = "fp1_") val fp1: FocalPlane?,
 	@Embedded(prefix = "fp2_") val fp2: FocalPlane?,
-	@Embedded(prefix = "footprints_") val footprints: Footprints,
+	@Embedded(prefix = "footprints_") val footprints: Footprints?,
 ) {
 	fun getDefaultFocalPlane(): FocalPlane {
 		return fp1 ?: fp2!!
