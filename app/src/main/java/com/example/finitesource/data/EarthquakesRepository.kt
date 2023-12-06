@@ -10,6 +10,7 @@ import com.example.finitesource.data.earthquake.toEarthquake
 import kotlinx.coroutines.flow.first
 import org.openapitools.client.apis.FiniteSourceAndroidAppApi
 import org.openapitools.client.infrastructure.ApiClient
+import org.openapitools.client.models.FiniteSourceAppAppJsonGet200ResponseInner
 import javax.inject.Inject
 
 class EarthquakesRepository @Inject constructor(
@@ -23,15 +24,18 @@ class EarthquakesRepository @Inject constructor(
 	// loads the latest data from the finite source api and compares it to the saved data
 	// returns the differences that are supposed to be shown to the user
 	suspend fun updateEarthquakes(): EarthquakeUpdates? {
-		// TODO remove this, just for debugging
-		earthquakeDao.deleteAll()
 
 		// build the request
 		val request = apiClient
 			.createService(FiniteSourceAndroidAppApi::class.java)
 			.finiteSourceAppAppJsonGet()
 		// execute the request, return null if it fails
-		val response = request.executeApiCall() ?: return null
+		val response: List<FiniteSourceAppAppJsonGet200ResponseInner>?
+		try {
+			response = request.executeApiCall()
+		} catch (e: Exception) {
+			return null
+		}
 		// get the saved earthquakes
 		val savedEarthquakes = earthquakeDao.getAll().first()
 		// map the loaded earthquakes to the database model

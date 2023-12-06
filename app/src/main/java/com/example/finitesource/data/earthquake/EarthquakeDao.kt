@@ -25,8 +25,4 @@ interface EarthquakeDao {
 
 	@Insert
 	fun insertAll(earthquakes: List<Earthquake>)
-
-	// TODO remove this, just for debugging
-	@Query("DELETE FROM earthquake")
-	fun deleteAll()
 }
