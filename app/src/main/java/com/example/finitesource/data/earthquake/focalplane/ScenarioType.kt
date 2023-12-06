@@ -12,4 +12,15 @@ open class ScenarioType(
 	override fun toString(): String {
 		return "$id,$name,$url"
 	}
+
+	override fun equals(other: Any?): Boolean {
+		if (other == null || other !is ScenarioType) {
+			return false
+		}
+		return id == other.id
+	}
+
+	override fun hashCode(): Int {
+		return id.hashCode()
+	}
 }

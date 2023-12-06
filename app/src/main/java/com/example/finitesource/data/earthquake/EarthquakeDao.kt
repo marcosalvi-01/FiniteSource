@@ -17,6 +17,9 @@ interface EarthquakeDao {
 	@Upsert
 	fun upsertAll(earthquakes: List<Earthquake>)
 
+	@Upsert
+	fun upsert(earthquake: Earthquake)
+
 	@Insert
 	fun insert(earthquake: Earthquake)
 

@@ -1,5 +1,7 @@
 package com.example.finitesource.data
 
+import com.example.finitesource.data.earthquake.focalplane.Scenario
+import com.example.finitesource.data.earthquake.focalplane.ScenarioType
 import org.junit.Assert.assertEquals
 import org.junit.Test
 import java.util.Calendar
@@ -17,12 +19,44 @@ internal class ConvertersTest {
 	}
 
 	@Test
-	fun `test Calendar to Timestamp`() {
+	fun `test calendarToTimestamp`() {
 		assertEquals(cal.timeInMillis, Converters().calendarToDatestamp(cal))
 	}
 
 	@Test
-	fun `test Timestamp to Calendar`() {
+	fun `test timestampToCalendar`() {
 		assertEquals(Converters().datestampToCalendar(cal.timeInMillis), cal)
+	}
+
+	@Test
+	fun `test scenarioToString`() {
+		val scenario = Scenario(
+			ScenarioType(
+				"1",
+				"2",
+				"3"
+			),
+			"4",
+			"5",
+			"6",
+			"7"
+		)
+		assertEquals(Converters().scenarioToString(scenario), "1,2,3,4,5,6,7")
+	}
+
+	@Test
+	fun `test stringToScenario`() {
+		val scenario = Scenario(
+			ScenarioType(
+				"1",
+				"2",
+				"3"
+			),
+			"4",
+			"5",
+			"6",
+			"7"
+		)
+		assertEquals(Converters().stringToScenario("1,2,3,4,5,6,7"), scenario)
 	}
 }

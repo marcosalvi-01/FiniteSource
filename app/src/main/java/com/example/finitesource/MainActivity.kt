@@ -32,6 +32,12 @@ class MainActivity : AppCompatActivity() {
 
 		earthquakesViewModel.earthquakes.observe(this) {
 			Log.d("MainActivity", "Earthquakes: ${it.size}")
+			if (it.isNotEmpty())
+				earthquakesViewModel.selectEarthquake(it[0])
+		}
+
+		earthquakesViewModel.uiState.observe(this) {
+			Log.d("MainActivity", "Selected earthquake: $it")
 		}
 	}
 }

@@ -1,9 +1,10 @@
 package com.example.finitesource.data
 
-import java.util.Calendar
 import androidx.room.TypeConverter
+import com.example.finitesource.data.earthquake.focalplane.FocalPlaneType
 import com.example.finitesource.data.earthquake.focalplane.Scenario
 import com.example.finitesource.data.earthquake.focalplane.ScenarioType
+import java.util.Calendar
 
 class Converters {
 	@TypeConverter
@@ -43,4 +44,10 @@ class Converters {
 			values[6]
 		)
 	}
+
+	@TypeConverter
+	fun focalPlaneTypeToString(focalPlaneType: FocalPlaneType): String = focalPlaneType.name
+
+	@TypeConverter
+	fun stringToFocalPlaneType(value: String): FocalPlaneType = FocalPlaneType.valueOf(value)
 }

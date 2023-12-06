@@ -17,8 +17,8 @@ data class Earthquake(
 	val latitude: Double,
 	val longitude: Double,
 //	val boundingBox: List<Double>,    // TODO see if it is better to use the osmdroid one
-	val finiteSourceLastUpdate: Calendar? = null,
-	@Embedded val details: EarthquakeDetails? = null,
+	var finiteSourceLastUpdate: Calendar? = null,
+	@Embedded var details: EarthquakeDetails? = null,
 ) {
 	override fun equals(other: Any?): Boolean {
 		if (this === other) return true

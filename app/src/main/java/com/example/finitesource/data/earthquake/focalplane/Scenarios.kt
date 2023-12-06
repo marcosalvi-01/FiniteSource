@@ -1,5 +1,7 @@
 package com.example.finitesource.data.earthquake.focalplane
 
+import com.example.finitesource.data.Product
+
 data class Scenarios(
 	val scenarios: List<Scenario>,
 ) {
@@ -19,7 +21,7 @@ class Scenario(
 	val displacementMapUrl: String,
 	val predictedFringesDescription: String?,
 	val predictedFringesUrl: String?
-) : ScenarioType(scenarioType.id, scenarioType.name, scenarioType.url) {
+) : ScenarioType(scenarioType.id, scenarioType.name, scenarioType.url), Product {
 	override fun toString(): String {
 		return super.toString() +
 				",$displacementMapDescription,$displacementMapUrl" +
