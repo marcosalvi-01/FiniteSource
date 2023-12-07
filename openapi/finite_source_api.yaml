@@ -1217,7 +1217,7 @@
         }
       }
     },
-    "/Catalog/{eventId}/FOC_MECH_FWD/scenario_details.json": {
+    "/Catalog/{eventId}/FOC_MECH_FWD/scenarios_details.json": {
       "get": {
         "summary": "The details of the scenario product for the event",
         "description": "The details of the scenario product for the event.",
