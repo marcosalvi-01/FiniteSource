@@ -42,7 +42,7 @@ android {
 
 dependencies {
 	// room
-	val roomVersion = "2.6.0"
+	val roomVersion = "2.6.1"
 	implementation("androidx.room:room-runtime:$roomVersion")
 	implementation("androidx.room:room-ktx:$roomVersion")
 	annotationProcessor("androidx.room:room-compiler:$roomVersion")
@@ -58,15 +58,21 @@ dependencies {
 	implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:$lifecycleVersion")
 	implementation("androidx.lifecycle:lifecycle-livedata-ktx:$lifecycleVersion")
 
+	// OpenAPI generator
 	implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8:1.9.10")
 	implementation("org.jetbrains.kotlin:kotlin-reflect:1.9.10")
 	implementation("com.squareup.moshi:moshi-kotlin:1.15.0")
 	implementation("com.squareup.moshi:moshi-adapters:1.15.0")
+	ksp("com.squareup.moshi:moshi-kotlin-codegen:1.15.0")
 	implementation("com.squareup.okhttp3:logging-interceptor:4.12.0")
 	implementation("com.squareup.retrofit2:retrofit:2.9.0")
 	implementation("com.squareup.retrofit2:converter-moshi:2.9.0")
 	implementation("com.squareup.retrofit2:converter-scalars:2.9.0")
 	testImplementation("io.kotlintest:kotlintest-runner-junit5:3.4.2")
+
+	// osmdroid
+//	implementation("com.github.MKergall:osmbonuspack:6.9.0")
+//	implementation("org.osmdroid:osmdroid-android:6.1.17")
 
 	// other
 	implementation("androidx.core:core-ktx:1.12.0")

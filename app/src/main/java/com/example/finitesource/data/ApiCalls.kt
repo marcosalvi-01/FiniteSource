@@ -7,6 +7,7 @@ import com.example.finitesource.data.earthquake.focalplane.FocalPlaneType
 import com.example.finitesource.data.earthquake.focalplane.Scenario
 import com.example.finitesource.data.earthquake.focalplane.ScenarioType
 import com.example.finitesource.data.earthquake.focalplane.Scenarios
+import com.example.finitesource.data.earthquake.focalplane.geojson.CustomGeoJson
 import com.example.finitesource.getLocaleSuffix
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -49,11 +50,20 @@ class ApiCalls @Inject constructor(private val apiClient: ApiClient) {
 					getLocaleSuffix()
 				).request().url.toString()
 
+			val source =
+				finiteSourceService.catalogEventIdINVERSEFocalPlaneSOURCESGeoJsonFileNameGet(
+					earthquake.id,
+					focalPlaneType.name,
+					// TODO get the file name from the config files
+					"Finite_source.json"
+				).executeApiCall().string()
+
 			FiniteSource(
 				inversionDescription,
 				resultDescription,
 				mainInversionMapImageUrl,
-				slipDistributionImageUrl
+				slipDistributionImageUrl,
+				CustomGeoJson.parseString(source)
 			)
 		} catch (e: Exception) {
 			e.printStackTrace()

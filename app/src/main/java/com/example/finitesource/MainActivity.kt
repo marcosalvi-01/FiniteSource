@@ -35,7 +35,7 @@ class MainActivity : AppCompatActivity() {
 			if (earthquakes.isNotEmpty())
 				earthquakesViewModel.selectEarthquake(
 					earthquakes.first {
-						it.id == "202310110041_01"
+						it.id == "202302201704_01"
 					}
 				)
 		}

@@ -4,6 +4,7 @@ import androidx.room.TypeConverter
 import com.example.finitesource.data.earthquake.focalplane.FocalPlaneType
 import com.example.finitesource.data.earthquake.focalplane.Scenario
 import com.example.finitesource.data.earthquake.focalplane.ScenarioType
+import com.example.finitesource.data.earthquake.focalplane.geojson.CustomGeoJson
 import java.util.Calendar
 
 class Converters {
@@ -52,4 +53,10 @@ class Converters {
 
 	@TypeConverter
 	fun stringToFocalPlaneType(value: String): FocalPlaneType = FocalPlaneType.valueOf(value)
+
+	@TypeConverter
+	fun geoJsonToString(geoJson: CustomGeoJson): String = geoJson.stringify()
+
+	@TypeConverter
+	fun stringToGeoJson(value: String): CustomGeoJson = CustomGeoJson.parseString(value)
 }

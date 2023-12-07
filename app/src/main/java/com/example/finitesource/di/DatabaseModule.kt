@@ -27,6 +27,7 @@ class DatabaseModule {
 	}
 
 	@Provides
+	@Singleton
 	fun provideApiClient(): ApiClient {
 		return ApiClient()
 	}

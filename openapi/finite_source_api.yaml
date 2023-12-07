@@ -144,7 +144,6 @@
       "id_event": {
         "type": "string",
         "description": "Unique identifier of the event",
-        "nullable": false,
         "example": "201504250611_01"
       },
       "name": {
@@ -306,7 +305,6 @@
                       "items": {
                         "type": "string",
                         "description": "Unique identifier of the event",
-                        "nullable": false,
                         "example": "201504250611_01"
                       }
                     },
@@ -375,7 +373,6 @@
                     "id": {
                       "type": "string",
                       "description": "Unique identifier of the event",
-                      "nullable": false,
                       "example": "201504250611_01"
                     },
                     "longitude": {
@@ -838,77 +835,12 @@
           "200": {
             "description": "Successful operation",
             "content": {
-              "application/json": {
+              "text/plain": {
                 "schema": {
-                  "type": "object",
-                  "properties": {
-                    "type": {
-                      "type": "string",
-                      "example": "FeatureCollection",
-                      "description": "The type of the GeoJson file."
-                    },
-                    "features": {
-                      "type": "array",
-                      "items": {
-                        "type": "object",
-                        "properties": {
-                          "type": {
-                            "type": "string",
-                            "example": "Feature",
-                            "description": "The type of the GeoJson feature."
-                          },
-                          "geometry": {
-                            "type": "object",
-                            "properties": {
-                              "type": {
-                                "type": "string",
-                                "example": "Polygon",
-                                "description": "The type of the GeoJson geometry."
-                              },
-                              "coordinates": {
-                                "type": "array",
-                                "items": {
-                                  "type": "array",
-                                  "items": {
-                                    "type": "array",
-                                    "items": {
-                                      "type": "number",
-                                      "format": "double",
-                                      "description": "The coordinates of the polygon."
-                                    }
-                                  },
-                                  "example": [
-                                    85.745,
-                                    27.459,
-                                    -7240.8
-                                  ]
-                                }
-                              }
-                            }
-                          },
-                          "properties": {
-                            "type": "object",
-                            "properties": {
-                              "Slip_m": {
-                                "type": "number",
-                                "format": "double",
-                                "nullable": true,
-                                "description": "The slip value of the polygon in meters.",
-                                "example": 1.028
-                              },
-                              "Rake_d": {
-                                "type": "number",
-                                "format": "double",
-                                "nullable": true,
-                                "description": "The rake value of the polygon.",
-                                "example": 137.44
-                              }
-                            }
-                          }
-                        }
-                      }
-                    }
-                  }
+                  "type": "string",
+                  "format": "binary",
+                  "description": "The finite source of this focal plane in the event as a GeoJson.",
+                  "example": "{ \"type\": \"FeatureCollection\", \"features\": [ { \"type\": \"Feature\", \"geometry\": { \"type\": \"Polygon\", \"coordinates\": [ [ 85.745, 27.459, -7240.8 ] ] }, \"properties\": { \"Slip_m\": 1.028, \"Rake_d\": 137.44 } } ] }"
                 }
               }
             }
@@ -2058,7 +1990,6 @@
                       "id_event": {
                         "type": "string",
                         "description": "Unique identifier of the event",
-                        "nullable": false,
                         "example": "201504250611_01"
                       },
                       "name": {
