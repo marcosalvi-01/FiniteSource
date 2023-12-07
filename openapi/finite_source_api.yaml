@@ -370,7 +370,7 @@
                       "example": "Costa Greca Ionica (GRECIA)",
                       "description": "The name of the event."
                     },
-                    "id": {
+                    "id_event": {
                       "type": "string",
                       "description": "Unique identifier of the event",
                       "example": "201504250611_01"
