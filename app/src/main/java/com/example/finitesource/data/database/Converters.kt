@@ -1,4 +1,4 @@
-package com.example.finitesource.data
+package com.example.finitesource.data.database
 
 import androidx.room.TypeConverter
 import com.example.finitesource.data.earthquake.focalplane.FocalPlaneType

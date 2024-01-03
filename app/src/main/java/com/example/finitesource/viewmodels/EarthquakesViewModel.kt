@@ -31,37 +31,36 @@ class EarthquakesViewModel @Inject constructor(
 		// build the live data that will emit the updates
 		liveData(viewModelScope.coroutineContext + Dispatchers.IO) {
 			// update the database and emit the result
-			emit(repository.updateEarthquakes())
+			emit(repository.getUpdates())
 		}
 
 	/**
 	 * Selects the earthquake and loads its details if necessary.
 	 * It throws an exception if there is an error loading the details.
 	 */
-	fun selectEarthquake(_earthquake: Earthquake, _focalPlaneType: FocalPlaneType? = null) {
+	fun selectEarthquake(earthquake: Earthquake, _focalPlaneType: FocalPlaneType? = null) {
 		// if the earthquake is already selected, do nothing
-		if (_earthquake == _uiState.value?.selectedEarthquake)
+		if (earthquake == _uiState.value?.selectedEarthquake)
 			return
-		var earthquake = _earthquake
-		var focalPlaneType: FocalPlaneType? = null
 		// select the earthquake
 		// if the selected earthquake doesn't have the details
 		if (earthquake.details == null) {
 			viewModelScope.launch(Dispatchers.IO) {
 				// set the loading state
-				_uiState.postValue(UiState(earthquake, focalPlaneType, true))
+				_uiState.postValue(UiState(earthquake, _focalPlaneType, true))
 				// load the details
-				earthquake = repository.loadEarthquakeDetails(earthquake.id)
+				val loadedEarthquake = repository.loadEarthquakeDetails(earthquake.id)
 					?: throw Exception("Failed to load earthquake details")
 				// if the focal plane type is not specified, use the default one
-				focalPlaneType =
-					_focalPlaneType ?: earthquake.details!!.getDefaultFocalPlane().focalPlaneType
+				val focalPlaneType =
+					_focalPlaneType
+						?: loadedEarthquake.details!!.getDefaultFocalPlane().focalPlaneType
 				// set the state
-				_uiState.postValue(UiState(earthquake, focalPlaneType, false))
+				_uiState.postValue(UiState(loadedEarthquake, focalPlaneType, false))
 			}
 		} else {
 			// if the focal plane type is not specified, use the default one
-			focalPlaneType =
+			val focalPlaneType =
 				_focalPlaneType ?: earthquake.details!!.getDefaultFocalPlane().focalPlaneType
 			// if the selected earthquake has the details, set the state
 			_uiState.value = UiState(earthquake, focalPlaneType, false)

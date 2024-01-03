@@ -3,6 +3,8 @@ package com.example.finitesource.data.earthquake
 import androidx.room.Embedded
 import androidx.room.Entity
 import androidx.room.PrimaryKey
+import com.example.finitesource.data.earthquake.focalplane.FocalPlane
+import com.example.finitesource.data.earthquake.focalplane.FocalPlaneType
 import com.example.finitesource.offsetDateTimeToCalendar
 import org.openapitools.client.models.FiniteSourceAppAppJsonGet200ResponseInner
 import java.util.Calendar
@@ -20,6 +22,17 @@ data class Earthquake(
 	var finiteSourceLastUpdate: Calendar? = null,
 	@Embedded var details: EarthquakeDetails? = null,
 ) {
+	/**
+	 * Returns the focal plane of the given type.
+	 * Returns null if the earthquake doesn't have the details or if the focal plane doesn't exist.
+	 */
+	fun getFocalPlane(focalPlaneType: FocalPlaneType): FocalPlane? {
+		return when (focalPlaneType) {
+			FocalPlaneType.FP1 -> details?.fp1
+			FocalPlaneType.FP2 -> details?.fp2
+		}
+	}
+
 	override fun equals(other: Any?): Boolean {
 		if (this === other) return true
 		if (other !is Earthquake) return false
@@ -30,8 +43,6 @@ data class Earthquake(
 	override fun hashCode(): Int {
 		return id.hashCode()
 	}
-
-
 }
 
 // TODO see why the fields of FiniteSourceAppAppJsonGet200ResponseInner are nullable they should not be nullable

@@ -23,4 +23,11 @@ open class ScenarioType(
 	override fun hashCode(): Int {
 		return id.hashCode()
 	}
+
+	companion object {
+		fun parseString(string: String): ScenarioType {
+			// TODO
+			return ScenarioType(string, "", "")
+		}
+	}
 }

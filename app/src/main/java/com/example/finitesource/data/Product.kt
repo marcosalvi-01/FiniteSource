@@ -6,15 +6,13 @@ interface Product {
 enum class Products(val productId: String) : Product {
 	FINITE_SOURCE("finite-source"),
 	SCENARIOS("scenarios"),
-	FOOTPRINTS("footprints"),
-}
+	FOOTPRINTS("footprints");
 
-// function to convert a list of strings to a list of products
-fun List<String>.toProducts(): List<Products> {
-	return this.map { it.toProduct() }
-}
-
-// function to convert a string to a product
-fun String.toProduct(): Products {
-	return Products.entries.first { it.productId == this }
+	companion object {
+		fun parseString(string: String): Products = try {
+			entries.first { it.productId == string }
+		} catch (e: NoSuchElementException) {
+			throw IllegalArgumentException("No product with id $string")
+		}
+	}
 }

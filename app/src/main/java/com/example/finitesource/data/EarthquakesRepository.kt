@@ -1,15 +1,18 @@
 package com.example.finitesource.data
 
+import com.example.finitesource.data.database.dao.EarthquakeDao
+import com.example.finitesource.data.database.dao.ScenarioTypeDao
 import com.example.finitesource.data.earthquake.Earthquake
-import com.example.finitesource.data.earthquake.EarthquakeDao
 import com.example.finitesource.data.earthquake.EarthquakeDetails
 import com.example.finitesource.data.earthquake.EarthquakeUpdates
 import com.example.finitesource.data.earthquake.focalplane.FiniteSource
 import com.example.finitesource.data.earthquake.focalplane.FocalPlane
 import com.example.finitesource.data.earthquake.focalplane.FocalPlaneType
+import com.example.finitesource.data.earthquake.focalplane.ScenarioType
 import com.example.finitesource.data.earthquake.focalplane.Scenarios
 import com.example.finitesource.data.earthquake.toEarthquake
 import kotlinx.coroutines.flow.first
+import org.openapitools.client.apis.ConfigurationFilesApi
 import org.openapitools.client.apis.FiniteSourceAndroidAppApi
 import org.openapitools.client.infrastructure.ApiClient
 import org.openapitools.client.models.FiniteSourceAppAppJsonGet200ResponseInner
@@ -17,15 +20,42 @@ import javax.inject.Inject
 
 class EarthquakesRepository @Inject constructor(
 	private val earthquakeDao: EarthquakeDao,
+	private val scenarioTypeDao: ScenarioTypeDao,
 	private val apiClient: ApiClient
 ) {
 	fun getAll() = earthquakeDao.getAll()
 
 	fun getById(id: String) = earthquakeDao.getById(id)
 
+	suspend fun getUpdates(): EarthquakeUpdates? = try {
+		updateConfig()
+		updateEarthquakes()
+	} catch (e: Exception) { // TODO handle errors using the correct error type
+		null
+	}
+
+	private suspend fun updateConfig() {
+		// build the request
+		val generalConfigResponse = apiClient
+			.createService(ConfigurationFilesApi::class.java)
+			.configGeneralConfigJsonGet().executeApiCall()
+		val scenariosProvidersResponse = apiClient
+			.createService(ConfigurationFilesApi::class.java)
+			.configFocalMechanismProvidersJsonGet().executeApiCall()
+
+		// update the ScenarioType table
+		val scenarioTypes = scenariosProvidersResponse.map {
+			ScenarioType(it.providerDir!!, it.providerName!!, it.providerUrl!!)
+		}
+		scenarioTypeDao.upsertAll(scenarioTypes)
+
+		// update the general configs, if for some reason it doesn't work, it will use the old values
+		Config.update(generalConfigResponse)
+	}
+
 	// loads the latest data from the finite source api and compares it to the saved data
 	// returns the differences that are supposed to be shown to the user
-	suspend fun updateEarthquakes(): EarthquakeUpdates? {
+	private suspend fun updateEarthquakes(): EarthquakeUpdates {
 		// TODO remove this
 		earthquakeDao.deleteAll()
 		// build the request
@@ -34,11 +64,7 @@ class EarthquakesRepository @Inject constructor(
 			.finiteSourceAppAppJsonGet()
 		// execute the request, return null if it fails
 		val response: List<FiniteSourceAppAppJsonGet200ResponseInner>?
-		try {
-			response = request.executeApiCall()
-		} catch (e: Exception) {
-			return null
-		}
+		response = request.executeApiCall()
 		// get the saved earthquakes
 		val savedEarthquakes = earthquakeDao.getAll().first()
 		// map the loaded earthquakes to the database model
@@ -57,6 +83,7 @@ class EarthquakesRepository @Inject constructor(
 	 * Returns null if there is an error loading the details.
 	 */
 	suspend fun loadEarthquakeDetails(id: String): Earthquake? {
+		// TODO load the products in parallel
 		try {
 			val earthquake = getById(id).first()
 			// if this earthquake is already loaded, return
@@ -71,23 +98,51 @@ class EarthquakesRepository @Inject constructor(
 
 			// load the event details
 			val eventDetailsResponse = apiCalls.getEventDetails(earthquake.id)
-			val eventDetails = eventDetailsResponse!!
-			val products = eventDetailsResponse.products!!.toProducts()
+			val availableProducts = apiCalls.getAvailableProducts(earthquake.id)
+			val availableScenarios = apiCalls.getAvailableScenarios(earthquake.id)
 			// load the focal planes
-			when (eventDetails.focalPlane) {
+			when (eventDetailsResponse.focalPlane) {
 				0 -> {    // FP1 and FP2
-					fp1 = buildFocalPlane(earthquake, FocalPlaneType.FP1, apiCalls, products)
-					fp2 = buildFocalPlane(earthquake, FocalPlaneType.FP2, apiCalls, products)
+					fp1 =
+						buildFocalPlane(
+							earthquake,
+							FocalPlaneType.FP1,
+							apiCalls,
+							availableProducts,
+							availableScenarios
+						)
+					fp2 =
+						buildFocalPlane(
+							earthquake,
+							FocalPlaneType.FP2,
+							apiCalls,
+							availableProducts,
+							availableScenarios
+						)
 				}
 
 				// FP1
-				1 -> fp1 = buildFocalPlane(earthquake, FocalPlaneType.FP1, apiCalls, products)
+				1 -> fp1 =
+					buildFocalPlane(
+						earthquake,
+						FocalPlaneType.FP1,
+						apiCalls,
+						availableProducts,
+						availableScenarios
+					)
 
 				// FP2
-				2 -> fp2 = buildFocalPlane(earthquake, FocalPlaneType.FP2, apiCalls, products)
+				2 -> fp2 =
+					buildFocalPlane(
+						earthquake,
+						FocalPlaneType.FP2,
+						apiCalls,
+						availableProducts,
+						availableScenarios
+					)
 
 				else -> {
-					// TODO handle errors
+					throw Exception("Error, invalid focal plane number: ${eventDetailsResponse.focalPlane}")
 				}
 			}
 
@@ -113,29 +168,37 @@ class EarthquakesRepository @Inject constructor(
 		@Volatile
 		private var instance: EarthquakesRepository? = null
 
-		fun getInstance(earthquakeDao: EarthquakeDao, apiClient: ApiClient) =
+		fun getInstance(
+			earthquakeDao: EarthquakeDao,
+			scenarioTypeDao: ScenarioTypeDao,
+			apiClient: ApiClient
+		) =
 			instance ?: synchronized(this) {
-				instance ?: EarthquakesRepository(earthquakeDao, apiClient).also { instance = it }
+				instance ?: EarthquakesRepository(
+					earthquakeDao,
+					scenarioTypeDao,
+					apiClient,
+				).also { instance = it }
 			}
 	}
 }
 
 // helper function to load the products of an earthquake in a specific focal plane
+// TODO load the products in parallel
 private fun buildFocalPlane(
 	earthquake: Earthquake,
 	focalPlaneType: FocalPlaneType,
 	apiCalls: ApiCalls,
-	availableProducts: List<Products>
+	availableProducts: List<Product>,
+	availableScenarios: List<ScenarioType>
 ): FocalPlane {
-	// TODO only load the products that are available for the event
-	// and propagate an error if the product is available but for some reason it can't be loaded
 	var scenarios: Scenarios? = null
 	var finiteSource: FiniteSource? = null
 
 	for (product in availableProducts) {
 		when (product) {
 			Products.SCENARIOS -> {
-				scenarios = apiCalls.getScenarios(earthquake, focalPlaneType)
+				scenarios = apiCalls.getScenarios(earthquake, focalPlaneType, availableScenarios)
 				if (scenarios == null)
 					throw Exception("Error loading the scenarios")
 			}

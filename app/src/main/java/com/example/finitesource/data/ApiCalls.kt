@@ -13,18 +13,21 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import org.openapitools.client.apis.EventApi
 import org.openapitools.client.apis.FiniteSourceApi
+import org.openapitools.client.apis.ScenariosApi
 import org.openapitools.client.infrastructure.ApiClient
 import org.openapitools.client.models.CatalogEventIdEventDetailsJsonGet200Response
+import org.openapitools.client.models.CatalogEventIdFOCMECHFWDScenariosDetailsJsonGet200Response
 import retrofit2.Call
 import javax.inject.Inject
 
 class ApiCalls @Inject constructor(private val apiClient: ApiClient) {
 
 	private val finiteSourceService = apiClient.createService(FiniteSourceApi::class.java)
+	private val scenariosService = apiClient.createService(ScenariosApi::class.java)
 
 	// loads the finite source
-	fun getFiniteSource(earthquake: Earthquake, focalPlaneType: FocalPlaneType): FiniteSource? {
-		return try {
+	fun getFiniteSource(earthquake: Earthquake, focalPlaneType: FocalPlaneType): FiniteSource? =
+		try {
 			val inversionDescription =
 				finiteSourceService.catalogEventIdINVERSEInversionDescriptionLanguageTxtGet(
 					earthquake.id,
@@ -54,8 +57,7 @@ class ApiCalls @Inject constructor(private val apiClient: ApiClient) {
 				finiteSourceService.catalogEventIdINVERSEFocalPlaneSOURCESGeoJsonFileNameGet(
 					earthquake.id,
 					focalPlaneType.name,
-					// TODO get the file name from the config files
-					"Finite_source.json"
+					Config.sourceGeoJsonFileName
 				).executeApiCall().string()
 
 			FiniteSource(
@@ -69,30 +71,97 @@ class ApiCalls @Inject constructor(private val apiClient: ApiClient) {
 			e.printStackTrace()
 			null
 		}
-	}
 
-	fun getScenarios(earthquake: Earthquake, focalPlaneType: FocalPlaneType): Scenarios? {
-		// TODO
-		return Scenarios(
-			listOf(
-				Scenario(
-					ScenarioType("1", "2", "3"),
-					"4", "5", "6", "7"
+	fun getScenarios(
+		earthquake: Earthquake,
+		focalPlaneType: FocalPlaneType,
+		availableScenarios: List<ScenarioType>
+	): Scenarios? =
+		try {
+			val scenarios: MutableList<Scenario> = mutableListOf()
+			for (scenarioType in availableScenarios) {
+				val displacementMapDescription =
+					scenariosService.catalogEventIdFOCMECHFWDScenarioIdFocalPlaneGRAPHICSDisplacementMapLanguageTxtGet(
+						earthquake.id,
+						scenarioType.id,
+						focalPlaneType.name,
+						getLocaleSuffix()
+					).executeApiCall().string()
+
+				val predictedFringesDescription =
+					scenariosService.catalogEventIdFOCMECHFWDScenarioIdFocalPlaneGRAPHICSPredictedFringesLanguageTxtGet(
+						earthquake.id,
+						scenarioType.id,
+						focalPlaneType.name,
+						getLocaleSuffix()
+					).executeApiCall().string()
+
+				val displacementMapImageUrl =
+					scenariosService.catalogEventIdFOCMECHFWDScenarioIdFocalPlaneGRAPHICSDisplacementMapJpgGet(
+						earthquake.id,
+						scenarioType.id,
+						focalPlaneType.name,
+					).request().url.toString()
+
+				val predictedFringesImageUrl =
+					scenariosService.catalogEventIdFOCMECHFWDScenarioIdFocalPlaneGRAPHICSPredictedFringesJpgGet(
+						earthquake.id,
+						scenarioType.id,
+						focalPlaneType.name,
+					).request().url.toString()
+
+				scenarios.add(
+					Scenario(
+						scenarioType,
+						displacementMapDescription,
+						predictedFringesDescription,
+						displacementMapImageUrl,
+						predictedFringesImageUrl
+					)
 				)
-			)
-		)
-	}
+			}
+			if (scenarios.isEmpty())
+				null    // should not happen
+			else
+				Scenarios(scenarios)
+		} catch (e: Exception) {
+			e.printStackTrace()
+			null
+		}
 
-	fun getFootprints(earthquake: Earthquake): Footprints {
+	fun getFootprints(earthquake: Earthquake): Footprints? {
 		// TODO
 		return Footprints("", "")
 	}
 
-	fun getEventDetails(id: String): CatalogEventIdEventDetailsJsonGet200Response? {
+	fun getEventDetails(id: String): CatalogEventIdEventDetailsJsonGet200Response {
 		return apiClient
 			.createService(EventApi::class.java)
 			.catalogEventIdEventDetailsJsonGet(id)
 			.executeApiCall()
+	}
+
+	fun getAvailableProducts(id: String): List<Products> {
+		return getEventDetails(id).products?.map {
+			Products.parseString(it)
+		} ?: throw Exception("Error loading the event details")
+	}
+
+	/**
+	 * Loads the details of the scenarios for the given earthquake and focal plane.
+	 * Throws an exception if the details cannot be loaded.
+	 */
+	fun getScenarioDetails(id: String):
+			CatalogEventIdFOCMECHFWDScenariosDetailsJsonGet200Response {
+		return scenariosService
+			.catalogEventIdFOCMECHFWDScenariosDetailsJsonGet(id)
+			.executeApiCall()
+	}
+
+	fun getAvailableScenarios(id: String): List<ScenarioType> {
+		return getScenarioDetails(id).providers?.map {
+			ScenarioType.parseString(it)
+		} ?: throw Exception("Error loading the scenario details")
 	}
 }
 
@@ -113,7 +182,8 @@ fun <T> Call<T>.executeApiCall(): T {
 			response.body()!!
 		else
 			throw Exception(
-				"Call: " + this.request().url + "\nunsuccessful: " + response.errorBody()?.string()
+				"\nCall: " + this.request().url + "\nunsuccessful: " + response.errorBody()
+					?.string()
 			)
 	} catch (e: Exception) {
 		// TODO handle the error

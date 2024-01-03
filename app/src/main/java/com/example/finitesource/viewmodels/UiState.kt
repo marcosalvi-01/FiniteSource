@@ -19,5 +19,9 @@ data class UiState(
 		require(selectedEarthquake == null || selectedEarthquake.details != null || earthquakeLoading) {
 			"If the selected earthquake doesn't have the details, loading must be true"
 		}
+		// if there is no selected earthquake, there must be no selected focal plane
+		require(selectedEarthquake != null || selectedFocalPlane == null) {
+			"If there is no selected earthquake, there must be no selected focal plane"
+		}
 	}
 }

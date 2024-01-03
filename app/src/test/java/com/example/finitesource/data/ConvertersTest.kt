@@ -1,5 +1,6 @@
 package com.example.finitesource.data
 
+import com.example.finitesource.data.database.Converters
 import com.example.finitesource.data.earthquake.focalplane.Scenario
 import com.example.finitesource.data.earthquake.focalplane.ScenarioType
 import org.junit.Assert.assertEquals

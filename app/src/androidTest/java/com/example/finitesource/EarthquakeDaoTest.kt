@@ -4,9 +4,9 @@ import android.content.Context
 import androidx.room.Room
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import com.example.finitesource.data.AppDatabase
+import com.example.finitesource.data.database.AppDatabase
+import com.example.finitesource.data.database.dao.EarthquakeDao
 import com.example.finitesource.data.earthquake.Earthquake
-import com.example.finitesource.data.earthquake.EarthquakeDao
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.test.runTest
 import org.junit.After
