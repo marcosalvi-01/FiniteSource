@@ -1,10 +1,10 @@
-package com.example.finitesource.data.database
+package com.example.finitesource.data.local.database
 
 import androidx.room.TypeConverter
-import com.example.finitesource.data.earthquake.focalplane.FocalPlaneType
-import com.example.finitesource.data.earthquake.focalplane.Scenario
-import com.example.finitesource.data.earthquake.focalplane.ScenarioType
-import com.example.finitesource.data.earthquake.focalplane.geojson.CustomGeoJson
+import com.example.finitesource.data.local.earthquake.focalplane.FocalPlaneType
+import com.example.finitesource.data.local.earthquake.focalplane.Scenario
+import com.example.finitesource.data.local.earthquake.focalplane.ScenarioType
+import com.example.finitesource.data.local.earthquake.focalplane.geojson.CustomGeoJson
 import java.util.Calendar
 
 class Converters {

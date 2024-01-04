@@ -1,4 +1,4 @@
-package com.example.finitesource.data.earthquake.focalplane
+package com.example.finitesource.data.local.earthquake.focalplane
 
 import androidx.room.Embedded
 

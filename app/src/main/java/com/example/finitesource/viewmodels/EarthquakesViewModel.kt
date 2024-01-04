@@ -7,9 +7,10 @@ import androidx.lifecycle.asLiveData
 import androidx.lifecycle.liveData
 import androidx.lifecycle.viewModelScope
 import com.example.finitesource.data.EarthquakesRepository
-import com.example.finitesource.data.earthquake.Earthquake
-import com.example.finitesource.data.earthquake.EarthquakeUpdates
-import com.example.finitesource.data.earthquake.focalplane.FocalPlaneType
+import com.example.finitesource.data.local.EarthquakeUpdates
+import com.example.finitesource.data.local.earthquake.Earthquake
+import com.example.finitesource.data.local.earthquake.focalplane.FocalPlaneType
+import com.example.finitesource.states.UiState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch

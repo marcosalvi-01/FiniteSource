@@ -1,4 +1,4 @@
-package com.example.finitesource.data.earthquake.focalplane.geojson
+package com.example.finitesource.data.local.earthquake.focalplane.geojson
 
 import com.squareup.moshi.Json
 import com.squareup.moshi.JsonClass

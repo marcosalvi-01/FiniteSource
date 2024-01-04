@@ -1,10 +1,10 @@
-package com.example.finitesource.data.earthquake
+package com.example.finitesource.data.local.earthquake
 
 import androidx.room.Embedded
 import androidx.room.Entity
 import androidx.room.PrimaryKey
-import com.example.finitesource.data.earthquake.focalplane.FocalPlane
-import com.example.finitesource.data.earthquake.focalplane.FocalPlaneType
+import com.example.finitesource.data.local.earthquake.focalplane.FocalPlane
+import com.example.finitesource.data.local.earthquake.focalplane.FocalPlaneType
 import com.example.finitesource.offsetDateTimeToCalendar
 import org.openapitools.client.models.FiniteSourceAppAppJsonGet200ResponseInner
 import java.util.Calendar

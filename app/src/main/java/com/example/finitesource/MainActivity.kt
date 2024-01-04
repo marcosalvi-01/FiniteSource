@@ -6,7 +6,7 @@ import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
-import com.example.finitesource.data.CatalogConfig
+import com.example.finitesource.data.local.CatalogConfig
 import com.example.finitesource.viewmodels.EarthquakesViewModel
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch

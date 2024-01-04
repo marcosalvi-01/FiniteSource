@@ -1,7 +1,7 @@
-package com.example.finitesource.data.earthquake.focalplane
+package com.example.finitesource.data.local.earthquake.focalplane
 
-import com.example.finitesource.data.Product
-import com.example.finitesource.data.earthquake.focalplane.geojson.CustomGeoJson
+import com.example.finitesource.data.local.Product
+import com.example.finitesource.data.local.earthquake.focalplane.geojson.CustomGeoJson
 
 class FiniteSource(
 	val inversionDescription: String,

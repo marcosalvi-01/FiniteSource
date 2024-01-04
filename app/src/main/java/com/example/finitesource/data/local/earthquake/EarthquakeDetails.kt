@@ -1,7 +1,7 @@
-package com.example.finitesource.data.earthquake
+package com.example.finitesource.data.local.earthquake
 
 import androidx.room.Embedded
-import com.example.finitesource.data.earthquake.focalplane.FocalPlane
+import com.example.finitesource.data.local.earthquake.focalplane.FocalPlane
 
 // The separation is needed because the details should not be stored in the database forever
 data class EarthquakeDetails(

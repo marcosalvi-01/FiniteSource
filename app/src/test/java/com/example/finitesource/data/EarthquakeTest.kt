@@ -1,9 +1,9 @@
 package com.example.finitesource.data
 
-import com.example.finitesource.data.earthquake.Earthquake
-import com.example.finitesource.data.earthquake.EarthquakeDetails
-import com.example.finitesource.data.earthquake.Footprints
-import com.example.finitesource.data.earthquake.toEarthquake
+import com.example.finitesource.data.local.earthquake.Earthquake
+import com.example.finitesource.data.local.earthquake.EarthquakeDetails
+import com.example.finitesource.data.local.earthquake.Footprints
+import com.example.finitesource.data.local.earthquake.toEarthquake
 import io.mockk.every
 import io.mockk.mockk
 import org.junit.Assert.assertEquals

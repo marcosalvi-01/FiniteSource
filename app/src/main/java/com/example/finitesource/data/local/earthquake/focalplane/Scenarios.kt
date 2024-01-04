@@ -1,6 +1,6 @@
-package com.example.finitesource.data.earthquake.focalplane
+package com.example.finitesource.data.local.earthquake.focalplane
 
-import com.example.finitesource.data.Product
+import com.example.finitesource.data.local.Product
 
 data class Scenarios(
 	val scenarios: List<Scenario>,

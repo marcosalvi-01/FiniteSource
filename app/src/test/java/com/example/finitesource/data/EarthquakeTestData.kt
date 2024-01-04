@@ -1,6 +1,6 @@
 package com.example.finitesource.data
 
-import com.example.finitesource.data.earthquake.Earthquake
+import com.example.finitesource.data.local.earthquake.Earthquake
 import org.openapitools.client.models.FiniteSourceAppAppJsonGet200ResponseInner
 import java.time.OffsetDateTime
 import java.util.Calendar

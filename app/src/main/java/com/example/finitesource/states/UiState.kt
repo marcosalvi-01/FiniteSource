@@ -1,7 +1,7 @@
-package com.example.finitesource.viewmodels
+package com.example.finitesource.states
 
-import com.example.finitesource.data.earthquake.Earthquake
-import com.example.finitesource.data.earthquake.focalplane.FocalPlaneType
+import com.example.finitesource.data.local.earthquake.Earthquake
+import com.example.finitesource.data.local.earthquake.focalplane.FocalPlaneType
 
 // Defines the state of the app.
 // The selected event, the selected focal plane

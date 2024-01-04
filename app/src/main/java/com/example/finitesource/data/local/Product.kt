@@ -1,4 +1,4 @@
-package com.example.finitesource.data
+package com.example.finitesource.data.local
 
 interface Product {
 }

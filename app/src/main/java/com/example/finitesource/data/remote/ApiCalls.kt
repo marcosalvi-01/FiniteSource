@@ -1,13 +1,15 @@
-package com.example.finitesource.data
+package com.example.finitesource.data.remote
 
-import com.example.finitesource.data.earthquake.Earthquake
-import com.example.finitesource.data.earthquake.Footprints
-import com.example.finitesource.data.earthquake.focalplane.FiniteSource
-import com.example.finitesource.data.earthquake.focalplane.FocalPlaneType
-import com.example.finitesource.data.earthquake.focalplane.Scenario
-import com.example.finitesource.data.earthquake.focalplane.ScenarioType
-import com.example.finitesource.data.earthquake.focalplane.Scenarios
-import com.example.finitesource.data.earthquake.focalplane.geojson.CustomGeoJson
+import com.example.finitesource.data.local.CatalogConfig
+import com.example.finitesource.data.local.Products
+import com.example.finitesource.data.local.earthquake.Earthquake
+import com.example.finitesource.data.local.earthquake.Footprints
+import com.example.finitesource.data.local.earthquake.focalplane.FiniteSource
+import com.example.finitesource.data.local.earthquake.focalplane.FocalPlaneType
+import com.example.finitesource.data.local.earthquake.focalplane.Scenario
+import com.example.finitesource.data.local.earthquake.focalplane.ScenarioType
+import com.example.finitesource.data.local.earthquake.focalplane.Scenarios
+import com.example.finitesource.data.local.earthquake.focalplane.geojson.CustomGeoJson
 import com.example.finitesource.getLocaleSuffix
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -22,9 +24,12 @@ import retrofit2.Call
 import javax.inject.Inject
 
 class ApiCalls @Inject constructor(private val apiClient: ApiClient) {
+	// TODO
 	// the gets for the products return null if the product is not available but also
 	// if there is an error.
 	// In the app, in both cases the product is shown as not available instead of showing an error
+	// The only exception is the Finite Source, because its availability is shown to the user through
+	// the color of the markers, so if there is an error, the user should be notified somehow
 
 	private val finiteSourceService = apiClient.createService(FiniteSourceApi::class.java)
 	private val scenariosService = apiClient.createService(ScenariosApi::class.java)

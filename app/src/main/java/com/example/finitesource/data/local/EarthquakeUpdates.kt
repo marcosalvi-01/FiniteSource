@@ -1,4 +1,6 @@
-package com.example.finitesource.data.earthquake
+package com.example.finitesource.data.local
+
+import com.example.finitesource.data.local.earthquake.Earthquake
 
 data class EarthquakeUpdates(
 	val newEarthquakes: List<Earthquake>,

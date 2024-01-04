@@ -1,10 +1,10 @@
-package com.example.finitesource.data.database.dao
+package com.example.finitesource.data.local.database.dao
 
 import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.Query
 import androidx.room.Upsert
-import com.example.finitesource.data.earthquake.Earthquake
+import com.example.finitesource.data.local.earthquake.Earthquake
 import kotlinx.coroutines.flow.Flow
 
 @Dao

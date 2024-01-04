@@ -1,8 +1,8 @@
 package com.example.finitesource.data
 
-import com.example.finitesource.data.database.dao.EarthquakeDao
-import com.example.finitesource.data.database.dao.ScenarioTypeDao
-import com.example.finitesource.data.earthquake.Earthquake
+import com.example.finitesource.data.local.database.dao.EarthquakeDao
+import com.example.finitesource.data.local.database.dao.ScenarioTypeDao
+import com.example.finitesource.data.local.earthquake.Earthquake
 import io.mockk.every
 import io.mockk.mockk
 import kotlinx.coroutines.flow.first
