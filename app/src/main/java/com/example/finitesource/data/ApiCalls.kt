@@ -13,6 +13,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import org.openapitools.client.apis.EventApi
 import org.openapitools.client.apis.FiniteSourceApi
+import org.openapitools.client.apis.FootprintApi
 import org.openapitools.client.apis.ScenariosApi
 import org.openapitools.client.infrastructure.ApiClient
 import org.openapitools.client.models.CatalogEventIdEventDetailsJsonGet200Response
@@ -21,9 +22,13 @@ import retrofit2.Call
 import javax.inject.Inject
 
 class ApiCalls @Inject constructor(private val apiClient: ApiClient) {
+	// the gets for the products return null if the product is not available but also
+	// if there is an error.
+	// In the app, in both cases the product is shown as not available instead of showing an error
 
 	private val finiteSourceService = apiClient.createService(FiniteSourceApi::class.java)
 	private val scenariosService = apiClient.createService(ScenariosApi::class.java)
+	private val footprintsService = apiClient.createService(FootprintApi::class.java)
 
 	// loads the finite source
 	fun getFiniteSource(earthquake: Earthquake, focalPlaneType: FocalPlaneType): FiniteSource? =
@@ -129,9 +134,19 @@ class ApiCalls @Inject constructor(private val apiClient: ApiClient) {
 			null
 		}
 
-	fun getFootprints(earthquake: Earthquake): Footprints? {
-		// TODO
-		return Footprints("", "")
+	fun getFootprints(earthquake: Earthquake): Footprints? = try {
+		Footprints(
+			footprintsService.catalogEventIdANCILLARYSentinelFootprintJpgGet(
+				earthquake.id
+			).request().url.toString(),
+			footprintsService.catalogEventIdANCILLARYFootprintDescriptionLanguageTxtGet(
+				earthquake.id,
+				getLocaleSuffix()
+			).executeApiCall().string(),
+		)
+	} catch (e: Exception) {
+		e.printStackTrace()
+		null
 	}
 
 	fun getEventDetails(id: String): CatalogEventIdEventDetailsJsonGet200Response {

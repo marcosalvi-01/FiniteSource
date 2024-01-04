@@ -43,7 +43,7 @@ class MainActivity : AppCompatActivity() {
 				try {
 					earthquakesViewModel.selectEarthquake(
 						earthquakes.first {
-							it.id == "202302201704_01"
+							it.id == "202401010710_01"
 						}
 					)
 				} catch (e: Exception) {
