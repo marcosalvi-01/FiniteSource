@@ -50,7 +50,7 @@ class EarthquakesRepository @Inject constructor(
 		scenarioTypeDao.upsertAll(scenarioTypes)
 
 		// update the general configs, if for some reason it doesn't work, it will use the old values
-		Config.update(generalConfigResponse)
+		CatalogConfig.update(generalConfigResponse)
 	}
 
 	// loads the latest data from the finite source api and compares it to the saved data

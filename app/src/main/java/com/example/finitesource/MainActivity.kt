@@ -6,7 +6,7 @@ import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
-import com.example.finitesource.data.Config
+import com.example.finitesource.data.CatalogConfig
 import com.example.finitesource.viewmodels.EarthquakesViewModel
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
@@ -23,7 +23,7 @@ class MainActivity : AppCompatActivity() {
 		// load the config
 		// TODO block the app until the config and the earthquake data are loaded (show a loading screen)
 		lifecycleScope.launch {
-			Config.init(this@MainActivity)
+			CatalogConfig.init(this@MainActivity)
 		}
 
 		// do something with the updates

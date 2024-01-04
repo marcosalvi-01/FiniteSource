@@ -10,9 +10,11 @@ import kotlinx.coroutines.flow.first
 import org.openapitools.client.models.ConfigGeneralConfigJsonGet200Response
 import kotlin.properties.Delegates
 
-private val Context.dataStore by preferencesDataStore("config")
+private const val CATALOG_CONFIG_TAG = "catalog_config"
 
-object Config {
+private val Context.dataStore by preferencesDataStore(CATALOG_CONFIG_TAG)
+
+object CatalogConfig {
 	lateinit var ingvItUrl: String
 	lateinit var ingvEnUrl: String
 	lateinit var sourceGeoJsonFileName: String

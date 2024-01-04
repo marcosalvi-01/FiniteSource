@@ -57,7 +57,7 @@ class ApiCalls @Inject constructor(private val apiClient: ApiClient) {
 				finiteSourceService.catalogEventIdINVERSEFocalPlaneSOURCESGeoJsonFileNameGet(
 					earthquake.id,
 					focalPlaneType.name,
-					Config.sourceGeoJsonFileName
+					CatalogConfig.sourceGeoJsonFileName
 				).executeApiCall().string()
 
 			FiniteSource(
