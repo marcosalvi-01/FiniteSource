@@ -185,6 +185,11 @@ class EarthquakesRepository @Inject constructor(
 					apiClient,
 				).also { instance = it }
 			}
+
+		// TODO find a better way to do this
+		fun parseScenarioType(id: String): ScenarioType {
+			return instance!!.scenarioTypeDao.getById(id)
+		}
 	}
 }
 

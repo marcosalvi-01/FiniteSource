@@ -1,3 +1,47 @@
 <resources>
-    <string name="app_name">FiniteSource</string>
+    <string name="app_name">INGV Finite Source</string>
+    <string name="global_list_item_depth" translatable="false">%s km</string>
+    <string name="global_list_item_magnitude" translatable="false">%s</string>
+    <string name="event_details_title">Event details</string>
+    <string name="searchbar_hint">Search here</string>
+    <string name="legend_title">Legend</string>
+    <string name="legend_description">The color represent the availability of modeled sources from InSAR data for the event.</string>
+    <string name="legend_has_finite_source">At least one modeled source is available.</string>
+    <string name="legend_has_no_finite_source">No modeled source models are available.</string>
+    <string name="slip_palette_max_depth" translatable="false">%s m</string>
+    <string name="slip_palette_min_depth" translatable="false">0.0 m</string>
+    <string name="finite_source_tab_name">Finite Source</string>
+    <string name="scenarios_tab_name">Scenarios</string>
+    <string name="footprints_tab_name">Footprints</string>
+    <string name="finite_source_not_available">No modeled source models are available</string>
+    <string name="scenarios_not_available">Scenarios not available</string>
+    <string name="footprints_not_available">Footprints not available</string>
+    <string name="event_error">Error while downloading the event details</string>
+    <string name="download_zip_button_text">Download data_and_model.zip</string>
+    <string name="download_completed">Download completed</string>
+    <string name="download_failed">Error while downloading</string>
+    <string name="full_screen_image_transition_name" translatable="false">full_screen_image_transistion</string>
+    <string name="share_event">Share event</string>
+    <string name="see_online">See on the INGV website</string>
+    <string name="no_ingv_url">INGV link not available</string>
+    <string name="share_event_format">Event: %s%nMagnitude: %.1f%nDate: %s%nDepth: %.1f km%nINGV URL: %s%nAvailable products: %s</string>
+    <string name="share_image">Share image</string>
+    <string name="save_image">Save image</string>
+    <string name="image_saved">Image saved in the gallery</string>
+    <string name="download_global_json_error">Error while retrieving the events</string>
+    <string name="retry">Retry</string>
+    <string name="info_item_title">Informations</string>
+    <string name="what_is_new">What\'s new</string>
+    <string name="more_info">More info</string>
+    <string name="ignore">Ignore</string>
+    <plurals name="new_earthquakes">
+        <item quantity="one">Added %d new earthquake</item>
+        <item quantity="other">Added %d new earthquakes</item>
+    </plurals>
+    <plurals name="new_products">
+        <item quantity="one">Added %d product to an old earthquake</item>
+        <item quantity="other">Added %d products to old earthquakes</item>
+    </plurals>
+    <string name="since_last_time">Since last time we have:</string>
+    <string name="updates_info_title">Last updates</string>
 </resources>

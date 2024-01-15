@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">INGV Sorgente Estesa</string>
+    <string name="event_details_title">Dettagli evento</string>
+    <string name="searchbar_hint">Cerca qui</string>
+    <string name="legend_title">Legenda</string>
+    <string name="legend_description">Il colore si riferisce alla presenza di modelli di sorgente da dati InSAR per l\'evento.</string>
+    <string name="legend_has_finite_source">È disponibile almeno un modello di sorgente.</string>
+    <string name="legend_has_no_finite_source">Non sono disponibili modelli di sorgente.</string>
+    <string name="finite_source_tab_name">Sorgente</string>
+    <string name="scenarios_tab_name">Scenari</string>
+    <string name="footprints_tab_name">Footprints</string>
+    <string name="finite_source_not_available">Non sono disponibili modelli di sorgente.</string>
+    <string name="scenarios_not_available">Scenari non disponibili</string>
+    <string name="footprints_not_available">Footprints non disponibili</string>
+    <string name="event_error">Errore nel download dei dettagli evento</string>
+    <string name="download_zip_button_text">Scarica data_and_model.zip</string>
+    <string name="download_completed">Download completato</string>
+    <string name="download_failed">Errore durante il download</string>
+    <string name="share_event">Condividi evento</string>
+    <string name="see_online">Vedi sul sito INGV</string>
+    <string name="no_ingv_url">Evento non disponibile sul sito INGV</string>
+    <string name="share_event_format">Evento: %s%nMagnitudo: %.1f%nData: %s%nProfondità: %.1f km%nIndirizzo INGV: %s%nProdotti disponibili: %s</string>
+    <string name="share_image">Condividi immagine</string>
+    <string name="save_image">Salva immagine</string>
+    <string name="image_saved">Immagine salvata nella galleria</string>
+    <string name="download_global_json_error">Errore nel caricamento degli eventi</string>
+    <string name="retry">Riprova</string>
+    <string name="info_item_title">Informazioni</string>
+    <string name="what_is_new">Cosa c\'è di nuovo</string>
+    <string name="since_last_time">Dall\'ultima volta abbiamo:</string>
+    <string name="more_info">Più informazioni</string>
+    <string name="ignore">Ignora</string>
+    <plurals name="new_earthquakes">
+        <item quantity="one">Aggiunto %d nuovo terremoto</item>
+        <item quantity="many">Aggiunto %d nuovi terremoti</item>
+        <item quantity="other">Aggiunto %d nuovi terremoti</item>
+    </plurals>
+    <plurals name="new_products">
+        <item quantity="one">Aggiunto %d prodotto ad un vecchio terremoto</item>
+        <item quantity="many">Aggiunto %d prodotti a vecchi terremoti</item>
+        <item quantity="other">Aggiunto %d prodotti a vecchi terremoti</item>
+    </plurals>
+    <string name="updates_info_title">Ultimi aggiornamenti</string>
+</resources>

@@ -5,6 +5,7 @@ import com.example.finitesource.data.local.earthquake.focalplane.FocalPlaneType
 import com.example.finitesource.data.local.earthquake.focalplane.Scenario
 import com.example.finitesource.data.local.earthquake.focalplane.ScenarioType
 import com.example.finitesource.data.local.earthquake.focalplane.geojson.CustomGeoJson
+import org.osmdroid.util.BoundingBox
 import java.util.Calendar
 
 class Converters {
@@ -59,4 +60,19 @@ class Converters {
 
 	@TypeConverter
 	fun stringToGeoJson(value: String): CustomGeoJson = CustomGeoJson.parseString(value)
+
+	@TypeConverter
+	fun boundingBoxToString(boundingBox: BoundingBox): String = boundingBox.toString()
+
+	@TypeConverter
+	fun stringToBoundingBox(value: String): BoundingBox {
+		// N:27.459793; E:84.47654; S:28.364096; W:85.931061
+		val values = value.split("; ")
+		return BoundingBox(
+			values[0].substring(2).toDouble(),
+			values[1].substring(2).toDouble(),
+			values[2].substring(2).toDouble(),
+			values[3].substring(2).toDouble()
+		)
+	}
 }

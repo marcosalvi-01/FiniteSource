@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <item name="focal_plane_switch" type="id" />
+    <item name="slip_palette" type="id" />
+</resources>

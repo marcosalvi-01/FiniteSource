@@ -2,6 +2,7 @@ package com.example.finitesource.data.local.earthquake.focalplane
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey
+import com.example.finitesource.data.local.database.dao.ScenarioTypeDao
 
 @Entity
 open class ScenarioType(
@@ -25,9 +26,8 @@ open class ScenarioType(
 	}
 
 	companion object {
-		fun parseString(string: String): ScenarioType {
-			// TODO
-			return ScenarioType(string, "", "")
+		fun parseString(string: String, scenarioTypeDao: ScenarioTypeDao): ScenarioType {
+			return scenarioTypeDao.getById(string)
 		}
 	}
 }

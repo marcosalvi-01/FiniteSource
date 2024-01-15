@@ -7,7 +7,9 @@ import com.example.finitesource.data.local.earthquake.focalplane.FocalPlane
 import com.example.finitesource.data.local.earthquake.focalplane.FocalPlaneType
 import com.example.finitesource.offsetDateTimeToCalendar
 import org.openapitools.client.models.FiniteSourceAppAppJsonGet200ResponseInner
+import org.osmdroid.util.BoundingBox
 import java.util.Calendar
+import kotlin.math.roundToInt
 
 @Entity
 data class Earthquake(
@@ -18,7 +20,7 @@ data class Earthquake(
 	val depth: Double,
 	val latitude: Double,
 	val longitude: Double,
-//	val boundingBox: List<Double>,    // TODO see if it is better to use the osmdroid one
+	val boundingBox: BoundingBox,
 	var finiteSourceLastUpdate: Calendar? = null,
 	@Embedded var details: EarthquakeDetails? = null,
 ) {
@@ -53,11 +55,18 @@ fun toEarthquake(response: FiniteSourceAppAppJsonGet200ResponseInner): Earthquak
 			id = response.idEvent!!,
 			name = response.name!!,
 			date = offsetDateTimeToCalendar(response.occurringTime)!!,
-			magnitude = response.magnitude!!,
+			magnitude = (response.magnitude!! * 10).roundToInt() / 10.0,
 			depth = response.depth!!,
 			latitude = response.latitude!!,
 			longitude = response.longitude!!,
 			finiteSourceLastUpdate = offsetDateTimeToCalendar(response.finiteSourceLastUpdated),
+			boundingBox = BoundingBox(
+				// South, West, North, East
+				response.boundingBox!![2],
+				response.boundingBox[3],
+				response.boundingBox[0],
+				response.boundingBox[1]
+			),
 			details = null,
 		)
 	} catch (e: Exception) {
