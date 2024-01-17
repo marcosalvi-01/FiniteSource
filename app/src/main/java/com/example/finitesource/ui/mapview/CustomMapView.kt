@@ -35,11 +35,54 @@ class CustomMapView(context: Context, attributeSet: AttributeSet) : MapView(cont
 	var earthquakesViewModel: EarthquakesViewModel? = null
 		set(value) {
 			// listen to changes in the ui state
-			value!!.uiState.observe(context as LifecycleOwner) {
-				if (it.selectedEarthquake != null) {
-					// zoom to the bounding box
-					zoomToBoundingBox(it.selectedEarthquake.boundingBox, true)
+			value!!.uiState.observe(context as LifecycleOwner) { uiState ->
+				// if there is a selected event
+				if (uiState.selectedEarthquake != null) {
+					// if it is loading
+					if (uiState.selectedEarthquakeLoading) {
+						// if the selected event is different from the previous one
+						// show the previous one
+						if (selectedMarker != null && selectedMarker!!.eventId != uiState.selectedEarthquake.id)
+							overlays.add(selectedMarker!!)
+						// zoom to the bounding box
+						zoomToBoundingBox(uiState.selectedEarthquake.boundingBox, true)
+					} else {
+						// if the event has finite source
+						// remove the marker of the selected event
+						overlays.forEach {
+							if (it is CustomMarker && it.eventId == uiState.selectedEarthquake.id) {
+								if (uiState.selectedEarthquake.hasFiniteSource())
+									overlays.remove(it)
+								selectedMarker = it
+							}
+						}
+					}
 				}
+				// if there was a selected event deselect it
+				else if (selectedMarker != null) {
+					// based on the zoom
+					if (zoomLevelDouble > BIG_MARKERS_ZOOM_LEVEL) {
+						// make the marker big
+						selectedMarker!!.setBigIcon()
+						// zoom out a little
+						zoomToBoundingBox(
+							boundingBox.increaseByScale(ZOOM_OUT_FACTOR),
+							true
+						) // TODO do this better
+					} else {
+						// make the marker small
+						selectedMarker!!.setSmallIcon()
+					}
+					// show the last selected marker
+					overlays.add(selectedMarker!!)
+					// remove the old polygons
+//					overlays.removeIf { overlay: Overlay? ->
+//						overlay is CustomPolygon || overlay is Polyline
+//					}
+					selectedMarker = null
+				}
+
+				invalidate()
 			}
 			field = value
 		}
@@ -85,7 +128,7 @@ class CustomMapView(context: Context, attributeSet: AttributeSet) : MapView(cont
 		// deselect the selected event when the map is clicked
 		overlays.add(0, MapEventsOverlay(object : MapEventsReceiver {
 			override fun singleTapConfirmedHelper(p: GeoPoint): Boolean {
-//                mapViewModel.mapClicked()
+				earthquakesViewModel?.deselectEarthquake()
 				return false
 			}
 
@@ -293,6 +336,12 @@ class CustomMapView(context: Context, attributeSet: AttributeSet) : MapView(cont
 		// sort the events by date
 		events.sortedByDescending { it.date }
 		for (event in events) {
+			// if the marker is already on the map or is the selected one skip it
+			if (
+				(overlays.any { it is CustomMarker && (it.eventId == event.id) }) ||
+				(selectedMarker != null && selectedMarker!!.eventId == event.id)
+			)
+				continue
 			val marker = CustomMarker(
 				this,
 				event.date,

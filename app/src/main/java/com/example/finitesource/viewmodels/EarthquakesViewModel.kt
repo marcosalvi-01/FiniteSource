@@ -43,13 +43,13 @@ class EarthquakesViewModel @Inject constructor(
 		// if the earthquake is already selected, do nothing
 		if (earthquake == _uiState.value?.selectedEarthquake)
 			return
+		// set the loading state
+		_uiState.value = UiState(earthquake, _focalPlaneType, true)
 		// select the earthquake
 		// if the selected earthquake doesn't have the details
 		if (earthquake.details == null) {
 			viewModelScope.launch(Dispatchers.IO) {
-				// set the loading state
-				_uiState.postValue(UiState(earthquake, _focalPlaneType, true))
-				// load the details
+				// load the detailst
 				val loadedEarthquake = repository.loadEarthquakeDetails(earthquake.id)
 					?: throw Exception("Failed to load earthquake details")
 				// if the focal plane type is not specified, use the default one
@@ -66,5 +66,10 @@ class EarthquakesViewModel @Inject constructor(
 			// if the selected earthquake has the details, set the state
 			_uiState.value = UiState(earthquake, focalPlaneType, false)
 		}
+	}
+
+	fun deselectEarthquake() {
+		// set the selected earthquake in the state to null
+		_uiState.value = UiState(null, null, false)
 	}
 }
