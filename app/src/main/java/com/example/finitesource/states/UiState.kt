@@ -8,15 +8,15 @@ import com.example.finitesource.data.local.earthquake.focalplane.FocalPlaneType
 data class UiState(
 	val selectedEarthquake: Earthquake? = null,
 	val selectedFocalPlane: FocalPlaneType? = null,
-	val selectedEarthquakeLoading: Boolean = true,
+	val loadingState: LoadingState = LoadingState(),
 ) {
 	init {
 		// if an earthquake is selected and it's not loading, a focal plane must be selected
-		require(selectedEarthquake == null || selectedEarthquakeLoading || selectedFocalPlane != null) {
+		require(selectedEarthquake == null || loadingState.loading || selectedFocalPlane != null) {
 			"If an earthquake is selected and it's not loading, a focal plane must be selected"
 		}
 		// if the selected earthquake doesn't have the details, loading must be true
-		require(selectedEarthquake == null || selectedEarthquake.details != null || selectedEarthquakeLoading) {
+		require(selectedEarthquake == null || selectedEarthquake.details != null || loadingState.loading) {
 			"If the selected earthquake doesn't have the details, loading must be true"
 		}
 		// if there is no selected earthquake, there must be no selected focal plane
@@ -25,3 +25,8 @@ data class UiState(
 		}
 	}
 }
+
+data class LoadingState(
+	val loading: Boolean = true,
+	val errorWhileLoading: Boolean = false,
+)

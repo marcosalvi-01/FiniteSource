@@ -8,6 +8,7 @@ import android.util.AttributeSet
 import android.util.DisplayMetrics
 import android.view.WindowManager
 import android.widget.ImageButton
+import android.widget.Toast
 import androidx.lifecycle.LifecycleOwner
 import com.example.finitesource.R
 import com.example.finitesource.cmToPx
@@ -39,23 +40,32 @@ class CustomMapView(context: Context, attributeSet: AttributeSet) : MapView(cont
 				// if there is a selected event
 				if (uiState.selectedEarthquake != null) {
 					// if it is loading
-					if (uiState.selectedEarthquakeLoading) {
+					if (uiState.loadingState.loading) {
+						// if there was an error while loading the event
+						if (uiState.loadingState.errorWhileLoading) {
+							// show a toast
+							Toast.makeText(
+								context,
+								R.string.event_error,
+								Toast.LENGTH_SHORT
+							).show() // TODO use a snackbar
+							return@observe
+						}
 						// if the selected event is different from the previous one
 						// show the previous one
 						if (selectedMarker != null && selectedMarker!!.eventId != uiState.selectedEarthquake.id)
 							overlays.add(selectedMarker!!)
 						// zoom to the bounding box
 						zoomToBoundingBox(uiState.selectedEarthquake.boundingBox, true)
+						// update the selected marker
+						selectedMarker = overlays.find {
+							it is CustomMarker && it.eventId == uiState.selectedEarthquake.id
+						} as CustomMarker?
 					} else {
 						// if the event has finite source
 						// remove the marker of the selected event
-						overlays.forEach {
-							if (it is CustomMarker && it.eventId == uiState.selectedEarthquake.id) {
-								if (uiState.selectedEarthquake.hasFiniteSource())
-									overlays.remove(it)
-								selectedMarker = it
-							}
-						}
+						if (uiState.selectedEarthquake.hasFiniteSource())
+							overlays.remove(selectedMarker)
 					}
 				}
 				// if there was a selected event deselect it
@@ -353,7 +363,13 @@ class CustomMapView(context: Context, attributeSet: AttributeSet) : MapView(cont
 			)
 			marker.setOnMarkerClickListener { _, _ ->
 				// when the marker is clicked, call the view model
-				earthquakesViewModel?.selectEarthquake(event)
+				try {
+					earthquakesViewModel?.selectEarthquake(event)
+				} catch (e: Exception) {
+					e.printStackTrace()
+					Toast.makeText(context, e.message, Toast.LENGTH_SHORT)
+						.show() // TODO use snackbar
+				}
 				true
 			}
 			// add the marker to the map

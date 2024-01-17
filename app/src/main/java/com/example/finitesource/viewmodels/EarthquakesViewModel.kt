@@ -10,6 +10,7 @@ import com.example.finitesource.data.EarthquakesRepository
 import com.example.finitesource.data.local.EarthquakeUpdates
 import com.example.finitesource.data.local.earthquake.Earthquake
 import com.example.finitesource.data.local.earthquake.focalplane.FocalPlaneType
+import com.example.finitesource.states.LoadingState
 import com.example.finitesource.states.UiState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
@@ -44,32 +45,48 @@ class EarthquakesViewModel @Inject constructor(
 		if (earthquake == _uiState.value?.selectedEarthquake)
 			return
 		// set the loading state
-		_uiState.value = UiState(earthquake, _focalPlaneType, true)
+		_uiState.value = UiState(earthquake, _focalPlaneType, LoadingState())
 		// select the earthquake
 		// if the selected earthquake doesn't have the details
 		if (earthquake.details == null) {
 			viewModelScope.launch(Dispatchers.IO) {
-				// load the detailst
+				// load the details
 				val loadedEarthquake = repository.loadEarthquakeDetails(earthquake.id)
-					?: throw Exception("Failed to load earthquake details")
+				// if there was an error while loading the event details
+				if (loadedEarthquake == null) {
+					// set the error state
+					_uiState.postValue(
+						UiState(
+							earthquake, _focalPlaneType, LoadingState(
+								loading = true,
+								errorWhileLoading = true
+							)
+						)
+					)
+					return@launch
+				}
 				// if the focal plane type is not specified, use the default one
 				val focalPlaneType =
 					_focalPlaneType
 						?: loadedEarthquake.details!!.getDefaultFocalPlane().focalPlaneType
 				// set the state
-				_uiState.postValue(UiState(loadedEarthquake, focalPlaneType, false))
+				_uiState.postValue(
+					UiState(
+						loadedEarthquake, focalPlaneType, LoadingState(loading = false)
+					)
+				)
 			}
 		} else {
 			// if the focal plane type is not specified, use the default one
 			val focalPlaneType =
 				_focalPlaneType ?: earthquake.details!!.getDefaultFocalPlane().focalPlaneType
 			// if the selected earthquake has the details, set the state
-			_uiState.value = UiState(earthquake, focalPlaneType, false)
+			_uiState.value = UiState(earthquake, focalPlaneType, LoadingState(loading = false))
 		}
 	}
 
 	fun deselectEarthquake() {
 		// set the selected earthquake in the state to null
-		_uiState.value = UiState(null, null, false)
+		_uiState.value = UiState()
 	}
 }
