@@ -228,6 +228,34 @@
         }
       }
     },
+    "/Config/SlipColorPalette.json": {
+      "get": {
+        "tags": [
+          "Configuration files"
+        ],
+        "summary": "The color palette used to represent the slip in the finite source data",
+        "description": "The color palette used to represent the slip in the finite source data. The color palette is an array of hexadecimal. The first color in the list is used for the slip value 0, the last color is used for the slip value 1. The colors in between are used for the intermediate values.",
+        "responses": {
+          "200": {
+            "description": "Successful operation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "string",
+                    "minimum": 256,
+                    "maximum": 256,
+                    "example": "#1F77B4",
+                    "description": "The color in hexadecimal format without the alpha value."
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/Config/GeneralConfig.json": {
       "get": {
         "tags": [
@@ -450,8 +478,10 @@
                       "description": "The list of the id of the available products for the event."
                     },
                     "id_ingv": {
-                      "type": "string",
-                      "example": "123456789"
+                      "type": "integer",
+                      "description": "Unique incremental id | bigint(20)",
+                      "format": "int64",
+                      "example": 14932631
                     },
                     "focal_plane": {
                       "type": "integer",

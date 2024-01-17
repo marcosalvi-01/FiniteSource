@@ -9,6 +9,8 @@ data class CustomGeoJson(
 	val features: List<Feature>,
 	val type: String
 ) {
+	val maxSlip = features.mapNotNull { it.properties.slipM }.maxOrNull() ?: 0.0
+
 	/**
 	 * Converts the GeoJson object into a string.
 	 */
@@ -47,3 +49,9 @@ data class Properties(
 	@Json(name = "Rake_d") val rakeD: Double?,
 	@Json(name = "Slip_m") val slipM: Double?
 )
+
+enum class CustomGeoJsonGeometryType(val value: String) {
+	// these are the ones used in the geojson given by INGV
+	POLYGON("Polygon"),
+	MULTI_LINE_STRING("MultiLineString")
+}

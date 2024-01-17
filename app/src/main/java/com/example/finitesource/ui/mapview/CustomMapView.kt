@@ -10,10 +10,15 @@ import android.view.WindowManager
 import android.widget.ImageButton
 import android.widget.Toast
 import androidx.lifecycle.LifecycleOwner
+import androidx.lifecycle.LiveData
 import com.example.finitesource.R
 import com.example.finitesource.cmToPx
+import com.example.finitesource.data.local.CatalogConfig
 import com.example.finitesource.data.local.earthquake.Earthquake
+import com.example.finitesource.data.local.earthquake.focalplane.geojson.CustomGeoJson
+import com.example.finitesource.data.local.earthquake.focalplane.geojson.CustomGeoJsonGeometryType
 import com.example.finitesource.pxToCm
+import com.example.finitesource.states.UiState
 import com.example.finitesource.viewmodels.EarthquakesViewModel
 import org.osmdroid.events.MapEventsReceiver
 import org.osmdroid.events.MapListener
@@ -25,6 +30,8 @@ import org.osmdroid.util.GeoPoint
 import org.osmdroid.views.CustomZoomButtonsController
 import org.osmdroid.views.MapView
 import org.osmdroid.views.overlay.MapEventsOverlay
+import org.osmdroid.views.overlay.Overlay
+import org.osmdroid.views.overlay.Polyline
 
 /**
  * This class is a subclass of [MapView] that extends its functionality by adding custom overlays
@@ -36,64 +43,7 @@ class CustomMapView(context: Context, attributeSet: AttributeSet) : MapView(cont
 	var earthquakesViewModel: EarthquakesViewModel? = null
 		set(value) {
 			// listen to changes in the ui state
-			value!!.uiState.observe(context as LifecycleOwner) { uiState ->
-				// if there is a selected event
-				if (uiState.selectedEarthquake != null) {
-					// if it is loading
-					if (uiState.loadingState.loading) {
-						// if there was an error while loading the event
-						if (uiState.loadingState.errorWhileLoading) {
-							// show a toast
-							Toast.makeText(
-								context,
-								R.string.event_error,
-								Toast.LENGTH_SHORT
-							).show() // TODO use a snackbar
-							return@observe
-						}
-						// if the selected event is different from the previous one
-						// show the previous one
-						if (selectedMarker != null && selectedMarker!!.eventId != uiState.selectedEarthquake.id)
-							overlays.add(selectedMarker!!)
-						// zoom to the bounding box
-						zoomToBoundingBox(uiState.selectedEarthquake.boundingBox, true)
-						// update the selected marker
-						selectedMarker = overlays.find {
-							it is CustomMarker && it.eventId == uiState.selectedEarthquake.id
-						} as CustomMarker?
-					} else {
-						// if the event has finite source
-						// remove the marker of the selected event
-						if (uiState.selectedEarthquake.hasFiniteSource())
-							overlays.remove(selectedMarker)
-					}
-				}
-				// if there was a selected event deselect it
-				else if (selectedMarker != null) {
-					// based on the zoom
-					if (zoomLevelDouble > BIG_MARKERS_ZOOM_LEVEL) {
-						// make the marker big
-						selectedMarker!!.setBigIcon()
-						// zoom out a little
-						zoomToBoundingBox(
-							boundingBox.increaseByScale(ZOOM_OUT_FACTOR),
-							true
-						) // TODO do this better
-					} else {
-						// make the marker small
-						selectedMarker!!.setSmallIcon()
-					}
-					// show the last selected marker
-					overlays.add(selectedMarker!!)
-					// remove the old polygons
-//					overlays.removeIf { overlay: Overlay? ->
-//						overlay is CustomPolygon || overlay is Polyline
-//					}
-					selectedMarker = null
-				}
-
-				invalidate()
-			}
+			observeState(value!!.uiState)
 			field = value
 		}
 	var compassButton: ImageButton? = null
@@ -138,7 +88,12 @@ class CustomMapView(context: Context, attributeSet: AttributeSet) : MapView(cont
 		// deselect the selected event when the map is clicked
 		overlays.add(0, MapEventsOverlay(object : MapEventsReceiver {
 			override fun singleTapConfirmedHelper(p: GeoPoint): Boolean {
-				earthquakesViewModel?.deselectEarthquake()
+				// This is done to prevent selecting an event and immediately deselecting it
+				// before the event is loaded causing weird behavior
+				// if there is no event that is loading
+				if (earthquakesViewModel?.uiState?.value?.loadingState?.loading == false)
+				// deselect the event
+					earthquakesViewModel?.deselectEarthquake()
 				return false
 			}
 
@@ -293,6 +248,78 @@ class CustomMapView(context: Context, attributeSet: AttributeSet) : MapView(cont
 		}
 	}
 
+	private fun observeState(uiStateLiveData: LiveData<UiState>) {
+		uiStateLiveData.observe(context as LifecycleOwner) { uiState ->
+			// if there is a selected event
+			if (uiState.selectedEarthquake != null) {
+				// if it is loading
+				if (uiState.loadingState.loading) {
+					// if there was an error while loading the event
+					if (uiState.loadingState.errorWhileLoading) {
+						// show a toast
+						Toast.makeText(
+							context,
+							R.string.event_error,
+							Toast.LENGTH_SHORT
+						).show() // TODO use a snackbar
+						return@observe
+					}
+					// if the selected event is different from the previous one
+					// show the previous one
+					if (selectedMarker != null && selectedMarker!!.eventId != uiState.selectedEarthquake.id)
+						deselectMarker(selectedMarker!!)
+					// zoom to the bounding box
+					zoomToBoundingBox(uiState.selectedEarthquake.boundingBox, true)
+					// update the selected marker
+					selectedMarker = overlays.find {
+						it is CustomMarker && it.eventId == uiState.selectedEarthquake.id
+					} as CustomMarker?
+				} else {    // if the event has loaded
+					// if the event has finite source
+					// remove the marker of the selected event
+					if (uiState.selectedEarthquake.hasFiniteSource()) {
+						overlays.remove(selectedMarker)
+						// show the finite source
+						overlays.addAll(
+							geoJsonToOsmdroidOverlays(
+								uiState.selectedEarthquake.details!!.getDefaultFocalPlane().finiteSource!!.sourceJson
+							)
+						)
+					}
+				}
+			}
+			// if there was a selected event deselect it
+			else if (selectedMarker != null) {
+				deselectMarker(selectedMarker!!)
+			}
+
+			invalidate()
+		}
+	}
+
+	private fun deselectMarker(marker: CustomMarker) {
+		// based on the zoom
+		if (zoomLevelDouble > BIG_MARKERS_ZOOM_LEVEL) {
+			// make the marker big
+			selectedMarker!!.setBigIcon()
+			// zoom out a little
+			zoomToBoundingBox(
+				boundingBox.increaseByScale(ZOOM_OUT_FACTOR),
+				true
+			) // TODO do this better
+		} else {
+			// make the marker small
+			selectedMarker!!.setSmallIcon()
+		}
+		// show the last selected marker
+		overlays.add(selectedMarker!!)
+		// remove the old polygons
+		overlays.removeIf { overlay: Overlay? ->
+			overlay is CustomPolygon || overlay is Polyline
+		}
+		selectedMarker = null
+	}
+
 	// set the alpha of the slip polygons
 	private fun setSlipAlpha(alpha: Int) {
 		overlays.filterIsInstance<CustomPolygon>().forEach { it.fillPaint.alpha = alpha }
@@ -301,7 +328,8 @@ class CustomMapView(context: Context, attributeSet: AttributeSet) : MapView(cont
 
 	// computes the color of the polygon based on the slip
 	private fun computeColor(slip: Double, maxSlip: Double): Int {
-		val colorArray = context.resources.getIntArray(R.array.color_palette)
+//		val colorArray = context.resources.getIntArray(R.array.color_palette)
+		val colorArray = CatalogConfig.slipColorPalette
 		return if (slip > 0) {
 			val ratio = slip / maxSlip
 			val index = (ratio * (colorArray.size - 1)).toInt()
@@ -399,69 +427,44 @@ class CustomMapView(context: Context, attributeSet: AttributeSet) : MapView(cont
 		)
 	}
 
-	// convert the features to poly-something to draw them on the map
-//	private fun featuresToPoly(
-//		featureCollection: FeatureCollection,
-//		maxSlip: Double
-//	): MutableSet<Overlay> {
-//		val polygons = mutableSetOf<Overlay>()
-//		featureCollection.features.forEach { feature ->
-//			// get the geometry of the feature
-//			// as a Jackson Polygon
-//			when (val poly = feature.geometry) {
-//				// convert the polygon to a CustomPolygon
-//				is Polygon -> polygons.add(
-//					osmdroidPolygonFromJacksonPolygon(
-//						poly,
-//						feature,
-//						maxSlip
-//					)
-//				)
-//
-//				// convert the MultiLineString to a Polyline
-//				is MultiLineString -> polygons.addAll(
-//					osmdroidPolylinesFromJacksonMultiLineString(
-//						poly
-//					)
-//				)
-//			}
-//		}
-//		return polygons
-//	}
+	private fun geoJsonToOsmdroidOverlays(geoJson: CustomGeoJson): MutableSet<Overlay> {
+		val overlays = mutableSetOf<Overlay>()
+		geoJson.features.forEach { feature ->
+			when (val geometryType = feature.geometry.type) {
+				CustomGeoJsonGeometryType.POLYGON.value -> {
+					overlays.add(CustomPolygon(
+						feature.properties.slipM ?: 0.0,
+						feature.properties.rakeD ?: 0.0
+					).apply {
+						points = feature.geometry.coordinates[0].map { coordinate ->
+							GeoPoint(coordinate[1], coordinate[0])
+						}
+						outlinePaint.strokeWidth = 2.0f
+						outlinePaint.color = Color.GRAY
+						fillPaint.color = computeColor(slip, geoJson.maxSlip)
+					})
+				}
 
-//	private fun osmdroidPolygonFromJacksonPolygon(
-//		poly: Polygon,
-//		feature: Feature,
-//		maxSlip: Double
-//	): CustomPolygon {
-//		// Convert the Jackson Polygon to a CustomPolygon (extends Osmdroid Polygon)
-//		val geoPoints = poly.coordinates[0].map { coordinate ->
-//			GeoPoint(coordinate.latitude, coordinate.longitude)
-//		}
-//		return CustomPolygon(
-//			feature.getProperty(SLIP_KEY),
-//			feature.getProperty(RAKE_KEY)
-//		).apply {
-//			points = geoPoints
-//			outlinePaint.strokeWidth = 2.0f
-//			outlinePaint.color = Color.GRAY
-//			fillPaint.color = computeColor(slip, maxSlip)
-//		}
-//	}
-//
-//	private fun osmdroidPolylinesFromJacksonMultiLineString(multiLineString: MultiLineString): List<Polyline> {
-//		// convert the Jackson MultiLineString to a Polylines
-//		return multiLineString.coordinates.map { coordinate ->
-//			val geoPointsLine = coordinate.map { lngLatAlt ->
-//				GeoPoint(lngLatAlt.latitude, lngLatAlt.longitude)
-//			}
-//			Polyline().apply {
-//				setPoints(geoPointsLine)
-//				outlinePaint.strokeWidth = 6f
-//				outlinePaint.color = Color.RED
-//			}
-//		}
-//	}
+				CustomGeoJsonGeometryType.MULTI_LINE_STRING.value -> {
+					overlays.addAll(feature.geometry.coordinates.map { coordinate ->
+						val geoPointsLine = coordinate.map { lngLatAlt ->
+							GeoPoint(lngLatAlt[1], lngLatAlt[0])
+						}
+						Polyline().apply {
+							setPoints(geoPointsLine)
+							outlinePaint.strokeWidth = 6f
+							outlinePaint.color = Color.RED
+						}
+					})
+				}
+
+				else -> {
+					throw Exception("Invalid geometry type $geometryType")
+				}
+			}
+		}
+		return overlays
+	}
 
 	private fun getDisplayMetrics(): DisplayMetrics {
 		val displayMetrics = DisplayMetrics()

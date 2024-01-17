@@ -62,16 +62,27 @@ fun toEarthquake(response: FiniteSourceAppAppJsonGet200ResponseInner): Earthquak
 			latitude = response.latitude!!,
 			longitude = response.longitude!!,
 			finiteSourceLastUpdate = offsetDateTimeToCalendar(response.finiteSourceLastUpdated),
-			boundingBox = BoundingBox(
-				// South, West, North, East
-				response.boundingBox!![2],
-				response.boundingBox[3],
-				response.boundingBox[0],
-				response.boundingBox[1]
-			),
+			boundingBox = normalizeBoundingBox(response.boundingBox!!),
 			details = null,
 		)
 	} catch (e: Exception) {
 		null
 	}
+}
+
+private fun normalizeBoundingBox(boundingBox: List<Double>): BoundingBox {
+	val (south, west, north, east) = boundingBox
+	// zoom out the bounding box
+	val eastDelta = 0.25
+	val westDelta = 0.25
+	val northDelta = 0.3
+	val southDelta = 0.3
+	val width = east - west
+	val height = north - south
+	return BoundingBox(
+		north + (northDelta * height),
+		east + (eastDelta * width),
+		south - (southDelta * height),
+		west - (westDelta * width)
+	)
 }

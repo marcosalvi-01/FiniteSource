@@ -62,7 +62,7 @@ class MainActivity : AppCompatActivity() {
 
 		// change the color of the status bar to match the theme
 		lightStatusBar(window, true)
-		
+
 		// give the viewmodel to the mapview
 		binding.customMapView.earthquakesViewModel = earthquakesViewModel
 
@@ -95,15 +95,6 @@ class MainActivity : AppCompatActivity() {
 		earthquakesViewModel.earthquakes.observe(this) { earthquakes ->
 			Log.d("MainActivity", "Earthquakes: ${earthquakes.size}")
 			if (earthquakes.isNotEmpty()) {
-//				try {
-//					earthquakesViewModel.selectEarthquake(
-//						earthquakes.first {
-//							it.id == "202401010710_01"
-//						}
-//					)
-//				} catch (e: Exception) {
-//					Log.d("MainActivity", "Failed to load earthquake ${e.message}")
-//				}
 				binding.customMapView.setEarthquakes(earthquakes)
 			} else {
 				// show a loading screen

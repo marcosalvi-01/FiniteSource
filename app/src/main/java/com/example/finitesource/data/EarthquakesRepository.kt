@@ -36,6 +36,7 @@ class EarthquakesRepository @Inject constructor(
 		updateConfig()
 		updateEarthquakes()
 	} catch (e: Exception) { // TODO handle errors using the correct error type
+		e.printStackTrace()
 		null
 	}
 
@@ -55,7 +56,16 @@ class EarthquakesRepository @Inject constructor(
 		scenarioTypeDao.upsertAll(scenarioTypes)
 
 		// update the general configs, if for some reason it doesn't work, it will use the old values
-		CatalogConfig.update(generalConfigResponse)
+		val newSlipPalette = CatalogConfig.update(generalConfigResponse)
+		// if the slip color palette has been updated, update the palette
+		if (newSlipPalette) {
+			// build the request
+			val slipColorPaletteResponse = apiClient
+				.createService(ConfigurationFilesApi::class.java)
+				.configSlipColorPaletteJsonGet().executeApiCall()
+			// update the general configs, if for some reason it doesn't work, it will use the old values
+			CatalogConfig.updateSlipColorPalette(slipColorPaletteResponse)
+		}
 	}
 
 	// loads the latest data from the finite source api and compares it to the saved data
