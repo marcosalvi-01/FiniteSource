@@ -58,7 +58,7 @@ class EarthquakesViewModel @Inject constructor(
 					_uiState.postValue(
 						UiState(
 							earthquake, _focalPlaneType, LoadingState(
-								loading = true,
+								loading = false,
 								errorWhileLoading = true
 							)
 						)

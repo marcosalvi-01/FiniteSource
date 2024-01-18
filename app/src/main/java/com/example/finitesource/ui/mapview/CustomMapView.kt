@@ -38,6 +38,7 @@ import org.osmdroid.views.overlay.Polyline
  * and handling specific map interactions.
  */
 class CustomMapView(context: Context, attributeSet: AttributeSet) : MapView(context, attributeSet) {
+	// In this class is a mess, the states are handled in a very bad way and it should be refactored (but it works)
 	private lateinit var scaleBarOverlay: CustomScaleBarOverlay
 	private var selectedMarker: CustomMarker? = null
 	var earthquakesViewModel: EarthquakesViewModel? = null
@@ -90,8 +91,10 @@ class CustomMapView(context: Context, attributeSet: AttributeSet) : MapView(cont
 			override fun singleTapConfirmedHelper(p: GeoPoint): Boolean {
 				// This is done to prevent selecting an event and immediately deselecting it
 				// before the event is loaded causing weird behavior
-				// if there is no event that is loading
-				if (earthquakesViewModel?.uiState?.value?.loadingState?.loading == false)
+				// if there is no event that is loading or there is one but it has an error
+				if (earthquakesViewModel?.uiState?.value?.loadingState?.loading == false
+					|| earthquakesViewModel?.uiState?.value?.loadingState?.errorWhileLoading == true
+				)
 				// deselect the event
 					earthquakesViewModel?.deselectEarthquake()
 				return false
@@ -110,16 +113,7 @@ class CustomMapView(context: Context, attributeSet: AttributeSet) : MapView(cont
 
 			override fun onZoom(event: ZoomEvent): Boolean {
 				// change the markers based on the zoom level
-				if (event.zoomLevel > BIG_MARKERS_ZOOM_LEVEL)
-					overlays.forEach {
-						if (it is CustomMarker)
-							it.setBigIcon()
-					}
-				else
-					overlays.forEach {
-						if (it is CustomMarker)
-							it.setSmallIcon()
-					}
+				overlays.filterIsInstance<CustomMarker>().forEach { updateMarkerBasedOnZoom(it) }
 				return false
 			}
 		})
@@ -248,76 +242,80 @@ class CustomMapView(context: Context, attributeSet: AttributeSet) : MapView(cont
 		}
 	}
 
+	private fun updateMarkerBasedOnZoom(marker: CustomMarker) {
+		// change the markers based on the zoom level
+		if (zoomLevelDouble > BIG_MARKERS_ZOOM_LEVEL)
+			marker.setBigIcon()
+		else
+			marker.setSmallIcon()
+	}
+
 	private fun observeState(uiStateLiveData: LiveData<UiState>) {
 		uiStateLiveData.observe(context as LifecycleOwner) { uiState ->
 			// if there is a selected event
 			if (uiState.selectedEarthquake != null) {
 				// if it is loading
 				if (uiState.loadingState.loading) {
+					// update the selected marker
+					selectedMarker = overlays.firstOrNull {
+						it is CustomMarker && it.eventId == uiState.selectedEarthquake.id
+					} as CustomMarker?
+					// zoom to the bounding box
+					zoomToBoundingBox(uiState.selectedEarthquake.boundingBox, true)
+				} else {    // if the event has loaded
 					// if there was an error while loading the event
 					if (uiState.loadingState.errorWhileLoading) {
-						// show a toast
+						// show a message
 						Toast.makeText(
 							context,
 							R.string.event_error,
 							Toast.LENGTH_SHORT
 						).show() // TODO use a snackbar
-						return@observe
-					}
-					// if the selected event is different from the previous one
-					// show the previous one
-					if (selectedMarker != null && selectedMarker!!.eventId != uiState.selectedEarthquake.id)
-						deselectMarker(selectedMarker!!)
-					// zoom to the bounding box
-					zoomToBoundingBox(uiState.selectedEarthquake.boundingBox, true)
-					// update the selected marker
-					selectedMarker = overlays.find {
-						it is CustomMarker && it.eventId == uiState.selectedEarthquake.id
-					} as CustomMarker?
-				} else {    // if the event has loaded
-					// if the event has finite source
-					// remove the marker of the selected event
-					if (uiState.selectedEarthquake.hasFiniteSource()) {
-						overlays.remove(selectedMarker)
-						// show the finite source
-						overlays.addAll(
-							geoJsonToOsmdroidOverlays(
-								uiState.selectedEarthquake.details!!.getDefaultFocalPlane().finiteSource!!.sourceJson
+						// deselect the event
+						earthquakesViewModel?.deselectEarthquake()
+					} else {
+						// if the event has finite source
+						// remove the marker of the selected event
+						if (uiState.selectedEarthquake.hasFiniteSource()) {
+							overlays.removeIf {
+								it is CustomMarker && it.eventId == uiState.selectedEarthquake.id
+							}
+							// show the finite source
+							overlays.addAll(
+								geoJsonToOsmdroidOverlays(
+									uiState.selectedEarthquake.details!!.getDefaultFocalPlane().finiteSource!!.sourceJson
+								)
 							)
-						)
+						}
 					}
 				}
 			}
 			// if there was a selected event deselect it
 			else if (selectedMarker != null) {
-				deselectMarker(selectedMarker!!)
+				// based on the zoom
+				if (zoomLevelDouble > BIG_MARKERS_ZOOM_LEVEL) {
+					// make the marker big
+					selectedMarker!!.setBigIcon()
+					// zoom out a little
+					zoomToBoundingBox(
+						boundingBox.increaseByScale(ZOOM_OUT_FACTOR),
+						true
+					) // TODO do this better
+				} else {
+					// make the marker small
+					selectedMarker!!.setSmallIcon()
+				}
+				// show the last selected marker only if it is not already shown
+				if (!overlays.contains(selectedMarker))
+					overlays.add(selectedMarker)
+				// remove the old polygons
+				overlays.removeIf { overlay: Overlay? ->
+					overlay is CustomPolygon || overlay is Polyline
+				}
 			}
 
 			invalidate()
 		}
-	}
-
-	private fun deselectMarker(marker: CustomMarker) {
-		// based on the zoom
-		if (zoomLevelDouble > BIG_MARKERS_ZOOM_LEVEL) {
-			// make the marker big
-			selectedMarker!!.setBigIcon()
-			// zoom out a little
-			zoomToBoundingBox(
-				boundingBox.increaseByScale(ZOOM_OUT_FACTOR),
-				true
-			) // TODO do this better
-		} else {
-			// make the marker small
-			selectedMarker!!.setSmallIcon()
-		}
-		// show the last selected marker
-		overlays.add(selectedMarker!!)
-		// remove the old polygons
-		overlays.removeIf { overlay: Overlay? ->
-			overlay is CustomPolygon || overlay is Polyline
-		}
-		selectedMarker = null
 	}
 
 	// set the alpha of the slip polygons
@@ -328,7 +326,6 @@ class CustomMapView(context: Context, attributeSet: AttributeSet) : MapView(cont
 
 	// computes the color of the polygon based on the slip
 	private fun computeColor(slip: Double, maxSlip: Double): Int {
-//		val colorArray = context.resources.getIntArray(R.array.color_palette)
 		val colorArray = CatalogConfig.slipColorPalette
 		return if (slip > 0) {
 			val ratio = slip / maxSlip
@@ -371,15 +368,10 @@ class CustomMapView(context: Context, attributeSet: AttributeSet) : MapView(cont
 	}
 
 	fun setEarthquakes(events: List<Earthquake>) {
+		val markers = mutableSetOf<CustomMarker>()
 		// sort the events by date
 		events.sortedByDescending { it.date }
 		for (event in events) {
-			// if the marker is already on the map or is the selected one skip it
-			if (
-				(overlays.any { it is CustomMarker && (it.eventId == event.id) }) ||
-				(selectedMarker != null && selectedMarker!!.eventId == event.id)
-			)
-				continue
 			val marker = CustomMarker(
 				this,
 				event.date,
@@ -392,6 +384,9 @@ class CustomMapView(context: Context, attributeSet: AttributeSet) : MapView(cont
 			marker.setOnMarkerClickListener { _, _ ->
 				// when the marker is clicked, call the view model
 				try {
+					// deselect the old event
+					earthquakesViewModel?.deselectEarthquake()
+					// select the new one
 					earthquakesViewModel?.selectEarthquake(event)
 				} catch (e: Exception) {
 					e.printStackTrace()
@@ -400,10 +395,24 @@ class CustomMapView(context: Context, attributeSet: AttributeSet) : MapView(cont
 				}
 				true
 			}
-			// add the marker to the map
-			overlays.add(marker)
+			// TODO find a better way to do this
+			// add the marker to the markers set if it is not the selected one
+			if (earthquakesViewModel?.uiState?.value?.selectedEarthquake?.id != event.id
+				|| earthquakesViewModel?.uiState?.value?.selectedEarthquake?.hasFiniteSource() == false
+			)
+				markers.add(marker)
+			else
+			// I have to do this because when the mapview is destroyed, the selected marker is not saved anywhere
+			// so i have to save it here. This is a hack and it should be fixed
+				selectedMarker = marker
 		}
-		// update the map
+		// remove the old markers
+		overlays.removeIf { it is CustomMarker }
+		// update the markers based on the zoom level
+		markers.forEach { updateMarkerBasedOnZoom(it) }
+		// add the new markers
+		overlays.addAll(markers)
+		// update the mapview
 		invalidate()
 	}
 
@@ -428,11 +437,11 @@ class CustomMapView(context: Context, attributeSet: AttributeSet) : MapView(cont
 	}
 
 	private fun geoJsonToOsmdroidOverlays(geoJson: CustomGeoJson): MutableSet<Overlay> {
-		val overlays = mutableSetOf<Overlay>()
+		val finiteSource = mutableSetOf<Overlay>()
 		geoJson.features.forEach { feature ->
 			when (val geometryType = feature.geometry.type) {
 				CustomGeoJsonGeometryType.POLYGON.value -> {
-					overlays.add(CustomPolygon(
+					finiteSource.add(CustomPolygon(
 						feature.properties.slipM ?: 0.0,
 						feature.properties.rakeD ?: 0.0
 					).apply {
@@ -446,7 +455,7 @@ class CustomMapView(context: Context, attributeSet: AttributeSet) : MapView(cont
 				}
 
 				CustomGeoJsonGeometryType.MULTI_LINE_STRING.value -> {
-					overlays.addAll(feature.geometry.coordinates.map { coordinate ->
+					finiteSource.addAll(feature.geometry.coordinates.map { coordinate ->
 						val geoPointsLine = coordinate.map { lngLatAlt ->
 							GeoPoint(lngLatAlt[1], lngLatAlt[0])
 						}
@@ -463,7 +472,7 @@ class CustomMapView(context: Context, attributeSet: AttributeSet) : MapView(cont
 				}
 			}
 		}
-		return overlays
+		return finiteSource
 	}
 
 	private fun getDisplayMetrics(): DisplayMetrics {
