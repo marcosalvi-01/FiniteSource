@@ -89,4 +89,26 @@ class EarthquakesViewModel @Inject constructor(
 		// set the selected earthquake in the state to null
 		_uiState.value = UiState()
 	}
+
+	/**
+	 * This function is used to select a specific focal plane type for the currently selected earthquake.
+	 * If there is no selected earthquake or the focal plane type is already selected, the function will return without making any changes.
+	 * Otherwise, it will update the UI state with the new focal plane type and set the loading state to false.
+	 *
+	 * @param focalPlaneType The type of the focal plane to be selected.
+	 */
+	fun selectFocalPlane(focalPlaneType: FocalPlaneType) {
+		// If there is no selected earthquake, the function will return without making any changes.
+		if (_uiState.value?.selectedEarthquake == null)
+			return
+		// If the focal plane type is already selected, the function will return without making any changes.
+		if (_uiState.value?.selectedFocalPlane == focalPlaneType)
+			return
+		// The UI state is updated with the new focal plane type and the loading state is set to false.
+		_uiState.value = UiState(
+			_uiState.value!!.selectedEarthquake,
+			focalPlaneType,
+			LoadingState(loading = false)
+		)
+	}
 }

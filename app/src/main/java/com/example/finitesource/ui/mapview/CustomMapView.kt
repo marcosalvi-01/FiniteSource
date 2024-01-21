@@ -280,10 +280,14 @@ class CustomMapView(context: Context, attributeSet: AttributeSet) : MapView(cont
 							overlays.removeIf {
 								it is CustomMarker && it.eventId == uiState.selectedEarthquake.id
 							}
+							// remove the old polygons (this is used when the user selects a new focal plane)
+							overlays.removeIf { overlay: Overlay? ->
+								overlay is CustomPolygon || overlay is Polyline
+							}
 							// show the finite source
 							overlays.addAll(
 								geoJsonToOsmdroidOverlays(
-									uiState.selectedEarthquake.details!!.getDefaultFocalPlane().finiteSource!!.sourceJson
+									uiState.selectedEarthquake.details!!.getFocalPlane(uiState.selectedFocalPlane)?.finiteSource!!.sourceJson
 								)
 							)
 						}
@@ -319,7 +323,7 @@ class CustomMapView(context: Context, attributeSet: AttributeSet) : MapView(cont
 	}
 
 	// set the alpha of the slip polygons
-	private fun setSlipAlpha(alpha: Int) {
+	fun setSlipAlpha(alpha: Int) {
 		overlays.filterIsInstance<CustomPolygon>().forEach { it.fillPaint.alpha = alpha }
 		invalidate()
 	}
@@ -473,6 +477,10 @@ class CustomMapView(context: Context, attributeSet: AttributeSet) : MapView(cont
 			}
 		}
 		return finiteSource
+	}
+
+	fun setDarkMode(darkMode: Boolean) {
+		// TODO
 	}
 
 	private fun getDisplayMetrics(): DisplayMetrics {

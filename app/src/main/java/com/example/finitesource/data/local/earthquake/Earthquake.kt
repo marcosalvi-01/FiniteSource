@@ -37,6 +37,23 @@ data class Earthquake(
 
 	fun hasFiniteSource(): Boolean = finiteSourceLastUpdate != null
 
+	/**
+	 * This function is used to count the number of focal planes associated with an earthquake.
+	 * It checks if the earthquake details contain focal plane 1 (fp1) and focal plane 2 (fp2).
+	 * If only fp1 is present, it returns 1.
+	 * If only fp2 is present, it returns 2.
+	 * If both fp1 and fp2 are present, it returns 0.
+	 * If neither fp1 nor fp2 are present, it returns null.
+	 *
+	 * @return The count of focal planes associated with the earthquake or null if no focal planes are present.
+	 */
+	fun focalPlaneCount(): Int? {
+		var count: Int? = null
+		if (details?.fp1 != null) count = 1
+		if (details?.fp2 != null) count = if (count == 1) 0 else 2
+		return count
+	}
+
 	override fun equals(other: Any?): Boolean {
 		if (this === other) return true
 		if (other !is Earthquake) return false

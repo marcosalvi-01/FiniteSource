@@ -2,6 +2,7 @@ package com.example.finitesource.data.local.earthquake
 
 import androidx.room.Embedded
 import com.example.finitesource.data.local.earthquake.focalplane.FocalPlane
+import com.example.finitesource.data.local.earthquake.focalplane.FocalPlaneType
 
 // The separation is needed because the details should not be stored in the database forever
 data class EarthquakeDetails(
@@ -11,6 +12,14 @@ data class EarthquakeDetails(
 ) {
 	fun getDefaultFocalPlane(): FocalPlane {
 		return fp1 ?: fp2!!
+	}
+
+	fun getFocalPlane(focalPlaneType: FocalPlaneType?): FocalPlane? {
+		return when (focalPlaneType) {
+			FocalPlaneType.FP1 -> fp1
+			FocalPlaneType.FP2 -> fp2
+			else -> null
+		}
 	}
 
 	init {

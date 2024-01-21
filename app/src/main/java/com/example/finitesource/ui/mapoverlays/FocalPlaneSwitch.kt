@@ -16,6 +16,7 @@ import com.google.android.material.switchmaterial.SwitchMaterial
  */
 // this class is a mess, it should be refactored
 // TODO find a better way to show that the focal plane changed if the event doesn't have a finite source
+// TODO there is a bug right now where the switch's position is sometimes wrong, but moving the map fixes it
 class FocalPlaneSwitch(context: Context, attributeSet: AttributeSet) :
 	SwitchMaterial(context, attributeSet) {
 

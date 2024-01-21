@@ -22,6 +22,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.finitesource.R
 import com.example.finitesource.data.local.CatalogConfig
+import com.example.finitesource.data.local.earthquake.focalplane.FocalPlaneType
 import com.example.finitesource.databinding.ActivityMainBinding
 import com.example.finitesource.databinding.LegendBottomSheetBinding
 import com.example.finitesource.isDarkTheme
@@ -75,8 +76,8 @@ class MainActivity : AppCompatActivity() {
 		// set up the search view and bar
 		searchInit()
 
-//		// load the config
-//		// TODO block the app until the config and the earthquake data are loaded (show a loading screen)
+		// load the config
+		// TODO block the app until the config and the earthquake data are loaded (show a loading screen)
 		lifecycleScope.launch {
 			CatalogConfig.init(this@MainActivity)
 		}
@@ -91,18 +92,39 @@ class MainActivity : AppCompatActivity() {
 				).show()
 			Log.d("MainActivity", "Updates: $it")
 		}
-//
+
 		earthquakesViewModel.earthquakes.observe(this) { earthquakes ->
 			Log.d("MainActivity", "Earthquakes: ${earthquakes.size}")
 			if (earthquakes.isNotEmpty()) {
 				binding.customMapView.setEarthquakes(earthquakes)
 			} else {
-				// show a loading screen
+				// show a loading screen or something
 			}
 		}
 
 		earthquakesViewModel.uiState.observe(this) {
-			Log.d("MainActivity", "Selected earthquake: $it")
+			// if there is a selected earthquake
+			if (it.selectedEarthquake != null) {
+				// handle the focal plane switch
+				if (it.selectedEarthquake.focalPlaneCount() == 0 && !binding.focalPlaneSwitch.isShown) {
+					// show the focal plane switch
+					binding.focalPlaneSwitch.visibility = View.VISIBLE
+					// reset the state of the switch
+					binding.focalPlaneSwitch.isChecked = true
+				}
+				// handle the slip alpha slider
+				if (it.selectedEarthquake.hasFiniteSource() && !it.loadingState.loading) {
+					// show the slip alpha slider
+					binding.slipAlphaSliderContainer.visibility = View.VISIBLE
+					// reset the alpha
+					binding.slipAlphaSlider.progress = 0
+				}
+			} else {
+				// hide the focal plane switch
+				binding.focalPlaneSwitch.visibility = View.GONE
+				// hide the slip alpha slider
+				binding.slipAlphaSliderContainer.visibility = View.INVISIBLE
+			}
 		}
 	}
 
@@ -130,7 +152,12 @@ class MainActivity : AppCompatActivity() {
 		// set the listener for the focal plane switch
 		binding.focalPlaneSwitch.setOnCheckedChangeListener { _, isChecked ->
 			// call the viewModel
-//			focalPlaneSwitchViewModel.onCheckedChanged(isChecked)
+			earthquakesViewModel.selectFocalPlane(
+				when (isChecked) {
+					true -> FocalPlaneType.FP1
+					false -> FocalPlaneType.FP2
+				}
+			)
 		}
 	}
 
@@ -173,8 +200,8 @@ class MainActivity : AppCompatActivity() {
 		binding.slipAlphaSlider.setOnSeekBarChangeListener(object :
 			SeekBar.OnSeekBarChangeListener {
 			override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
-				// post an event to the event channel
-//				EventBus.postEvent(Event(SLIP_ALPHA_SLIDER_SLIDE, 255 - progress))
+				// set the alpha on the mapview
+				binding.customMapView.setSlipAlpha(255 - progress)
 			}
 
 			override fun onStartTrackingTouch(p0: SeekBar?) {}
