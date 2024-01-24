@@ -13,7 +13,6 @@ import android.view.ViewGroup
 import android.view.Window
 import android.view.animation.Animation
 import android.view.animation.Transformation
-import android.widget.TextView
 import android.widget.Toast
 import androidx.core.view.WindowCompat
 import com.bumptech.glide.Glide
@@ -61,44 +60,34 @@ fun cmToPx(cm: Float, context: Context): Float {
 /**
  * Used by the data binding to format a date into a TextView
  */
-//@BindingAdapter("dateTime")
-fun formatDateTime(textView: TextView, date: Date?) {
-	if (date == null) return
+fun formatDateTime(date: Date): String {
 	// Format the Date object to the desired format
 	val dateFormat = DateFormat.getDateTimeInstance(DateFormat.MEDIUM, DateFormat.SHORT)
-	val formattedDate = "${dateFormat.format(date)} UTC"
-	textView.text = formattedDate
+	return "${dateFormat.format(date)} UTC"
 }
 
 /**
  * Used by the data binding to format a depth into a TextView
  */
-//@BindingAdapter("depth")
-fun formatDepth(textView: TextView, depth: Double?) {
-	if (depth == null) return
+fun formatDepth(context: Context, depth: Double) =
 	// Format the Date object to the desired format
-	val formattedDepth = textView.context.getString(
+	context.getString(
 		R.string.global_list_item_depth, String.format(
 			Locale.US, "%.1f", depth
 		)
 	)
-	textView.text = formattedDepth
-}
+
 
 /**
  * Used by the data binding to format a magnitude into a TextView
  */
-//@BindingAdapter("magnitude")
-fun formatMagnitude(textView: TextView, magnitude: Double?) {
-	if (magnitude == null) return
+fun formatMagnitude(context: Context, magnitude: Double) =
 	// Format the Date object to the desired format
-	val formattedMagnitude = textView.context.getString(
+	context.getString(
 		R.string.global_list_item_magnitude, String.format(
 			Locale.US, "%.1f", magnitude
 		)
 	)
-	textView.text = formattedMagnitude
-}
 
 /**
  * Expand the given view with an animation

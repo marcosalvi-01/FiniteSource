@@ -2,7 +2,6 @@ package com.example.finitesource.data
 
 import com.example.finitesource.data.local.CatalogConfig
 import com.example.finitesource.data.local.EarthquakeUpdates
-import com.example.finitesource.data.local.Product
 import com.example.finitesource.data.local.Products
 import com.example.finitesource.data.local.database.dao.EarthquakeDao
 import com.example.finitesource.data.local.database.dao.ScenarioTypeDao
@@ -72,7 +71,7 @@ class EarthquakesRepository @Inject constructor(
 	// returns the differences that are supposed to be shown to the user
 	private suspend fun updateEarthquakes(): EarthquakeUpdates {
 		// TODO remove this
-		earthquakeDao.deleteAll()
+//		earthquakeDao.deleteAll()
 		// build the request
 		val request = apiClient
 			.createService(FiniteSourceAndroidAppApi::class.java)
@@ -209,7 +208,7 @@ private fun buildFocalPlane(
 	earthquake: Earthquake,
 	focalPlaneType: FocalPlaneType,
 	apiCalls: ApiCalls,
-	availableProducts: List<Product>,
+	availableProducts: List<Products>,
 	availableScenarios: List<ScenarioType>
 ): FocalPlane {
 	var scenarios: Scenarios? = null

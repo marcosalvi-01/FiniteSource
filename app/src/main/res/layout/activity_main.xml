@@ -134,29 +134,27 @@
         </com.google.android.material.search.SearchView>
 
         <!-- Bottom sheet -->
-        <!--        <androidx.coordinatorlayout.widget.CoordinatorLayout-->
-        <!--            android:id="@+id/bottom_sheet_container"-->
-        <!--            android:layout_width="match_parent"-->
-        <!--            android:layout_height="match_parent"-->
-        <!--            android:visibility="gone">-->
-        <!--            &lt;!&ndash; Shadow &ndash;&gt;-->
-        <!--            <View-->
-        <!--                android:layout_width="match_parent"-->
-        <!--                android:layout_height="15dp"-->
-        <!--                android:background="@drawable/bottom_sheet_shadow"-->
-        <!--                android:translationY="3dp"-->
-        <!--                app:layout_anchor="@id/persistent_bottom_sheet"-->
-        <!--                app:layout_anchorGravity="top" />-->
+        <androidx.coordinatorlayout.widget.CoordinatorLayout
+            android:id="@+id/bottom_sheet_container"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:visibility="gone">
+            <!-- Shadow -->
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="15dp"
+                android:background="@drawable/bottom_sheet_shadow"
+                android:translationY="3dp"
+                app:layout_anchor="@id/persistent_bottom_sheet"
+                app:layout_anchorGravity="top" />
 
-        <!--            <com.finitesource.activities.main.bottomsheet.PersistentBottomSheetLayout-->
-        <!--                android:id="@+id/persistent_bottom_sheet"-->
-        <!--                android:layout_width="match_parent"-->
-        <!--                android:layout_height="match_parent"-->
-        <!--                android:background="@drawable/persistent_bottom_sheet_background"-->
-        <!--                app:layout_behavior=".activities.main.bottomsheet.behavior.ViewPagerBottomSheetBehavior">-->
-
-        <!--            </com.finitesource.activities.main.bottomsheet.PersistentBottomSheetLayout>-->
-        <!--        </androidx.coordinatorlayout.widget.CoordinatorLayout>-->
+            <com.example.finitesource.ui.persistentbottomsheet.PersistentBottomSheetLayout
+                android:id="@+id/persistent_bottom_sheet"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                app:layout_behavior=".ui.persistentbottomsheet.behavior.ViewPagerBottomSheetBehavior"
+                android:background="@drawable/persistent_bottom_sheet_background" />
+        </androidx.coordinatorlayout.widget.CoordinatorLayout>
 
         <!-- Search bar -->
         <androidx.constraintlayout.widget.ConstraintLayout
@@ -184,7 +182,6 @@
             android:id="@+id/tool_bar_container"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:visibility="gone"
             android:fitsSystemWindows="true">
 
             <com.google.android.material.appbar.MaterialToolbar

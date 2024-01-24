@@ -54,6 +54,22 @@ data class Earthquake(
 		return count
 	}
 
+	/**
+	 * This function is used to get the maximum slip of a focal plane associated with an earthquake.
+	 * It takes a focal plane type (FP1 or FP2) as an argument.
+	 * If the earthquake details contain the given focal plane type and it has a finite source with a max slip value, it returns that value.
+	 * If the earthquake details do not contain the given focal plane type or it does not have a finite source with a max slip value, it returns 0.0.
+	 *
+	 * @param focalPlaneType The type of the focal plane (FP1 or FP2).
+	 * @return The maximum slip of the focal plane or 0.0 if the focal plane or its max slip value does not exist.
+	 */
+	fun focalPlaneMaxSlip(focalPlaneType: FocalPlaneType): Double {
+		return when (focalPlaneType) {
+			FocalPlaneType.FP1 -> details?.fp1?.finiteSource?.sourceJson?.maxSlip ?: 0.0
+			FocalPlaneType.FP2 -> details?.fp2?.finiteSource?.sourceJson?.maxSlip ?: 0.0
+		}
+	}
+
 	override fun equals(other: Any?): Boolean {
 		if (this === other) return true
 		if (other !is Earthquake) return false

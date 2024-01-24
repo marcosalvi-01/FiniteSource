@@ -290,6 +290,8 @@ class CustomMapView(context: Context, attributeSet: AttributeSet) : MapView(cont
 									uiState.selectedEarthquake.details!!.getFocalPlane(uiState.selectedFocalPlane)?.finiteSource!!.sourceJson
 								)
 							)
+							// show the scalebar
+							showScaleBar()
 						}
 					}
 				}
@@ -316,6 +318,8 @@ class CustomMapView(context: Context, attributeSet: AttributeSet) : MapView(cont
 				overlays.removeIf { overlay: Overlay? ->
 					overlay is CustomPolygon || overlay is Polyline
 				}
+				// hide the scale bar
+				hideScaleBar()
 			}
 
 			invalidate()
@@ -369,6 +373,25 @@ class CustomMapView(context: Context, attributeSet: AttributeSet) : MapView(cont
 				yOffset + context.resources.getDimension(R.dimen.bottom_sheet_peek_height).toInt()
 			)
 		}
+	}
+
+	fun setScaleBarOffset(xOffset: Int, yOffset: Int) {
+		scaleBarOverlay.setScaleBarOffset(xOffset, yOffset)
+		invalidate()
+	}
+
+	fun setScaleBarYOffset(yOffset: Int) {
+		setScaleBarOffset(scaleBarOverlay.xOffset, yOffset)
+	}
+
+	fun showScaleBar() {
+		overlays.add(scaleBarOverlay)
+		invalidate()
+	}
+
+	fun hideScaleBar() {
+		overlays.remove(scaleBarOverlay)
+		invalidate()
 	}
 
 	fun setEarthquakes(events: List<Earthquake>) {
