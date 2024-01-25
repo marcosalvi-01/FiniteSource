@@ -1,12 +1,17 @@
 package com.example.finitesource.ui.persistentbottomsheet.tabs.scenarios
 
 import android.os.Bundle
+import android.text.Html
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.fragment.app.activityViewModels
+import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.finitesource.data.local.ProductFragment
+import com.example.finitesource.data.local.earthquake.focalplane.Scenarios
 import com.example.finitesource.databinding.FragmentScenariosBinding
+import com.example.finitesource.viewmodels.EarthquakesViewModel
 
 /**
  * Corresponds to the [Scenarios] product.
@@ -21,10 +26,8 @@ class ScenariosFragment : ProductFragment() {
 		FragmentScenariosBinding.inflate(layoutInflater)
 	}
 
-	// Lazily initialize the ViewModel for this fragment
-//	private val viewModel: ScenariosFragmentViewModel by lazy {
-//		ViewModelProvider(this)[ScenariosFragmentViewModel::class.java]
-//	}
+	// initialize the view model
+	private val earthquakesViewModel: EarthquakesViewModel by activityViewModels()
 
 	override fun onCreateView(
 		inflater: LayoutInflater,
@@ -45,5 +48,24 @@ class ScenariosFragment : ProductFragment() {
 //					Html.fromHtml(Scenarios.description, Html.FROM_HTML_MODE_COMPACT)
 //			}
 //		}
+
+		// Observe the UI state of the EarthquakesViewModel
+		earthquakesViewModel.uiState.observe(viewLifecycleOwner) {
+			// Get the selected earthquake event from the UI state
+			val event = it.selectedEarthquake
+			val focalPlaneType = it.selectedFocalPlane
+			// Check if the selected earthquake event is not null
+			if (event != null && focalPlaneType != null) {
+				// Get the scenarios details of the selected earthquake event
+				val scenarios = event.getFocalPlane(focalPlaneType)?.scenarios
+				// Check if the scenarios details are not null
+				if (scenarios != null) {
+					binding.recyclerView.adapter = ExpandableItemAdapter(scenarios.scenarios)
+					binding.recyclerView.layoutManager = LinearLayoutManager(context)
+					binding.globalDescription.text =
+						Html.fromHtml(scenarios.description, Html.FROM_HTML_MODE_COMPACT)
+				}
+			}
+		}
 	}
 }

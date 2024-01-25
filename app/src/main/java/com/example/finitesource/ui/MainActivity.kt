@@ -1,13 +1,17 @@
 package com.example.finitesource.ui
 
+import android.content.Intent
 import android.content.res.ColorStateList
 import android.graphics.Color
 import android.graphics.drawable.LayerDrawable
+import android.net.Uri
 import android.os.Bundle
 import android.preference.PreferenceManager
 import android.text.Editable
 import android.text.TextWatcher
 import android.util.Log
+import android.view.Menu
+import android.view.MenuItem
 import android.view.View
 import android.view.inputmethod.InputMethodManager
 import android.widget.SeekBar
@@ -36,6 +40,7 @@ import com.google.android.material.bottomsheet.BottomSheetDialog
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 import org.osmdroid.config.Configuration
+import java.text.DateFormat
 
 @AndroidEntryPoint
 class MainActivity : AppCompatActivity() {
@@ -503,6 +508,69 @@ class MainActivity : AppCompatActivity() {
 		window.decorView.systemUiVisibility =
 			View.SYSTEM_UI_FLAG_LAYOUT_STABLE or View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
 		window.statusBarColor = Color.TRANSPARENT
+	}
+
+	override fun onSupportNavigateUp(): Boolean {
+		// collapse the bottom sheet
+		binding.persistentBottomSheet.collapse()
+		return true
+	}
+
+	override fun onCreateOptionsMenu(menu: Menu): Boolean {
+		// TODO show the menu only if the event has downloaded
+		menuInflater.inflate(R.menu.event_details_options_menu, menu)
+		return true
+	}
+
+	override fun onOptionsItemSelected(item: MenuItem): Boolean {
+		return when (item.itemId) {
+			R.id.share_event -> {
+				// Handle sharing event details
+				earthquakesViewModel.uiState.value?.selectedEarthquake?.let {
+					val dateFormat =
+						DateFormat.getDateTimeInstance(DateFormat.MEDIUM, DateFormat.SHORT)
+					// build the string to share
+					val shareString = getString(
+						R.string.share_event_format,
+						it.name,
+						it.magnitude,
+						"${dateFormat.format(it.date.time)} UTC",
+						it.depth,
+						if (it.details!!.ingvId != null) it.details!!.getIngvUrl() else getString(R.string.no_ingv_url),
+					)
+					// create the intent
+					val shareIntent = Intent(Intent.ACTION_SEND).apply {
+						type = "text/plain"
+						putExtra(Intent.EXTRA_TEXT, shareString)
+					}
+					// start the chooser
+					startActivity(
+						Intent.createChooser(
+							shareIntent,
+							getString(R.string.share_event)
+						)
+					)
+				}
+				true
+			}
+
+			R.id.see_online -> {
+				// Handle opening event's INGV page
+				earthquakesViewModel.uiState.value?.selectedEarthquake?.let {
+					// TODO check what happens if the details are null
+					val url = it.details!!.getIngvUrl()
+					if (url != null) {
+						val browserIntent = Intent(Intent.ACTION_VIEW, Uri.parse(url))
+						startActivity(browserIntent)
+					} else
+					// show a toast with the no url message
+						Toast.makeText(this, R.string.no_ingv_url, Toast.LENGTH_SHORT).show()
+				}
+				true
+			}
+
+			else -> super.onOptionsItemSelected(item)
+		}
 	}
 
 	override fun onSaveInstanceState(outState: Bundle) {

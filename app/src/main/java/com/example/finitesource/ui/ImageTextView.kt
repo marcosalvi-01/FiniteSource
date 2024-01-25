@@ -134,6 +134,7 @@ class ImageTextView(
 						super.onLoadFailed(errorDrawable)
 						// clear the image url
 						this@ImageTextView.imageUrl = null
+						// TODO show an error message
 					}
 
 					override fun onLoadCleared(placeholder: Drawable?) {

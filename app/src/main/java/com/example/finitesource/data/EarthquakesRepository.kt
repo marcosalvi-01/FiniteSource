@@ -71,7 +71,7 @@ class EarthquakesRepository @Inject constructor(
 	// returns the differences that are supposed to be shown to the user
 	private suspend fun updateEarthquakes(): EarthquakeUpdates {
 		// TODO remove this
-//		earthquakeDao.deleteAll()
+		earthquakeDao.deleteAll()
 		// build the request
 		val request = apiClient
 			.createService(FiniteSourceAndroidAppApi::class.java)
@@ -165,6 +165,7 @@ class EarthquakesRepository @Inject constructor(
 				fp1 = fp1,
 				fp2 = fp2,
 				apiCalls.getFootprints(earthquake),
+				if (eventDetailsResponse.idIngv!! != 0L) eventDetailsResponse.idIngv else null,
 			)
 
 			// update the database
@@ -239,6 +240,7 @@ private fun buildFocalPlane(
 		focalPlaneType,
 		scenarios,
 		finiteSource,
+		availableProducts,
 	)
 }
 

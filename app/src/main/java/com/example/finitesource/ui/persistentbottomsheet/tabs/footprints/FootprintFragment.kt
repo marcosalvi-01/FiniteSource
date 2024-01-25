@@ -4,8 +4,11 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.fragment.app.activityViewModels
 import com.example.finitesource.data.local.ProductFragment
 import com.example.finitesource.databinding.FragmentFootprintBinding
+import com.example.finitesource.setTitleId
+import com.example.finitesource.viewmodels.EarthquakesViewModel
 
 /**
  * Corresponds to the [Footprint] product.
@@ -18,10 +21,8 @@ class FootprintsFragment : ProductFragment() {
 		FragmentFootprintBinding.inflate(layoutInflater)
 	}
 
-	// Lazily initialize the view model using FootprintFragmentViewModel
-//    private val viewModel: FootprintFragmentViewModel by lazy {
-//        ViewModelProvider(this)[FootprintFragmentViewModel::class.java]
-//    }
+	// initialize the view model
+	private val earthquakesViewModel: EarthquakesViewModel by activityViewModels()
 
 	override fun onCreateView(
 		inflater: LayoutInflater,
@@ -32,18 +33,24 @@ class FootprintsFragment : ProductFragment() {
 	}
 
 	override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-		// Observe the selected earthquake event data from the view model
-//        viewModel.selectedEarthquakeEventLiveData.observe(viewLifecycleOwner) { earthquakeEvent ->
-//            earthquakeEvent?.let {
-//                // Set the description from the Footprint companion object
-//                binding.description.text = Footprint.description
-//
-//                // Set the image URL from the earthquake event data
-//                binding.sentinelFootprint.imageUrl = it.data?.footprint?.imagePath
-//
-//                // Set the title of the ImageTextView
-//                setTitleId(product.tabNameId, binding.sentinelFootprint)
-//            }
-//        }
+		// Observe the UI state of the EarthquakesViewModel
+		earthquakesViewModel.uiState.observe(viewLifecycleOwner) {
+			// Get the selected earthquake event from the UI state
+			val event = it.selectedEarthquake
+			// Check if the selected earthquake event is not null
+			if (event != null) {
+				// Get the footprints details of the selected earthquake event
+				val footprints = event.details?.footprints
+				// Check if the footprints details are not null
+				if (footprints != null) {
+					// Set the description text of the binding with the description of the footprints
+					binding.description.text = footprints.description
+					// Set the image URL of the sentinel footprint in the binding with the image URL of the footprints
+					binding.sentinelFootprint.imageUrl = footprints.imageUrl
+					// Set the title ID of the product tab name in the binding with the sentinel footprint
+					setTitleId(product.tabNameId, binding.sentinelFootprint)
+				}
+			}
+		}
 	}
 }

@@ -24,6 +24,10 @@ data class UiState(
 			"If there is no selected earthquake, there must be no selected focal plane"
 		}
 	}
+
+	fun isLoaded(): Boolean {
+		return !loadingState.loading && !loadingState.errorWhileLoading
+	}
 }
 
 data class LoadingState(

@@ -3,6 +3,7 @@ package com.example.finitesource.data.local.earthquake.focalplane
 
 data class Scenarios(
 	val scenarios: List<Scenario>,
+	val description: String,
 ) {
 	override fun toString(): String {
 		val sb = StringBuilder()

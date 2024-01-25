@@ -6,6 +6,9 @@ import androidx.viewpager2.adapter.FragmentStateAdapter
 import androidx.viewpager2.widget.ViewPager2
 import com.example.finitesource.data.local.Products
 import com.example.finitesource.states.UiState
+import com.example.finitesource.ui.persistentbottomsheet.tabs.fragmentstates.EventErrorFragment
+import com.example.finitesource.ui.persistentbottomsheet.tabs.fragmentstates.EventLoadingFragment
+import com.example.finitesource.ui.persistentbottomsheet.tabs.fragmentstates.ProductNotAvailableFragment
 
 /**
  * This class is responsible for managing the fragments displayed within a [ViewPager2]
@@ -13,7 +16,7 @@ import com.example.finitesource.states.UiState
  */
 class TabAdapter(
 	fragmentActivity: FragmentActivity,
-	private val state: UiState
+	private val uiState: UiState
 ) : FragmentStateAdapter(fragmentActivity) {
 
 	override fun getItemCount(): Int {
@@ -31,20 +34,21 @@ class TabAdapter(
 	 * Determines the appropriate fragment to be displayed based on the given product and resource status.
 	 */
 	private fun getActiveFragment(product: Products): Fragment {
-//        return when (resource) {
-//            // if the resource is loading or selected, return the loading fragment
-//            is Resource.Loading, is Resource.Selected -> EventLoadingFragment()
-//            // if the resource is error, return the error fragment
-//            is Resource.Error -> EventErrorFragment()
-//            // if the resource is loaded and the product is available, return the product fragment
-//            is Resource.Loaded -> {
-//                if (product in resource.data.availableProducts)
-//                    product.newFragmentInstance()
-//                // if the product is not available, return the not available fragment
-//                else
-//                    ProductNotAvailableFragment(product)
-//            }
-//        }
-		return Fragment()   // TODO
+		// based on the state, return the appropriate fragment
+		// if there is an error while loading, show the error fragment
+		if (uiState.loadingState.errorWhileLoading)
+			return EventErrorFragment()
+		// if there is no selected earthquake, show the loading fragment
+		if (uiState.loadingState.loading)
+			return EventLoadingFragment()
+		val selectedEarthquake = uiState.selectedEarthquake
+		val selectedFocalPlane = uiState.selectedFocalPlane
+		// if the product is available, return the fragment for the product
+		if (product in (selectedEarthquake?.details?.getFocalPlane(selectedFocalPlane)?.availableProducts
+				?: emptyList())
+		)
+			return product.newFragmentInstance()
+		// if the product is not available, return the fragment for the product not available
+		return ProductNotAvailableFragment(product)
 	}
 }

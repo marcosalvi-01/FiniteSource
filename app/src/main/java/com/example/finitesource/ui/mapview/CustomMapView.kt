@@ -385,8 +385,10 @@ class CustomMapView(context: Context, attributeSet: AttributeSet) : MapView(cont
 	}
 
 	fun showScaleBar() {
-		overlays.add(scaleBarOverlay)
-		invalidate()
+		if (!overlays.contains(scaleBarOverlay)) {
+			overlays.add(scaleBarOverlay)
+			invalidate()
+		}
 	}
 
 	fun hideScaleBar() {

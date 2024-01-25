@@ -1,6 +1,7 @@
 package com.example.finitesource.data.local.database
 
 import androidx.room.TypeConverter
+import com.example.finitesource.data.local.Products
 import com.example.finitesource.data.local.earthquake.focalplane.FocalPlaneType
 import com.example.finitesource.data.local.earthquake.focalplane.Scenario
 import com.example.finitesource.data.local.earthquake.focalplane.ScenarioType
@@ -74,5 +75,17 @@ class Converters {
 			values[2].substring(2).toDouble(),
 			values[3].substring(2).toDouble()
 		)
+	}
+
+	@TypeConverter
+	fun productListToString(productList: List<Products>): String = productList.joinToString(",")
+
+	@TypeConverter
+	fun stringToProductList(value: String): List<Products> {
+		val productList = mutableListOf<Products>()
+		value.split(",").forEach {
+			productList.add(Products.parseString(it))
+		}
+		return productList
 	}
 }

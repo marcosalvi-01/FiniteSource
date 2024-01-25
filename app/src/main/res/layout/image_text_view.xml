@@ -18,6 +18,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:strokeColor="@color/stroke_color"
+        android:backgroundTint="@color/background"
         app:strokeWidth="@dimen/stroke_width">
 
         <ImageView

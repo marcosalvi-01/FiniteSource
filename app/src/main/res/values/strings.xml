@@ -24,7 +24,7 @@
     <string name="share_event">Share event</string>
     <string name="see_online">See on the INGV website</string>
     <string name="no_ingv_url">INGV link not available</string>
-    <string name="share_event_format">Event: %s%nMagnitude: %.1f%nDate: %s%nDepth: %.1f km%nINGV URL: %s%nAvailable products: %s</string>
+    <string name="share_event_format">Earthquake: %s%nMagnitude: %.1f%nDate: %s%nDepth: %.1f km%nINGV URL: %s</string>
     <string name="share_image">Share image</string>
     <string name="save_image">Save image</string>
     <string name="image_saved">Image saved in the gallery</string>

@@ -57,13 +57,13 @@ class ApiCalls @Inject constructor(
 			val mainInversionMapImageUrl =
 				finiteSourceService.catalogEventIdINVERSEFocalPlaneGRAPHICSMainInversionMapJpgGet(
 					earthquake.id,
-					getLocaleSuffix()
+					focalPlaneType.name,
 				).request().url.toString()
 
 			val slipDistributionImageUrl =
 				finiteSourceService.catalogEventIdINVERSEFocalPlaneGRAPHICSMainInversionMapJpgGet(
 					earthquake.id,
-					getLocaleSuffix()
+					focalPlaneType.name,
 				).request().url.toString()
 
 			val source =
@@ -91,6 +91,12 @@ class ApiCalls @Inject constructor(
 		availableScenarios: List<ScenarioType>
 	): Scenarios? =
 		try {
+			val scenariosDescription =
+				scenariosService.catalogEventIdFOCMECHFWDFocMechFwdDescriptionLanguageTxtGet(
+					earthquake.id,
+					getLocaleSuffix()
+				).executeApiCall().string()
+
 			val scenarios: MutableList<Scenario> = mutableListOf()
 			for (scenarioType in availableScenarios) {
 				val displacementMapDescription =
@@ -139,7 +145,7 @@ class ApiCalls @Inject constructor(
 			if (scenarios.isEmpty())
 				null    // should not happen
 			else
-				Scenarios(scenarios)
+				Scenarios(scenarios, scenariosDescription)
 		} catch (e: Exception) {
 			e.printStackTrace()
 			null

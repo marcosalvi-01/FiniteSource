@@ -12,7 +12,7 @@ import com.example.finitesource.data.local.earthquake.focalplane.ScenarioType
 
 @Database(
 	entities = [Earthquake::class, ScenarioType::class],
-	version = 5,
+	version = 1,
 )
 @TypeConverters(Converters::class)
 abstract class AppDatabase : RoomDatabase() {

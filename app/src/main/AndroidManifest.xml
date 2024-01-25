@@ -22,6 +22,10 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <activity
+            android:name=".ui.FullScreenImageActivity"
+            android:label="Full Screen Image"
+            android:windowContentTransitions="true" />
     </application>
 
     <uses-permission android:name="android.permission.INTERNET" />
