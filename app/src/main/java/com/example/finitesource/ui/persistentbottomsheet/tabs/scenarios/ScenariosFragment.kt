@@ -62,8 +62,9 @@ class ScenariosFragment : ProductFragment() {
 				if (scenarios != null) {
 					binding.recyclerView.adapter = ExpandableItemAdapter(scenarios.scenarios)
 					binding.recyclerView.layoutManager = LinearLayoutManager(context)
-					binding.globalDescription.text =
-						Html.fromHtml(scenarios.description, Html.FROM_HTML_MODE_COMPACT)
+					if (scenarios.description != null)
+						binding.globalDescription.text =
+							Html.fromHtml(scenarios.description, Html.FROM_HTML_MODE_COMPACT)
 				}
 			}
 		}

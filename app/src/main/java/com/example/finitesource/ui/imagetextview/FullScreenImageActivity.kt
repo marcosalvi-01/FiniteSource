@@ -1,4 +1,4 @@
-package com.example.finitesource.ui
+package com.example.finitesource.ui.imagetextview
 
 import android.graphics.Bitmap
 import android.graphics.drawable.Drawable

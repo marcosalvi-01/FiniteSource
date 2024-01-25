@@ -1,4 +1,4 @@
-package com.example.finitesource.ui
+package com.example.finitesource.ui.imagetextview
 
 import android.app.Activity
 import android.content.Context

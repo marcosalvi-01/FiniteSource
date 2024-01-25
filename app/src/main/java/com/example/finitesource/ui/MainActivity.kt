@@ -9,7 +9,6 @@ import android.os.Bundle
 import android.preference.PreferenceManager
 import android.text.Editable
 import android.text.TextWatcher
-import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
@@ -35,6 +34,7 @@ import com.example.finitesource.isDarkTheme
 import com.example.finitesource.lightStatusBar
 import com.example.finitesource.ui.mapoverlays.SlipPalette
 import com.example.finitesource.ui.persistentbottomsheet.behavior.ViewPagerBottomSheetBehavior
+import com.example.finitesource.ui.updates.UpdatesDialog
 import com.example.finitesource.viewmodels.EarthquakesViewModel
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import dagger.hilt.android.AndroidEntryPoint
@@ -112,11 +112,13 @@ class MainActivity : AppCompatActivity() {
 					"Failed to update earthquakes",    // TODO: use snackbar
 					Toast.LENGTH_SHORT
 				).show()
-			Log.d("MainActivity", "Updates: $it")
+			else {
+				if (it.hasUpdates())
+					UpdatesDialog(this, it).show()
+			}
 		}
 
 		earthquakesViewModel.earthquakes.observe(this) { earthquakes ->
-			Log.d("MainActivity", "Earthquakes: ${earthquakes.size}")
 			if (earthquakes.isNotEmpty()) {
 				binding.customMapView.setEarthquakes(earthquakes)
 			} else {

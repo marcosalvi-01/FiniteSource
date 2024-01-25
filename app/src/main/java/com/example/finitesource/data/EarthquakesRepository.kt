@@ -266,11 +266,34 @@ private fun getDifferences(
 		}
 	}
 
+	// Create a map to store Earthquakes and their new products
+	val eventsWithNewProducts: Map<Earthquake, List<Products>> =
+		// Iterate over each loaded earthquake
+		loadedEarthquakes.mapNotNull { new ->
+			// Find a matching earthquake in the saved earthquakes list based on their IDs
+			savedEarthquakes.find { old ->
+				new.id == old.id
+			}?.let { old ->
+				// Get the list of new products that are in the loaded earthquake but not in the saved earthquake
+				val newProducts = new.details?.getAvailableProducts()?.filter {
+					it !in (old.details?.getAvailableProducts() ?: emptyList())
+				}
+				// If there are new products, pair the loaded earthquake with the new products
+				if (!newProducts.isNullOrEmpty())
+					new to newProducts
+				else
+				// If there are no new products, return null
+					null
+			}
+			// Convert the list of pairs to a map
+		}.toMap()
+
 	// return the updates
 	return EarthquakeUpdates(
 		newEarthquakes = newEarthquakes.mapNotNull { id ->
 			loadedEarthquakes.find { it.id == id }
 		},
 		finiteSourceUpdated = updatedEarthquakes,
+		newProducts = eventsWithNewProducts
 	)
 }

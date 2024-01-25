@@ -23,7 +23,7 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".ui.FullScreenImageActivity"
+            android:name=".ui.imagetextview.FullScreenImageActivity"
             android:label="Full Screen Image"
             android:windowContentTransitions="true" />
     </application>

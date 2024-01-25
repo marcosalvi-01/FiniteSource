@@ -91,11 +91,14 @@ class ApiCalls @Inject constructor(
 		availableScenarios: List<ScenarioType>
 	): Scenarios? =
 		try {
-			val scenariosDescription =
+			val scenariosDescription = try {
 				scenariosService.catalogEventIdFOCMECHFWDFocMechFwdDescriptionLanguageTxtGet(
 					earthquake.id,
 					getLocaleSuffix()
 				).executeApiCall().string()
+			} catch (e: Exception) {
+				null
+			}
 
 			val scenarios: MutableList<Scenario> = mutableListOf()
 			for (scenarioType in availableScenarios) {
@@ -152,14 +155,22 @@ class ApiCalls @Inject constructor(
 		}
 
 	fun getFootprints(earthquake: Earthquake): Footprints? = try {
-		Footprints(
-			footprintsService.catalogEventIdANCILLARYSentinelFootprintJpgGet(
-				earthquake.id
-			).request().url.toString(),
+		val sentinelFootprintUrl = footprintsService.catalogEventIdANCILLARYSentinelFootprintJpgGet(
+			earthquake.id
+		).request().url.toString()
+
+		val sentinelFootprintDescription = try {
 			footprintsService.catalogEventIdANCILLARYFootprintDescriptionLanguageTxtGet(
 				earthquake.id,
 				getLocaleSuffix()
-			).executeApiCall().string(),
+			).executeApiCall().string()
+		} catch (e: Exception) {
+			null
+		}
+
+		Footprints(
+			sentinelFootprintUrl,
+			sentinelFootprintDescription,
 		)
 	} catch (e: Exception) {
 		e.printStackTrace()

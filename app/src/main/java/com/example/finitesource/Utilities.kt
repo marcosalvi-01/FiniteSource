@@ -18,7 +18,7 @@ import androidx.core.view.WindowCompat
 import com.bumptech.glide.Glide
 import com.bumptech.glide.request.target.CustomTarget
 import com.bumptech.glide.request.transition.Transition
-import com.example.finitesource.ui.ImageTextView
+import com.example.finitesource.ui.imagetextview.ImageTextView
 import java.io.ByteArrayOutputStream
 import java.text.DateFormat
 import java.time.OffsetDateTime

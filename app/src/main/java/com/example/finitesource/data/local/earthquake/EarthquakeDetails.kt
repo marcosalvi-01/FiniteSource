@@ -1,6 +1,7 @@
 package com.example.finitesource.data.local.earthquake
 
 import androidx.room.Embedded
+import com.example.finitesource.data.local.Products
 import com.example.finitesource.data.local.earthquake.focalplane.FocalPlane
 import com.example.finitesource.data.local.earthquake.focalplane.FocalPlaneType
 import java.util.Locale
@@ -22,6 +23,21 @@ data class EarthquakeDetails(
 			FocalPlaneType.FP2 -> fp2
 			else -> null
 		}
+	}
+
+	fun getAvailableProducts(vararg focalPlaneTypes: FocalPlaneType): List<Products> {
+		val availableProducts = mutableListOf<Products>()
+		for (focalPlaneType in focalPlaneTypes) {
+			val focalPlane = getFocalPlane(focalPlaneType)
+			if (focalPlane != null) {
+				availableProducts.addAll(focalPlane.availableProducts)
+			}
+		}
+		return availableProducts
+	}
+
+	fun getAvailableProducts(): List<Products> {
+		return getAvailableProducts(FocalPlaneType.FP1, FocalPlaneType.FP2)
 	}
 
 

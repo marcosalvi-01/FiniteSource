@@ -6,7 +6,11 @@ import com.example.finitesource.data.local.earthquake.focalplane.FocalPlaneType
 import com.example.finitesource.data.local.earthquake.focalplane.Scenario
 import com.example.finitesource.data.local.earthquake.focalplane.ScenarioType
 import com.example.finitesource.data.local.earthquake.focalplane.geojson.CustomGeoJson
+import com.opencsv.CSVReader
+import com.opencsv.CSVWriter
 import org.osmdroid.util.BoundingBox
+import java.io.StringReader
+import java.io.StringWriter
 import java.util.Calendar
 
 class Converters {
@@ -18,73 +22,124 @@ class Converters {
 		Calendar.getInstance().apply { timeInMillis = value }
 
 	@TypeConverter
-	fun scenariosToString(scenarios: List<Scenario>): String = scenarios.joinToString(",")
+	fun scenariosToString(scenarios: List<Scenario>): String {
+		val stringWriter = StringWriter()
+		CSVWriter(stringWriter).use { writer ->
+			for (scenario in scenarios) {
+				writer.writeNext(
+					arrayOf(
+						scenario.id,
+						scenario.name,
+						scenario.url,
+						scenario.displacementMapDescription,
+						scenario.displacementMapUrl,
+						scenario.predictedFringesDescription,
+						scenario.predictedFringesUrl
+					)
+				)
+			}
+		}
+		return stringWriter.toString()
+	}
 
 	@TypeConverter
 	fun stringToScenarios(value: String): List<Scenario> {
 		val scenarios = mutableListOf<Scenario>()
-		value.split(";").forEach {
-			scenarios.add(stringToScenario(it))
+		CSVReader(StringReader(value)).use { reader ->
+			var nextLine: Array<String>?
+			while (reader.readNext().also { nextLine = it } != null) {
+				scenarios.add(
+					Scenario(
+						ScenarioType(nextLine!![0], nextLine!![1], nextLine!![2]),
+						nextLine!![3],
+						nextLine!![4],
+						nextLine!![5],
+						nextLine!![6]
+					)
+				)
+			}
 		}
 		return scenarios
 	}
 
 	@TypeConverter
-	fun scenarioToString(scenario: Scenario): String {
-		return scenario.toString()
+	fun focalPlaneTypeToString(focalPlaneType: FocalPlaneType): String {
+		val stringWriter = StringWriter()
+		CSVWriter(stringWriter).use { writer ->
+			writer.writeNext(arrayOf(focalPlaneType.name))
+		}
+		return stringWriter.toString()
 	}
 
 	@TypeConverter
-	fun stringToScenario(value: String): Scenario {
-		val values = value.split(",")
-		return Scenario(
-			ScenarioType(
-				values[0],
-				values[1],
-				values[2]
-			),
-			values[3],
-			values[4],
-			values[5],
-			values[6]
-		)
+	fun stringToFocalPlaneType(value: String): FocalPlaneType {
+		val reader = CSVReader(StringReader(value))
+		val nextLine = reader.readNext()
+		return FocalPlaneType.valueOf(nextLine[0])
 	}
 
 	@TypeConverter
-	fun focalPlaneTypeToString(focalPlaneType: FocalPlaneType): String = focalPlaneType.name
+	fun geoJsonToString(geoJson: CustomGeoJson): String {
+		val stringWriter = StringWriter()
+		CSVWriter(stringWriter).use { writer ->
+			writer.writeNext(arrayOf(geoJson.stringify()))
+		}
+		return stringWriter.toString()
+	}
 
 	@TypeConverter
-	fun stringToFocalPlaneType(value: String): FocalPlaneType = FocalPlaneType.valueOf(value)
+	fun stringToGeoJson(value: String): CustomGeoJson {
+		val reader = CSVReader(StringReader(value))
+		val nextLine = reader.readNext()
+		return CustomGeoJson.parseString(nextLine[0])
+	}
 
 	@TypeConverter
-	fun geoJsonToString(geoJson: CustomGeoJson): String = geoJson.stringify()
-
-	@TypeConverter
-	fun stringToGeoJson(value: String): CustomGeoJson = CustomGeoJson.parseString(value)
-
-	@TypeConverter
-	fun boundingBoxToString(boundingBox: BoundingBox): String = boundingBox.toString()
+	fun boundingBoxToString(boundingBox: BoundingBox): String {
+		val stringWriter = StringWriter()
+		CSVWriter(stringWriter).use { writer ->
+			writer.writeNext(
+				arrayOf(
+					boundingBox.latNorth.toString(),
+					boundingBox.lonWest.toString(),
+					boundingBox.latSouth.toString(),
+					boundingBox.lonEast.toString()
+				)
+			)
+		}
+		return stringWriter.toString()
+	}
 
 	@TypeConverter
 	fun stringToBoundingBox(value: String): BoundingBox {
-		// N:27.459793; E:84.47654; S:28.364096; W:85.931061
-		val values = value.split("; ")
+		val reader = CSVReader(StringReader(value))
+		val nextLine = reader.readNext()
 		return BoundingBox(
-			values[0].substring(2).toDouble(),
-			values[1].substring(2).toDouble(),
-			values[2].substring(2).toDouble(),
-			values[3].substring(2).toDouble()
+			nextLine[0].toDouble(),
+			nextLine[3].toDouble(),
+			nextLine[2].toDouble(),
+			nextLine[1].toDouble()
 		)
 	}
 
 	@TypeConverter
-	fun productListToString(productList: List<Products>): String = productList.joinToString(",")
+	fun productListToString(productList: List<Products>): String {
+		val stringWriter = StringWriter()
+		CSVWriter(stringWriter).use { writer ->
+			productList.forEach { product ->
+				writer.writeNext(arrayOf(product.toString()))
+			}
+		}
+		return stringWriter.toString()
+	}
 
 	@TypeConverter
 	fun stringToProductList(value: String): List<Products> {
 		val productList = mutableListOf<Products>()
-		value.split(",").forEach {
-			productList.add(Products.parseString(it))
+		val reader = CSVReader(StringReader(value))
+		var nextLine: Array<String>?
+		while (reader.readNext().also { nextLine = it } != null) {
+			productList.add(Products.parseString(nextLine!![0]))
 		}
 		return productList
 	}

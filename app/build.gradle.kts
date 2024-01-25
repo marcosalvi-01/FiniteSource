@@ -92,7 +92,9 @@ dependencies {
 	implementation("com.davemorrissey.labs:subsampling-scale-image-view-androidx:3.10.0")
 	implementation("com.google.android.flexbox:flexbox:3.0.0")
 	implementation("com.github.bumptech.glide:glide:4.15.1")
+	annotationProcessor("com.github.bumptech.glide:compiler:4.15.1")
 	implementation("org.osmdroid:osmdroid-android:6.1.17")
+	implementation("com.opencsv:opencsv:5.5.2")
 
 
 	// testing
