@@ -44,6 +44,9 @@ class EarthquakesViewModel @Inject constructor(
 		// if the earthquake is already selected, do nothing
 		if (earthquake == _uiState.value?.selectedEarthquake)
 			return
+		// if there is a selected earthquake, deselect it
+		if (_uiState.value?.selectedEarthquake != null)
+			deselectEarthquake()
 		// set the loading state
 		_uiState.value = UiState(earthquake, _focalPlaneType, LoadingState())
 		// select the earthquake

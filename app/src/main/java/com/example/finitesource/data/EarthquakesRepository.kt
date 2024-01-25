@@ -71,7 +71,7 @@ class EarthquakesRepository @Inject constructor(
 	// returns the differences that are supposed to be shown to the user
 	private suspend fun updateEarthquakes(): EarthquakeUpdates {
 		// TODO remove this
-		earthquakeDao.deleteAll()
+//		earthquakeDao.deleteAll()
 		// build the request
 		val request = apiClient
 			.createService(FiniteSourceAndroidAppApi::class.java)

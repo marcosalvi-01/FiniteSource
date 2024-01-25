@@ -413,8 +413,6 @@ class CustomMapView(context: Context, attributeSet: AttributeSet) : MapView(cont
 			marker.setOnMarkerClickListener { _, _ ->
 				// when the marker is clicked, call the view model
 				try {
-					// deselect the old event
-					earthquakesViewModel?.deselectEarthquake()
 					// select the new one
 					earthquakesViewModel?.selectEarthquake(event)
 				} catch (e: Exception) {
