@@ -2,4 +2,18 @@
 <resources>
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
+    <color name="has_finite_source">#00C4FF</color>
+    <color name="no_finite_source">#FF9800</color>
+    <color name="transparent">#00000000</color>
+    <color name="primary">#ABDAFF</color>
+    <color name="secondary">#0091EA</color>
+    <color name="background">#FFFFFF</color>
+    <color name="bottom_sheet_line">#484848</color>
+    <color name="on_background">#1A1A1A</color>
+    <color name="stroke_color">#5A5A5A</color>
+    <color name="slip_palette_stroke_color">@color/stroke_color</color>
+    <color name="color_subtitle_text">#757575</color>
+    <color name="tab_selected_color">@color/secondary</color>
+    <color name="popup_menu_background">@color/background</color>
+    <color name="ingv_logo_stoke_color">@color/stroke_color</color>
 </resources>

@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <style name="TabStyle" parent="Widget.Design.TabLayout">
+        <item name="tabSelectedTextColor">@color/tab_selected_color</item>
+        <item name="tabTextColor">@color/color_subtitle_text</item>
+        <item name="tabUnboundedRipple">true</item>
+        <item name="tabIndicatorColor">@color/tab_selected_color</item>
+    </style>
+
+    <style name="ThemeOverlay.App.MaterialAlertDialog" parent="ThemeOverlay.Material3.MaterialAlertDialog">
+        <item name="colorPrimary">@color/secondary</item>
+    </style>
+</resources>

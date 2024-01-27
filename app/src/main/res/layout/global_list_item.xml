@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginHorizontal="8dp"
+    android:layout_marginTop="@dimen/global_list_item_vertical_margin"
+    android:background="@drawable/global_list_item_background"
+    android:padding="8dp">
+
+    <TextView
+        android:id="@+id/event_name"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentTop="true"
+        android:paddingTop="3dp"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:textStyle="bold" />
+
+    <View
+        android:id="@+id/title_line"
+        android:layout_width="wrap_content"
+        android:layout_height="1dp"
+        android:layout_below="@id/event_name"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentEnd="true"
+        android:layout_marginVertical="5dp"
+        android:background="?attr/backgroundColor" />
+
+
+    <RelativeLayout
+        android:id="@id/event_date_layout"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/title_line"
+        android:layout_marginVertical="4dp">
+
+        <ImageView
+            android:id="@+id/clock_icon"
+            android:layout_width="@dimen/global_list_icon_size"
+            android:layout_height="@dimen/global_list_icon_size"
+            android:layout_alignParentStart="true"
+            android:layout_centerVertical="true"
+            android:background="@drawable/clock_icon"
+            android:backgroundTint="?android:attr/textColor" />
+
+        <TextView
+            android:id="@+id/event_date"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_toEndOf="@+id/clock_icon"
+            android:paddingHorizontal="4dp"
+            android:textAppearance="?android:attr/textAppearanceMedium" />
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:id="@+id/event_depth_layout"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/event_date_layout"
+        android:layout_marginVertical="4dp">
+
+        <ImageView
+            android:id="@+id/depth_icon"
+            android:layout_width="@dimen/global_list_icon_size"
+            android:layout_height="@dimen/global_list_icon_size"
+            android:layout_alignParentStart="true"
+            android:layout_centerVertical="true"
+            android:background="@drawable/depth_icon"
+            android:backgroundTint="?android:attr/textColor" />
+
+        <TextView
+            android:id="@+id/event_depth"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_toEndOf="@+id/depth_icon"
+            android:paddingHorizontal="4dp"
+            android:textAppearance="?android:attr/textAppearanceMedium" />
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignBottom="@id/event_depth_layout"
+        android:layout_alignParentEnd="true">
+
+        <ImageView
+            android:id="@+id/magnitude_icon"
+            android:layout_width="25dp"
+            android:layout_height="25dp"
+            android:layout_centerVertical="true"
+            android:background="@drawable/magnitude_icon"
+            android:backgroundTint="?android:attr/textColor" />
+
+        <TextView
+            android:id="@+id/event_magnitude"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_toEndOf="@id/magnitude_icon"
+            android:paddingStart="2dp"
+            android:paddingEnd="3dp"
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:textSize="@dimen/global_list_item_magnitude_text_size"
+            android:textStyle="bold" />
+    </RelativeLayout>
+</RelativeLayout>

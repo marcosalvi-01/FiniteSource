@@ -1,6 +1,5 @@
 package com.example.finitesource.data.local.earthquake.focalplane
 
-import com.example.finitesource.data.local.Product
 import com.example.finitesource.data.local.earthquake.focalplane.geojson.CustomGeoJson
 
 class FiniteSource(
@@ -9,4 +8,4 @@ class FiniteSource(
 	val mainInversionMapImageUrl: String,
 	val slipDistributionImageUrl: String,
 	val sourceJson: CustomGeoJson,
-) : Product
+)

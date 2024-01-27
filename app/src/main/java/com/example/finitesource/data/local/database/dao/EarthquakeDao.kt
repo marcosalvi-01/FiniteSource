@@ -9,14 +9,15 @@ import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface EarthquakeDao {
-	@Query("SELECT * FROM earthquake ORDER BY date ASC")
+	@Query("SELECT * FROM earthquake ORDER BY date DESC")
 	fun getAll(): Flow<List<Earthquake>>
 
 	@Query("SELECT * FROM earthquake WHERE id = :id")
 	fun getById(id: String): Flow<Earthquake>
 
 	@Upsert
-	fun upsertAll(earthquakes: List<Earthquake>)
+	fun upsertAll(earthquakes: Set<Earthquake>)
+
 
 	@Upsert
 	fun upsert(earthquake: Earthquake)

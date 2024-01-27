@@ -1,5 +1,6 @@
 package com.example.finitesource.data.remote
 
+import com.example.finitesource.data.EarthquakesRepository
 import com.example.finitesource.data.local.CatalogConfig
 import com.example.finitesource.data.local.Products
 import com.example.finitesource.data.local.earthquake.Earthquake
@@ -23,7 +24,9 @@ import org.openapitools.client.models.CatalogEventIdFOCMECHFWDScenariosDetailsJs
 import retrofit2.Call
 import javax.inject.Inject
 
-class ApiCalls @Inject constructor(private val apiClient: ApiClient) {
+class ApiCalls @Inject constructor(
+	private val apiClient: ApiClient,
+) {
 	// TODO
 	// the gets for the products return null if the product is not available but also
 	// if there is an error.
@@ -54,13 +57,13 @@ class ApiCalls @Inject constructor(private val apiClient: ApiClient) {
 			val mainInversionMapImageUrl =
 				finiteSourceService.catalogEventIdINVERSEFocalPlaneGRAPHICSMainInversionMapJpgGet(
 					earthquake.id,
-					getLocaleSuffix()
+					focalPlaneType.name,
 				).request().url.toString()
 
 			val slipDistributionImageUrl =
-				finiteSourceService.catalogEventIdINVERSEFocalPlaneGRAPHICSMainInversionMapJpgGet(
+				finiteSourceService.catalogEventIdINVERSEFocalPlaneGRAPHICSSlipDistributionJpgGet(
 					earthquake.id,
-					getLocaleSuffix()
+					focalPlaneType.name,
 				).request().url.toString()
 
 			val source =
@@ -88,6 +91,15 @@ class ApiCalls @Inject constructor(private val apiClient: ApiClient) {
 		availableScenarios: List<ScenarioType>
 	): Scenarios? =
 		try {
+			val scenariosDescription = try {
+				scenariosService.catalogEventIdFOCMECHFWDFocMechFwdDescriptionLanguageTxtGet(
+					earthquake.id,
+					getLocaleSuffix()
+				).executeApiCall().string()
+			} catch (e: Exception) {
+				null
+			}
+
 			val scenarios: MutableList<Scenario> = mutableListOf()
 			for (scenarioType in availableScenarios) {
 				val displacementMapDescription =
@@ -98,13 +110,16 @@ class ApiCalls @Inject constructor(private val apiClient: ApiClient) {
 						getLocaleSuffix()
 					).executeApiCall().string()
 
-				val predictedFringesDescription =
+				val predictedFringesDescription = try {
 					scenariosService.catalogEventIdFOCMECHFWDScenarioIdFocalPlaneGRAPHICSPredictedFringesLanguageTxtGet(
 						earthquake.id,
 						scenarioType.id,
 						focalPlaneType.name,
 						getLocaleSuffix()
 					).executeApiCall().string()
+				} catch (e: Exception) {
+					null
+				}
 
 				val displacementMapImageUrl =
 					scenariosService.catalogEventIdFOCMECHFWDScenarioIdFocalPlaneGRAPHICSDisplacementMapJpgGet(
@@ -124,8 +139,8 @@ class ApiCalls @Inject constructor(private val apiClient: ApiClient) {
 					Scenario(
 						scenarioType,
 						displacementMapDescription,
-						predictedFringesDescription,
 						displacementMapImageUrl,
+						predictedFringesDescription,
 						predictedFringesImageUrl
 					)
 				)
@@ -133,21 +148,29 @@ class ApiCalls @Inject constructor(private val apiClient: ApiClient) {
 			if (scenarios.isEmpty())
 				null    // should not happen
 			else
-				Scenarios(scenarios)
+				Scenarios(scenarios, scenariosDescription)
 		} catch (e: Exception) {
 			e.printStackTrace()
 			null
 		}
 
 	fun getFootprints(earthquake: Earthquake): Footprints? = try {
-		Footprints(
-			footprintsService.catalogEventIdANCILLARYSentinelFootprintJpgGet(
-				earthquake.id
-			).request().url.toString(),
+		val sentinelFootprintUrl = footprintsService.catalogEventIdANCILLARYSentinelFootprintJpgGet(
+			earthquake.id
+		).request().url.toString()
+
+		val sentinelFootprintDescription = try {
 			footprintsService.catalogEventIdANCILLARYFootprintDescriptionLanguageTxtGet(
 				earthquake.id,
 				getLocaleSuffix()
-			).executeApiCall().string(),
+			).executeApiCall().string()
+		} catch (e: Exception) {
+			null
+		}
+
+		Footprints(
+			sentinelFootprintUrl,
+			sentinelFootprintDescription,
 		)
 	} catch (e: Exception) {
 		e.printStackTrace()
@@ -180,7 +203,7 @@ class ApiCalls @Inject constructor(private val apiClient: ApiClient) {
 
 	fun getAvailableScenarios(id: String): List<ScenarioType> {
 		return getScenarioDetails(id).providers?.map {
-			ScenarioType.parseString(it)
+			EarthquakesRepository.parseScenarioType(it)
 		} ?: throw Exception("Error loading the scenario details")
 	}
 }

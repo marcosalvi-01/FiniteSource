@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.core.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:paddingHorizontal="@dimen/bottom_sheet_padding">
+
+    <com.google.android.flexbox.FlexboxLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:paddingVertical="@dimen/bottom_sheet_padding"
+        app:flexWrap="wrap"
+        app:justifyContent="center">
+
+        <TextView
+            android:id="@+id/inversion_description"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+
+        <com.example.finitesource.ui.imagetextview.ImageTextView
+            android:id="@+id/main_inversion_map"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:layout_flexGrow="1"
+            app:layout_wrapBefore="true" />
+
+        <com.example.finitesource.ui.imagetextview.ImageTextView
+            android:id="@+id/slip_distribution"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:layout_flexGrow="1" />
+
+        <TextView
+            android:id="@+id/result_description"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:layout_wrapBefore="true" />
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingTop="16dp"
+            app:layout_wrapBefore="true">
+
+            <!-- TODO: Use an icon instead instead of "Download" -->
+            <Button
+                android:id="@+id/download_zip_button"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerHorizontal="true"
+                android:backgroundTint="@color/primary"
+                android:text="@string/download_zip_button_text"
+                android:textColor="?android:attr/textColor"
+                android:textSize="16sp" />
+
+            <ProgressBar
+                android:id="@+id/download_zip_progress_bar"
+                style="@style/IndeterminateProgressBar"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerHorizontal="true"
+                android:visibility="gone" />
+        </RelativeLayout>
+
+    </com.google.android.flexbox.FlexboxLayout>
+</androidx.core.widget.NestedScrollView>

@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Text style for titles -->
+    <style name="TitleTextStyle" parent="TextAppearance.AppCompat.Large">
+        <item name="android:textSize">@dimen/title_text_size</item>
+    </style>
+
+    <!-- Text style for subtitles -->
+    <style name="SubtitleTextStyle" parent="TextAppearance.AppCompat.Medium">
+        <item name="android:textSize">@dimen/subtitle_text_size</item>
+        <item name="android:textColor">@color/color_subtitle_text</item>
+    </style>
+
+    <style name="TabStyle" parent="Widget.Design.TabLayout">
+        <item name="tabSelectedTextColor">@color/tab_selected_color</item>
+        <item name="tabTextColor">@color/color_subtitle_text</item>
+        <item name="tabUnboundedRipple">true</item>
+        <item name="tabIndicatorColor">@color/tab_selected_color</item>
+    </style>
+
+    <style name="IndeterminateProgressBar" parent="Widget.AppCompat.ProgressBar">
+        <item name="android:indeterminateTint">@color/primary</item>
+    </style>
+
+    <style name="ThemeOverlay.App.MaterialAlertDialog" parent="ThemeOverlay.Material3.MaterialAlertDialog">
+        <item name="colorPrimary">@color/secondary</item>
+    </style>
+</resources>

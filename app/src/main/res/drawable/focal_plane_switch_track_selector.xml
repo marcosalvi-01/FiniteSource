@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<selector xmlns:android="http://schemas.android.com/apk/res/android" xmlns:tools="http://schemas.android.com/tools" android:width="60dp" android:height="30dp" android:viewportWidth="52" android:viewportHeight="32" tools:ignore="NewApi">
+
+    <item android:name="track">
+        <shape android:shape="rectangle">
+            <corners android:radius="12dp" />
+            <solid android:color="@color/background" />
+            <stroke android:width="@dimen/stroke_width" android:color="@color/stroke_color" />
+        </shape>
+    </item>
+
+</selector>

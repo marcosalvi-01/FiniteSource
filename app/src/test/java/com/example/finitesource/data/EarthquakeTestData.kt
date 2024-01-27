@@ -2,6 +2,7 @@ package com.example.finitesource.data
 
 import com.example.finitesource.data.local.earthquake.Earthquake
 import org.openapitools.client.models.FiniteSourceAppAppJsonGet200ResponseInner
+import org.osmdroid.util.BoundingBox
 import java.time.OffsetDateTime
 import java.util.Calendar
 import java.util.Date
@@ -17,6 +18,7 @@ val testEarthquakes = listOf(
 		16.0,
 		36.1094,
 		36.0165,
+		BoundingBox(10.0, 20.1, 30.2, 40.3),
 		Calendar.getInstance().apply {
 			time = Date.from(OffsetDateTime.parse("2023-11-26T12:27:59Z").toInstant())
 		},
@@ -31,7 +33,7 @@ val testEarthquakes = listOf(
 		14.844,
 		34.4461,
 		62.0754,
-		null,
+		BoundingBox(10.0, 20.1, 30.2, 40.3),
 	),
 )
 
