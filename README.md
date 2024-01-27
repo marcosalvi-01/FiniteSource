@@ -27,6 +27,21 @@ within a map-based context.
 - Optimized interface for touchscreen devices.
 - Interactive web-GIS environment for precise navigation through the earthquake catalog.
 
+## External libraries used
+
+- [Osmdroid](https://github.com/osmdroid/osmdroid)
+- [OpenAPI generator](https://github.com/OpenAPITools/openapi-generator)
+- [Moshi](https://github.com/square/moshi)
+- [Retrofit](https://github.com/square/retrofit)
+- [OkHttp](https://github.com/square/okhttp)
+- [Subsampling Scale Image View](https://github.com/davemorrissey/subsampling-scale-image-view)
+- [FlexboxLayout](https://github.com/google/flexbox-layout)
+- [Glide](https://github.com/bumptech/glide)
+- [Osmdroid](https://github.com/osmdroid/osmdroid)
+- [OSMBonusPack](https://github.com/MKergall/osmbonuspack)
+- [OpenCSV](https://opencsv.sourceforge.net/)
+- [ExViewPagerBottomSheet](https://github.com/xcc3641/ExViewPagerBottomSheet)
+
 ## License
 
-This project is licensed under the GPL v3 - see the [LICENSE](LICENSE) file for details.
+This project is licensed under the GPL v3 license - see the [LICENSE](LICENSE) file for details.
