@@ -41,11 +41,11 @@ class UpdatesDialog(
 		val updatedProducts = updates.finiteSourceUpdated.size
 
 		// Hide the TextViews for new events, new products, and updated products if there are no updates
-		if (newEvents == 0)
+		if (newEvents <= 0)
 			updatesDialogBinding.newEvents.visibility = View.GONE
-		if (newProducts == 0)
+		if (newProducts <= 0)
 			updatesDialogBinding.newProducts.visibility = View.GONE
-		if (updatedProducts == 0)
+		if (updatedProducts <= 0)
 			updatesDialogBinding.updatedProducts.visibility = View.GONE
 
 		// Set the text for the TextViews
@@ -61,6 +61,12 @@ class UpdatesDialog(
 				R.plurals.new_products,
 				newProducts,
 				newProducts
+			)
+		updatesDialogBinding.updatedProducts.text =
+			context.resources.getQuantityString(
+				R.plurals.updated_finite_source,
+				updatedProducts,
+				updatedProducts
 			)
 
 		// Create a MaterialAlertDialogBuilder

@@ -42,6 +42,10 @@
         <item quantity="one">Added %d product to an old earthquake</item>
         <item quantity="other">Added %d products to old earthquakes</item>
     </plurals>
+    <plurals name="updated_finite_source">
+        <item quantity="one">Updated the Finite Source of %d earthquake</item>
+        <item quantity="other">Updated the Finite Source of %d earthquakes</item>
+    </plurals>
     <string name="since_last_time">Since last time we have:</string>
     <string name="updates_info_title">Last updates</string>
 </resources>

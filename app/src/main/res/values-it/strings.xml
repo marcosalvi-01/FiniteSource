@@ -41,5 +41,10 @@
         <item quantity="many">Aggiunto %d prodotti a vecchi terremoti</item>
         <item quantity="other">Aggiunto %d prodotti a vecchi terremoti</item>
     </plurals>
+    <plurals name="updated_finite_source">
+        <item quantity="one">Aggiornata la Sorgente Estesa di %d terremoto</item>
+        <item quantity="many">Aggiornata la Sorgente Estesa di %d terremoti</item>
+        <item quantity="other">Aggiornata la Sorgente Estesa di %d terremoti</item>
+    </plurals>
     <string name="updates_info_title">Ultimi aggiornamenti</string>
 </resources>

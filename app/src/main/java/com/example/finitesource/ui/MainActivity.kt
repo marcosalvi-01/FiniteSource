@@ -24,6 +24,7 @@ import androidx.drawerlayout.widget.DrawerLayout
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.bumptech.glide.Glide
 import com.example.finitesource.R
 import com.example.finitesource.data.local.CatalogConfig
 import com.example.finitesource.data.local.earthquake.focalplane.FocalPlaneType
@@ -113,8 +114,10 @@ class MainActivity : AppCompatActivity() {
 					Toast.LENGTH_SHORT
 				).show()
 			else {
-				if (it.hasUpdates())
+				if (it.hasUpdates()) {
 					UpdatesDialog(this, it).show()
+					Glide.get(this).clearMemory()
+				}
 			}
 		}
 

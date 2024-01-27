@@ -16,7 +16,8 @@ interface EarthquakeDao {
 	fun getById(id: String): Flow<Earthquake>
 
 	@Upsert
-	fun upsertAll(earthquakes: List<Earthquake>)
+	fun upsertAll(earthquakes: Set<Earthquake>)
+
 
 	@Upsert
 	fun upsert(earthquake: Earthquake)

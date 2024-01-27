@@ -16,6 +16,7 @@ import com.example.finitesource.data.local.earthquake.toEarthquake
 import com.example.finitesource.data.remote.ApiCalls
 import com.example.finitesource.data.remote.executeApiCall
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.firstOrNull
 import org.openapitools.client.apis.ConfigurationFilesApi
 import org.openapitools.client.apis.FiniteSourceAndroidAppApi
 import org.openapitools.client.infrastructure.ApiClient
@@ -85,15 +86,45 @@ class EarthquakesRepository @Inject constructor(
 		val loadedEarthquakes = response.mapNotNull { toEarthquake(it) }
 		// get the differences
 		val updates = getDifferences(loadedEarthquakes, savedEarthquakes)
-		// if there are any updates
-		if (updates.hasUpdates())
+
 		// update the database
-			earthquakeDao.upsertAll(loadedEarthquakes)
+		updateDatabase(updates)
+
 		return updates
 	}
 
 	/**
-	 * Loads the details of the earthquake with the given id.
+	 * This function is responsible for updating the database with the latest earthquake data.
+	 *
+	 * @param updates An instance of the EarthquakeUpdates data class which contains information about new and updated earthquakes.
+	 * @return Unit This function does not return a result.
+	 * @throws Exception This function will throw an exception if there is an error loading the details of an earthquake.
+	 */
+	private suspend fun updateDatabase(updates: EarthquakeUpdates) {
+		// Create a HashSet of updated earthquakes by combining the finiteSourceUpdated and newProducts keys from the updates parameter.
+		val updatedEarthquakes =
+			updates.finiteSourceUpdated.toHashSet() + updates.newProducts.keys.toHashSet()
+
+		// Iterate over each updated earthquake.
+		for (updatedEarthquake in updatedEarthquakes) {
+			// If the earthquake is not loaded (i.e., it is not present in the database), skip the current iteration.
+			val loadedEarthquake = getById(updatedEarthquake.id).firstOrNull() ?: continue
+
+			// If the details of the loaded earthquake are null, skip the current iteration.
+			if (loadedEarthquake.details == null)
+				continue
+
+			// Download the details of the updated earthquake and update the database.
+			loadEarthquakeDetails(updatedEarthquake.id)
+		}
+
+		// Update the database with the new earthquakes.
+		earthquakeDao.upsertAll(updates.newEarthquakes)
+	}
+
+
+	/**
+	 * Loads the details of the earthquake with the given id and updates the database with the new details.
 	 * Returns null if there is an error loading the details.
 	 */
 	suspend fun loadEarthquakeDetails(id: String): Earthquake? {
@@ -250,9 +281,9 @@ private fun getDifferences(
 	savedEarthquakes: List<Earthquake>
 ): EarthquakeUpdates {
 	// Check if there are any new earthquakes
-	val newIds = loadedEarthquakes.map { it.id }
-	val oldIds = savedEarthquakes.map { it.id }
-	val newEarthquakes = newIds.filter { it !in oldIds }
+	val newIds = loadedEarthquakes.map { it.id }.toSet()
+	val oldIds = savedEarthquakes.map { it.id }.toSet()
+	val newEarthquakes = newIds.filter { it !in oldIds }.toSet()
 
 	// Check for which events the finite source has been updated
 	val updatedEarthquakes = loadedEarthquakes.filter { new ->
@@ -264,7 +295,7 @@ private fun getDifferences(
 			// if the new event has a finite source more recent than the old one, return true, false otherwise
 			new.finiteSourceLastUpdate?.after(old.finiteSourceLastUpdate) ?: false
 		}
-	}
+	}.toSet()
 
 	// Create a map to store Earthquakes and their new products
 	val eventsWithNewProducts: Map<Earthquake, List<Products>> =
@@ -292,7 +323,7 @@ private fun getDifferences(
 	return EarthquakeUpdates(
 		newEarthquakes = newEarthquakes.mapNotNull { id ->
 			loadedEarthquakes.find { it.id == id }
-		},
+		}.toSet(),
 		finiteSourceUpdated = updatedEarthquakes,
 		newProducts = eventsWithNewProducts
 	)

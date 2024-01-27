@@ -61,7 +61,7 @@ class ApiCalls @Inject constructor(
 				).request().url.toString()
 
 			val slipDistributionImageUrl =
-				finiteSourceService.catalogEventIdINVERSEFocalPlaneGRAPHICSMainInversionMapJpgGet(
+				finiteSourceService.catalogEventIdINVERSEFocalPlaneGRAPHICSSlipDistributionJpgGet(
 					earthquake.id,
 					focalPlaneType.name,
 				).request().url.toString()
