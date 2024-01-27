@@ -29,4 +29,4 @@ within a map-based context.
 
 ## License
 
-This project is licensed under the GPL v3 - see the [LICENSE.md](LICENSE) file for details.
+This project is licensed under the GPL v3 - see the [LICENSE](LICENSE) file for details.
