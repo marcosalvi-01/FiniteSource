@@ -460,7 +460,7 @@ class MainActivity : AppCompatActivity() {
 			}
 		}
 
-		// Lock the navigation drawer to prevent opening it with a swipe
+		// Prevent the navigation drawer from being opened by swiping
 		binding.navigationDrawer.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED)
 
 		// Drawer listener for handling drawer open/close events
@@ -469,11 +469,15 @@ class MainActivity : AppCompatActivity() {
 			override fun onDrawerOpened(drawerView: View) {
 				// Change status bar color when drawer is opened
 				lightStatusBar(window, !isDarkTheme(this@MainActivity))
+				// Enable swipe gesture when the drawer is open
+				binding.navigationDrawer.setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED)
 			}
 
 			override fun onDrawerClosed(drawerView: View) {
 				// Change status bar color when drawer is closed
 				lightStatusBar(window, true)
+				// Disable swipe gesture when the drawer is closed
+				binding.navigationDrawer.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED)
 			}
 
 			override fun onDrawerStateChanged(newState: Int) {}
