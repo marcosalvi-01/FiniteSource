@@ -23,11 +23,15 @@ import org.openapitools.client.infrastructure.ApiClient
 import org.openapitools.client.models.FiniteSourceAppAppJsonGet200ResponseInner
 import javax.inject.Inject
 
+const val ZIP_FILE_NAME = "data_and_model.zip"
+
 class EarthquakesRepository @Inject constructor(
 	private val earthquakeDao: EarthquakeDao,
 	private val scenarioTypeDao: ScenarioTypeDao,
-	private val apiClient: ApiClient
+	private val apiClient: ApiClient,
+	private val apiCalls: ApiCalls,
 ) {
+
 	fun getAll() = earthquakeDao.getAll()
 
 	fun getById(id: String) = earthquakeDao.getById(id)
@@ -135,8 +139,6 @@ class EarthquakesRepository @Inject constructor(
 			if (earthquake.details != null)
 				return earthquake
 
-			val apiCalls = ApiCalls(apiClient)
-
 			// initialize the focal planes
 			var fp1: FocalPlane? = null
 			var fp2: FocalPlane? = null
@@ -210,6 +212,21 @@ class EarthquakesRepository @Inject constructor(
 		}
 	}
 
+	/**
+	 * Initiates the download of a zip file for a specific earthquake and focal plane type.
+	 *
+	 * This function uses the `apiCalls` object to start the download of a zip file for the given earthquake and focal plane type.
+	 * The zip file is saved with a name that includes the id of the earthquake.
+	 *
+	 * @param earthquake The earthquake for which the zip file is to be downloaded.
+	 * @param focalPlaneType The type of the focal plane for which the zip file is to be downloaded.
+	 * @return A Boolean indicating whether the download was successful. Returns true if the download was successful, false otherwise.
+	 */
+	fun downloadZipToFile(earthquake: Earthquake, focalPlaneType: FocalPlaneType): Boolean {
+		val destinationFileName = ZIP_FILE_NAME.replace(".zip", "_${earthquake.id}.zip")
+		return apiCalls.downloadZipToFile(earthquake.id, focalPlaneType.name, destinationFileName)
+	}
+
 	companion object {
 		@Volatile
 		private var instance: EarthquakesRepository? = null
@@ -217,13 +234,15 @@ class EarthquakesRepository @Inject constructor(
 		fun getInstance(
 			earthquakeDao: EarthquakeDao,
 			scenarioTypeDao: ScenarioTypeDao,
-			apiClient: ApiClient
+			apiClient: ApiClient,
+			apiCalls: ApiCalls,
 		) =
 			instance ?: synchronized(this) {
 				instance ?: EarthquakesRepository(
 					earthquakeDao,
 					scenarioTypeDao,
 					apiClient,
+					apiCalls,
 				).also { instance = it }
 			}
 

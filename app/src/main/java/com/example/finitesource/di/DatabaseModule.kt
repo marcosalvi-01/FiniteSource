@@ -5,6 +5,7 @@ import com.example.finitesource.data.EarthquakesRepository
 import com.example.finitesource.data.local.database.AppDatabase
 import com.example.finitesource.data.local.database.dao.EarthquakeDao
 import com.example.finitesource.data.local.database.dao.ScenarioTypeDao
+import com.example.finitesource.data.remote.ApiCalls
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -44,8 +45,19 @@ class DatabaseModule {
 	fun provideRepository(
 		earthquakeDao: EarthquakeDao,
 		scenarioTypeDao: ScenarioTypeDao,
-		apiClient: ApiClient
+		apiClient: ApiClient,
+		apiCalls: ApiCalls,
 	): EarthquakesRepository {
-		return EarthquakesRepository.getInstance(earthquakeDao, scenarioTypeDao, apiClient)
+		return EarthquakesRepository.getInstance(
+			earthquakeDao,
+			scenarioTypeDao,
+			apiClient,
+			apiCalls
+		)
+	}
+
+	@Provides
+	fun provideApiCalls(apiClient: ApiClient): ApiCalls {
+		return ApiCalls(apiClient)
 	}
 }

@@ -114,4 +114,22 @@ class EarthquakesViewModel @Inject constructor(
 			LoadingState(loading = false)
 		)
 	}
+
+	/**
+	 * Initiates the download of the data_and_model.zip file for a specific earthquake and focal plane type.
+	 *
+	 * This function uses the repository to start the download of a zip file for the given earthquake and focal plane type.
+	 * The result of the download is emitted as a LiveData<Boolean> object. The Boolean value indicates whether the download was successful or not.
+	 *
+	 * @param earthquake The earthquake for which the zip file is to be downloaded.
+	 * @param focalPlaneType The type of the focal plane for which the zip file is to be downloaded.
+	 * @return A LiveData<Boolean> object that emits the result of the download. The Boolean value is true if the download was successful, false otherwise.
+	 */
+	fun downloadZipToFile(
+		earthquake: Earthquake,
+		focalPlaneType: FocalPlaneType
+	): LiveData<Boolean> =
+		liveData(viewModelScope.coroutineContext + Dispatchers.IO) {
+			emit(repository.downloadZipToFile(earthquake, focalPlaneType))
+		}
 }
