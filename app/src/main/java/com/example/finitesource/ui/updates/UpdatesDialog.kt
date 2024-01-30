@@ -37,7 +37,7 @@ class UpdatesDialog(
 
 		// Count the number of new events and the total number of new products
 		val newEvents = updates.newEarthquakes.size
-		val newProducts = updates.newProducts.size
+		val newProducts = updates.newFiniteSource.size
 		val updatedProducts = updates.finiteSourceUpdated.size
 
 		// Hide the TextViews for new events, new products, and updated products if there are no updates

@@ -85,9 +85,9 @@ class EarthquakesRepository @Inject constructor(
 		val response: List<FiniteSourceAppAppJsonGet200ResponseInner>?
 		response = request.executeApiCall()
 		// get the saved earthquakes
-		val savedEarthquakes = earthquakeDao.getAll().first()
+		val savedEarthquakes = earthquakeDao.getAll().first().toSet()
 		// map the loaded earthquakes to the database model
-		val loadedEarthquakes = response.mapNotNull { toEarthquake(it) }
+		val loadedEarthquakes = response.mapNotNull { toEarthquake(it) }.toSet()
 		// get the differences
 		val updates = getDifferences(loadedEarthquakes, savedEarthquakes)
 
@@ -98,31 +98,35 @@ class EarthquakesRepository @Inject constructor(
 	}
 
 	/**
-	 * This function is responsible for updating the database with the latest earthquake data.
+	 * Updates the database with the latest earthquake data.
 	 *
 	 * @param updates An instance of the EarthquakeUpdates data class which contains information about new and updated earthquakes.
-	 * @return Unit This function does not return a result.
 	 * @throws Exception This function will throw an exception if there is an error loading the details of an earthquake.
 	 */
 	private suspend fun updateDatabase(updates: EarthquakeUpdates) {
-		// Create a HashSet of updated earthquakes by combining the finiteSourceUpdated and newProducts keys from the updates parameter.
-		val updatedEarthquakes =
-			updates.finiteSourceUpdated.toHashSet() + updates.newProducts.keys.toHashSet()
+		// remove the earthquakes that have been removed
+		earthquakeDao.deleteAll(updates.removedEarthquakes)
 
-		// Iterate over each updated earthquake.
+		// for these earthquakes, the details might be loaded, so they might need to be re-downloaded
+		val updatedEarthquakes = updates.finiteSourceUpdated + updates.newFiniteSource
+
+		// Update the database with the new finite source earthquakes
+		earthquakeDao.upsertAll(updates.newFiniteSource)
+
+		// Iterate over each updated earthquake
 		for (updatedEarthquake in updatedEarthquakes) {
-			// If the earthquake is not loaded (i.e., it is not present in the database), skip the current iteration.
+			// If the earthquake is not loaded (i.e., it is not present in the database), skip the current iteration
 			val loadedEarthquake = getById(updatedEarthquake.id).firstOrNull() ?: continue
 
-			// If the details of the loaded earthquake are null, skip the current iteration.
+			// If the details of the loaded earthquake are null, skip the current iteration
 			if (loadedEarthquake.details == null)
 				continue
 
-			// Download the details of the updated earthquake and update the database.
+			// Download the details of the updated earthquake and update the database
 			loadEarthquakeDetails(updatedEarthquake.id)
 		}
 
-		// Update the database with the new earthquakes.
+		// Update the database with the new earthquakes
 		earthquakeDao.upsertAll(updates.newEarthquakes)
 	}
 
@@ -296,54 +300,37 @@ private fun buildFocalPlane(
 
 // function to get the differences between the old and the new data
 private fun getDifferences(
-	loadedEarthquakes: List<Earthquake>,
-	savedEarthquakes: List<Earthquake>
+	loadedEarthquakes: Set<Earthquake>,
+	savedEarthquakes: Set<Earthquake>
 ): EarthquakeUpdates {
+	// TODO test this function
 	// Check if there are any new earthquakes
-	val newIds = loadedEarthquakes.map { it.id }.toSet()
-	val oldIds = savedEarthquakes.map { it.id }.toSet()
-	val newEarthquakes = newIds.filter { it !in oldIds }.toSet()
+	val newEarthquakes = loadedEarthquakes - savedEarthquakes
+	// Check if there are any earthquakes that have been removed
+	val removedEarthquakes = savedEarthquakes - loadedEarthquakes
 
-	// Check for which events the finite source has been updated
-	val updatedEarthquakes = loadedEarthquakes.filter { new ->
-		savedEarthquakes.any { old ->
-			// if the ids are not the same, skip
-			if (new.id != old.id) return@any false
-			// if the old event has no finite source, but the new one has one, return true
-			if (old.finiteSourceLastUpdate == null && new.finiteSourceLastUpdate != null) return@any true
-			// if the new event has a finite source more recent than the old one, return true, false otherwise
-			new.finiteSourceLastUpdate?.after(old.finiteSourceLastUpdate) ?: false
-		}
-	}.toSet()
+	// the events that had their finite source updated
+	val updatedEarthquakes = mutableSetOf<Earthquake>()
+	// the events that had their finite source added
+	val newFiniteSource = mutableSetOf<Earthquake>()
 
-	// Create a map to store Earthquakes and their new products
-	val eventsWithNewProducts: Map<Earthquake, List<Products>> =
-		// Iterate over each loaded earthquake
-		loadedEarthquakes.mapNotNull { new ->
-			// Find a matching earthquake in the saved earthquakes list based on their IDs
-			savedEarthquakes.find { old ->
-				new.id == old.id
-			}?.let { old ->
-				// Get the list of new products that are in the loaded earthquake but not in the saved earthquake
-				val newProducts = new.details?.getAvailableProducts()?.filter {
-					it !in (old.details?.getAvailableProducts() ?: emptyList())
-				}
-				// If there are new products, pair the loaded earthquake with the new products
-				if (!newProducts.isNullOrEmpty())
-					new to newProducts
-				else
-				// If there are no new products, return null
-					null
-			}
-			// Convert the list of pairs to a map
-		}.toMap()
+	// for each new earthquake, check it
+	for (new in loadedEarthquakes) {
+		// find its saved version
+		val savedEarthquake = savedEarthquakes.find { it.id == new.id } ?: continue
 
-	// return the updates
+		// if the old event has no finite source, but the new one has one, add it to the new finite source set
+		if (new.finiteSourceLastUpdate != null && savedEarthquake.finiteSourceLastUpdate == null)
+			newFiniteSource.add(new)
+		// if the new event has a finite source more recent than the old one, add it to the updated earthquakes set
+		else if (new.finiteSourceLastUpdate?.after(savedEarthquake.finiteSourceLastUpdate) == true)
+			updatedEarthquakes.add(new)
+	}
+
 	return EarthquakeUpdates(
-		newEarthquakes = newEarthquakes.mapNotNull { id ->
-			loadedEarthquakes.find { it.id == id }
-		}.toSet(),
-		finiteSourceUpdated = updatedEarthquakes,
-		newProducts = eventsWithNewProducts
+		newEarthquakes,
+		updatedEarthquakes,
+		newFiniteSource,
+		removedEarthquakes,
 	)
 }

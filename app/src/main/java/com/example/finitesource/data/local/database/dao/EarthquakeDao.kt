@@ -1,6 +1,7 @@
 package com.example.finitesource.data.local.database.dao
 
 import androidx.room.Dao
+import androidx.room.Delete
 import androidx.room.Insert
 import androidx.room.Query
 import androidx.room.Upsert
@@ -28,7 +29,6 @@ interface EarthquakeDao {
 	@Insert
 	fun insertAll(earthquakes: List<Earthquake>)
 
-	// TODO remove this function
-	@Query("DELETE FROM earthquake")
-	fun deleteAll()
+	@Delete
+	fun deleteAll(earthquakes: Set<Earthquake>)
 }
