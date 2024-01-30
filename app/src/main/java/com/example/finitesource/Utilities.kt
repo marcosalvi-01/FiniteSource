@@ -276,3 +276,30 @@ fun getStatusBarHeight(resources: Resources): Int {
 	}
 	return result
 }
+
+/**
+ * Checks if the application is launched for the first time.
+ *
+ * This function checks a flag in the shared preferences to determine if the app is launched for the first time.
+ * If it is the first launch, it updates the flag in the shared preferences to indicate that the app has been launched before.
+ *
+ * @param context The context used to access the shared preferences.
+ * @return A boolean indicating whether the app is launched for the first time. Returns true if it is the first launch, false otherwise.
+ */
+fun isFirstLaunch(context: Context): Boolean {
+	// Get the shared preferences
+	val sharedPreferences =
+		context.getSharedPreferences("PREFERENCE_NAME", Context.MODE_PRIVATE)
+	// Get the flag indicating whether it is the first launch
+	val isFirstLaunch = sharedPreferences.getBoolean("IS_FIRST_LAUNCH", true)
+
+	if (isFirstLaunch) {
+		// If it's the first launch, update the flag in shared preferences
+		val editor = sharedPreferences.edit()
+		editor.putBoolean("IS_FIRST_LAUNCH", false)
+		editor.apply()
+	}
+
+	// Return whether it is the first launch
+	return isFirstLaunch
+}

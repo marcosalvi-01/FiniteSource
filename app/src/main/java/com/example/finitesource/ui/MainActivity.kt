@@ -32,6 +32,7 @@ import com.example.finitesource.databinding.ActivityMainBinding
 import com.example.finitesource.databinding.LegendBottomSheetBinding
 import com.example.finitesource.getStatusBarHeight
 import com.example.finitesource.isDarkTheme
+import com.example.finitesource.isFirstLaunch
 import com.example.finitesource.lightStatusBar
 import com.example.finitesource.ui.mapoverlays.SlipPalette
 import com.example.finitesource.ui.persistentbottomsheet.behavior.ViewPagerBottomSheetBehavior
@@ -107,15 +108,19 @@ class MainActivity : AppCompatActivity() {
 
 		// do something with the updates
 		earthquakesViewModel.getUpdates().observe(this) {
-			if (it == null)
+			if (it == null) {
 				Toast.makeText(
 					this@MainActivity,
 					"Failed to update earthquakes",    // TODO: use snackbar
 					Toast.LENGTH_SHORT
 				).show()
-			else {
-				if (it.hasUpdates()) {
+			} else {
+				// if there are updates and it is not the first launch
+				if (it.hasUpdates() && !isFirstLaunch(this)) {
+					// TODO show some kind of greeting the first time the app is launched
+					// show the updates dialog
 					UpdatesDialog(this, it).show()
+					// clear the glide cache to avoid showing old images
 					Glide.get(this).clearMemory()
 				}
 			}
