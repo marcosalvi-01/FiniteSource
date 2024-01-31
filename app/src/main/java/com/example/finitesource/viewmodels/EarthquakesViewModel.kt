@@ -27,14 +27,19 @@ class EarthquakesViewModel @Inject constructor(
 	private val _uiState = MutableLiveData<UiState>()
 	val uiState: LiveData<UiState> = _uiState
 
+	val updates: EarthquakeUpdates?
+		get() = repository.catalogUpdates
+
 	// loads the latest data from the finite source api and compares it to the saved data
 	// returns the differences that are supposed to be shown to the user
-	fun getUpdates(): LiveData<EarthquakeUpdates?> =
+	fun getUpdatesLiveData(): LiveData<EarthquakeUpdates?> =
 		// build the live data that will emit the updates
 		liveData(viewModelScope.coroutineContext + Dispatchers.IO) {
 			// update the database and emit the result
-			emit(repository.getUpdates())
+			emit(repository.getUpdatesFromRemote())
 		}
+
+	fun isFirstRun(firstRun: Boolean) = repository.isFirstRun(firstRun)
 
 	/**
 	 * Selects the earthquake and loads its details if necessary.

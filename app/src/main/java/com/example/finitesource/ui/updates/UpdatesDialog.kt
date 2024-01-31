@@ -1,11 +1,13 @@
 package com.example.finitesource.ui.updates
 
 import android.content.Context
+import android.content.Intent
 import android.graphics.Typeface
 import android.view.LayoutInflater
 import android.view.View
 import android.widget.TextView
 import androidx.appcompat.app.AlertDialog
+import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat.getString
 import com.example.finitesource.R
 import com.example.finitesource.data.local.EarthquakeUpdates
@@ -15,17 +17,15 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder
 // UpdatesDialog class definition
 class UpdatesDialog(
 	context: Context,
-	updates: EarthquakeUpdates
+	val updates: EarthquakeUpdates
 ) {
 	// AlertDialog instance
 	private val alertDialog: AlertDialog
 
-	// Method to show the dialog
 	fun show() {
 		alertDialog.show()
 	}
 
-	// Method to dismiss the dialog
 	fun dismiss() {
 		alertDialog.dismiss()
 	}
@@ -49,7 +49,7 @@ class UpdatesDialog(
 			updatesDialogBinding.updatedProducts.visibility = View.GONE
 
 		// Set the text for the TextViews
-		updatesDialogBinding.sinceLastTime.text = getString(context, R.string.since_last_time)
+		// TODO remove the plurals
 		updatesDialogBinding.newEvents.text =
 			context.resources.getQuantityString(
 				R.plurals.new_earthquakes,
@@ -86,8 +86,19 @@ class UpdatesDialog(
 			this.setView(updatesDialogBinding.root)
 
 			// Set the positive button of the dialog
-			this.setPositiveButton(getString(context, R.string.more_info)) { dialog, which ->
-				// TODO: Handle the positive button click
+			this.setPositiveButton(getString(context, R.string.more_info)) { _, _ ->
+				// start the activity to show the updates
+				val intent = Intent(context, UpdatesActivity::class.java)
+				// convert the updates to EarthquakeUpdatesData
+				val updatesData = EarthquakeUpdatesData.from(updates)
+				// put the updates in the intent
+				intent.putExtra(UPDATES_INTENT_EXTRA_KEY, updatesData)
+				// start the activity
+				ActivityCompat.startActivity(
+					context,
+					intent,
+					null
+				)
 			}
 
 			// Set the negative button of the dialog
@@ -97,3 +108,5 @@ class UpdatesDialog(
 		}.create()
 	}
 }
+
+const val UPDATES_INTENT_EXTRA_KEY = "updates_intent_extra_key"

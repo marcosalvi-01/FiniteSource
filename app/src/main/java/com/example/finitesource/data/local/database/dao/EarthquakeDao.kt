@@ -31,4 +31,8 @@ interface EarthquakeDao {
 
 	@Delete
 	fun deleteAll(earthquakes: Set<Earthquake>)
+
+	// TODO remove this, just for testing
+	@Query("DELETE FROM earthquake")
+	fun clearDatabase()
 }

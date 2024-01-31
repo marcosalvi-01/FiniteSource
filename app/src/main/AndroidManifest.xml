@@ -26,6 +26,9 @@
             android:name=".ui.imagetextview.FullScreenImageActivity"
             android:label="Full Screen Image"
             android:windowContentTransitions="true" />
+        <activity
+            android:name=".ui.updates.UpdatesActivity"
+            android:label="@string/catalog_updates_title" />
     </application>
 
     <uses-permission android:name="android.permission.INTERNET" />

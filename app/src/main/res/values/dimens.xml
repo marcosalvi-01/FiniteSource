@@ -31,4 +31,5 @@
     <dimen name="images_max_height">375dp</dimen>
     <dimen name="images_margin_horizontal">4dp</dimen>
     <dimen name="dialog_title_padding">24dp</dimen>
+    <dimen name="updates_max_width">500dp</dimen>
 </resources>

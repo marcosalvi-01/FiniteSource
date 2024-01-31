@@ -25,4 +25,8 @@
     <style name="ThemeOverlay.App.MaterialAlertDialog" parent="ThemeOverlay.Material3.MaterialAlertDialog">
         <item name="colorPrimary">@color/secondary</item>
     </style>
+
+    <style name="NavigationViewTextStyle">
+        <item name="android:ellipsize">end</item>
+    </style>
 </resources>

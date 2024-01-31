@@ -36,6 +36,9 @@ import com.example.finitesource.isFirstLaunch
 import com.example.finitesource.lightStatusBar
 import com.example.finitesource.ui.mapoverlays.SlipPalette
 import com.example.finitesource.ui.persistentbottomsheet.behavior.ViewPagerBottomSheetBehavior
+import com.example.finitesource.ui.updates.EarthquakeUpdatesData
+import com.example.finitesource.ui.updates.UPDATES_INTENT_EXTRA_KEY
+import com.example.finitesource.ui.updates.UpdatesActivity
 import com.example.finitesource.ui.updates.UpdatesDialog
 import com.example.finitesource.viewmodels.EarthquakesViewModel
 import com.google.android.material.bottomsheet.BottomSheetDialog
@@ -55,7 +58,7 @@ class MainActivity : AppCompatActivity() {
 
 	// TODO place this in the xml
 	private val slipPaletteView by lazy { SlipPalette(this) }
-
+	private val isFirstLaunch by lazy { isFirstLaunch(this) }
 	override fun onCreate(savedInstanceState: Bundle?) {
 		super.onCreate(savedInstanceState)
 
@@ -106,8 +109,8 @@ class MainActivity : AppCompatActivity() {
 			CatalogConfig.init(this@MainActivity)
 		}
 
-		// do something with the updates
-		earthquakesViewModel.getUpdates().observe(this) {
+		// get the updates only if they are not already loaded
+		earthquakesViewModel.getUpdatesLiveData().observe(this) {
 			if (it == null) {
 				Toast.makeText(
 					this@MainActivity,
@@ -116,12 +119,15 @@ class MainActivity : AppCompatActivity() {
 				).show()
 			} else {
 				// if there are updates and it is not the first launch
-				if (it.hasUpdates() && !isFirstLaunch(this)) {
-					// TODO show some kind of greeting the first time the app is launched
+				if (it.hasUpdates() && !isFirstLaunch) {
 					// show the updates dialog
 					UpdatesDialog(this, it).show()
 					// clear the glide cache to avoid showing old images
 					Glide.get(this).clearMemory()
+				} else if (isFirstLaunch) {
+					// TODO show a greeting message
+					// tell the repository that the updates need to be null
+					earthquakesViewModel.isFirstRun(true)
 				}
 			}
 		}
@@ -195,7 +201,6 @@ class MainActivity : AppCompatActivity() {
 		// Initialize and set up the bottom sheet behavior
 		val bottomSheetBehavior =
 			ViewPagerBottomSheetBehavior.from(binding.persistentBottomSheet).apply {
-//				state = savedState
 				peekHeight = resources.getDimension(R.dimen.bottom_sheet_peek_height).toInt()
 				isHideable = false
 				expandedOffset = getStatusBarHeight(resources)
@@ -344,12 +349,6 @@ class MainActivity : AppCompatActivity() {
 		// Initialize the navigation drawer
 		navigationDrawerInit()
 
-		// Retry button click listener for downloading global events again
-		binding.searchErrorRetryButton.setOnClickListener {
-			// TODO: Implement the retry button
-//			searchViewModel.loadGlobalEvents()
-		}
-
 		// Set the icon color
 		binding.searchBar.menu.findItem(R.id.navigation_drawer_item).iconTintList =
 			ColorStateList.valueOf(getColor(R.color.on_background))
@@ -370,25 +369,9 @@ class MainActivity : AppCompatActivity() {
 			}
 		}
 
-		// Observe changes in the global list
-		// TODO
-//		globalListViewModel.globalListItemLiveData.observe(this) { list ->
-//			if (list == null) {
-//				// Hide the global list and show the error container
-//				binding.searchResults.visibility = View.GONE
-//				binding.searchErrorContainer.visibility = View.VISIBLE
-//			} else {
-//				// Show the global list and hide the error container
-//				binding.searchResults.visibility = View.VISIBLE
-//				binding.searchErrorContainer.visibility = View.GONE
-//			}
-//		}
-
-
 		// Listen to changes in the search view visibility
 		binding.searchView.viewTreeObserver.addOnGlobalLayoutListener {
 			// If the bottom sheet is not expanded update the search view visibility state
-//			if (!binding.persistentBottomSheet.isExpanded()) {
 			val isCurrentlyShown =
 				binding.searchResults.isShown || binding.searchErrorContainer.isShown
 			if (isCurrentlyShown != isSearchViewShown) {
@@ -405,7 +388,6 @@ class MainActivity : AppCompatActivity() {
 					binding.customMapView.visibility = View.VISIBLE
 				}
 			}
-//			}
 		}
 
 		// Listen to text changes in the search view
@@ -458,6 +440,17 @@ class MainActivity : AppCompatActivity() {
 			when (menuItem.itemId) {
 				R.id.info_item -> {
 					// TODO: Implement the info activity
+					true
+				}
+
+				R.id.updates_info -> {
+					val intent = Intent(this, UpdatesActivity::class.java)
+					val updatesData = earthquakesViewModel.updates?.let {
+						EarthquakeUpdatesData.from(it)
+					}
+					intent.putExtra(UPDATES_INTENT_EXTRA_KEY, updatesData)
+					// start the updates activity
+					startActivity(intent)
 					true
 				}
 

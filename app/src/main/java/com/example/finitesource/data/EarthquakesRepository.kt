@@ -36,9 +36,13 @@ class EarthquakesRepository @Inject constructor(
 
 	fun getById(id: String) = earthquakeDao.getById(id)
 
-	suspend fun getUpdates(): EarthquakeUpdates? = try {
+	// save the updates done this time to show them to the user
+	var catalogUpdates: EarthquakeUpdates? = null
+
+	suspend fun getUpdatesFromRemote(): EarthquakeUpdates? = try {
 		updateConfig()
-		updateEarthquakes()
+		catalogUpdates = updateEarthquakes()
+		catalogUpdates
 	} catch (e: Exception) { // TODO handle errors using the correct error type
 		e.printStackTrace()
 		null
@@ -76,7 +80,7 @@ class EarthquakesRepository @Inject constructor(
 	// returns the differences that are supposed to be shown to the user
 	private suspend fun updateEarthquakes(): EarthquakeUpdates {
 		// TODO remove this
-//		earthquakeDao.deleteAll()
+//		earthquakeDao.clearDatabase()
 		// build the request
 		val request = apiClient
 			.createService(FiniteSourceAndroidAppApi::class.java)
@@ -229,6 +233,11 @@ class EarthquakesRepository @Inject constructor(
 	fun downloadZipToFile(earthquake: Earthquake, focalPlaneType: FocalPlaneType): Boolean {
 		val destinationFileName = ZIP_FILE_NAME.replace(".zip", "_${earthquake.id}.zip")
 		return apiCalls.downloadZipToFile(earthquake.id, focalPlaneType.name, destinationFileName)
+	}
+
+	fun isFirstRun(firstRun: Boolean) {
+		if (firstRun)
+			catalogUpdates = null
 	}
 
 	companion object {
