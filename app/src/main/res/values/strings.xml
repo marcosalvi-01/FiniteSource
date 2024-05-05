@@ -39,7 +39,7 @@
         <item quantity="other">New earthquakes: %d</item>
     </plurals>
     <plurals name="new_products">
-        <item quantity="one">Finite source added: %d </item>
+        <item quantity="one">Finite source added: %d</item>
         <item quantity="other">Finite source added: %d</item>
     </plurals>
     <plurals name="updated_finite_source">
@@ -52,4 +52,12 @@
     <string name="new_earthquakes_title">New earthquakes added:</string>
     <string name="catalog_updates_title">Catalog updates</string>
     <string name="no_updates">There are no catalog updates</string>
+    <string name="info_activity_title">Information</string>
+    <string name="catalog_info_text">The INGV finite soruce catalog is a set international earthquakes for which some information are made accessible or something</string>
+    <string name="catalog_info_title">The INGV catalog</string>
+    <string name="visit_website">Visit website</string>
+    <string name="application_info_title">App info</string>
+    <string name="application_info_text">The application source code has been made open source on github</string>
+    <string name="open_on_github">Open on GitHub</string>
+    <string name="version_format" translatable="false">"%1$s v%2$s"</string>
 </resources>

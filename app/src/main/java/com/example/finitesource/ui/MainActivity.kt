@@ -439,7 +439,8 @@ class MainActivity : AppCompatActivity() {
 		binding.navigationView.setNavigationItemSelectedListener { menuItem ->
 			when (menuItem.itemId) {
 				R.id.info_item -> {
-					// TODO: Implement the info activity
+					val intent = Intent(this, InfoActivity::class.java)
+					startActivity(intent)
 					true
 				}
 
