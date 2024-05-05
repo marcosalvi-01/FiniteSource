@@ -73,7 +73,7 @@ data class Earthquake(
 	override fun equals(other: Any?): Boolean {
 		if (this === other) return true
 		if (other !is Earthquake) return false
-
+		// TODO consider maybe adding a last update field to the earthquake class
 		return id == other.id
 	}
 

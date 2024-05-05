@@ -27,24 +27,28 @@
     <string name="download_global_json_error">Errore nel caricamento degli eventi</string>
     <string name="retry">Riprova</string>
     <string name="info_item_title">Informazioni</string>
-    <string name="what_is_new">Cosa c\'è di nuovo</string>
-    <string name="since_last_time">Dall\'ultima volta abbiamo:</string>
-    <string name="more_info">Più informazioni</string>
-    <string name="ignore">Ignora</string>
+    <string name="what_is_new">Aggiornamenti del catalogo</string>
+    <string name="more_info">Dimmi di più</string>
+    <string name="ignore">OK, torna all\'app</string>
     <plurals name="new_earthquakes">
-        <item quantity="one">Aggiunto %d nuovo terremoto</item>
-        <item quantity="many">Aggiunto %d nuovi terremoti</item>
-        <item quantity="other">Aggiunto %d nuovi terremoti</item>
+        <item quantity="one">Nuovi terremoti: %d</item>
+        <item quantity="many">Nuovi terremoti: %d</item>
+        <item quantity="other">Nuovi terremoti: %d</item>
     </plurals>
     <plurals name="new_products">
-        <item quantity="one">Aggiunto %d prodotto ad un vecchio terremoto</item>
-        <item quantity="many">Aggiunto %d prodotti a vecchi terremoti</item>
-        <item quantity="other">Aggiunto %d prodotti a vecchi terremoti</item>
+        <item quantity="one">Sorgente estese aggiunte: %d</item>
+        <item quantity="many">Sorgente estese aggiunte: %d</item>
+        <item quantity="other">Sorgente estese aggiunte: %d</item>
     </plurals>
     <plurals name="updated_finite_source">
-        <item quantity="one">Aggiornata la Sorgente Estesa di %d terremoto</item>
-        <item quantity="many">Aggiornata la Sorgente Estesa di %d terremoti</item>
-        <item quantity="other">Aggiornata la Sorgente Estesa di %d terremoti</item>
+        <item quantity="one">Sorgenti aggiornates: %d</item>
+        <item quantity="many">Sorgenti aggiornates: %d</item>
+        <item quantity="other">Sorgenti aggiornates: %d</item>
     </plurals>
-    <string name="updates_info_title">Ultimi aggiornamenti</string>
+    <string name="updates_info_title">Aggiornamenti catalogo</string>
+    <string name="updated_finite_source_earthquakes_title">Aggiornata la sorgente di:</string>
+    <string name="new_finite_source_earthquakes_title">Aggiunta la sorgente a:</string>
+    <string name="new_earthquakes_title">Terremoti aggiunti:</string>
+    <string name="catalog_updates_title">Aggiornamenti catalogo</string>
+    <string name="no_updates">Non ci sono aggiornamenti per il catalogo</string>
 </resources>

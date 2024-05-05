@@ -30,22 +30,26 @@
     <string name="image_saved">Image saved in the gallery</string>
     <string name="download_global_json_error">Error while retrieving the events</string>
     <string name="retry">Retry</string>
-    <string name="info_item_title">Informations</string>
-    <string name="what_is_new">What\'s new</string>
-    <string name="more_info">More info</string>
-    <string name="ignore">Ignore</string>
+    <string name="info_item_title">Information</string>
+    <string name="what_is_new">Catalog updates</string>
+    <string name="more_info">Tell me more</string>
+    <string name="ignore">OK, back to the app</string>
     <plurals name="new_earthquakes">
-        <item quantity="one">Added %d new earthquake</item>
-        <item quantity="other">Added %d new earthquakes</item>
+        <item quantity="one">New earthquakes: %d</item>
+        <item quantity="other">New earthquakes: %d</item>
     </plurals>
     <plurals name="new_products">
-        <item quantity="one">Added %d product to an old earthquake</item>
-        <item quantity="other">Added %d products to old earthquakes</item>
+        <item quantity="one">Finite source added: %d </item>
+        <item quantity="other">Finite source added: %d</item>
     </plurals>
     <plurals name="updated_finite_source">
-        <item quantity="one">Updated the Finite Source of %d earthquake</item>
-        <item quantity="other">Updated the Finite Source of %d earthquakes</item>
+        <item quantity="one">Finite source updated: %d</item>
+        <item quantity="other">Finite source updated: %d</item>
     </plurals>
-    <string name="since_last_time">Since last time we have:</string>
-    <string name="updates_info_title">Last updates</string>
+    <string name="updates_info_title">Last catalog updates</string>
+    <string name="updated_finite_source_earthquakes_title">Updated the finite source of:</string>
+    <string name="new_finite_source_earthquakes_title">Added the finite source to:</string>
+    <string name="new_earthquakes_title">New earthquakes added:</string>
+    <string name="catalog_updates_title">Catalog updates</string>
+    <string name="no_updates">There are no catalog updates</string>
 </resources>
