@@ -116,6 +116,8 @@ openApiGenerate {
 	inputSpec.set("$rootDir/openapi/finite_source_api.yaml")
 	generatorName.set("kotlin")
 	library.set("jvm-retrofit2")
+	generateApiTests.set(false)
+	generateModelTests.set(false)
 }
 
 tasks.preBuild {

@@ -1,2103 +1,688 @@
-{
-  "openapi": "3.0.0",
-  "info": {
-    "version": "1.0.0",
-    "title": "INGV Finite Source Catalog",
-    "description": "An access point to a catalog containing scientific data about international earthquakes."
-  },
-  "servers": [
-    {
-      "url": "https://transit.rm.ingv.it/files/sar/V1/"
-    }
-  ],
-  "tags": [
-    {
-      "name": "Configuration files",
-      "description": "The configuration files contain the list of the available providers for the scenarios, the color palette used to represent the slip in the finite source data and some general data about the whole API."
-    },
-    {
-      "name": "Catalog",
-      "description": "The catalog contains a folder for each event named using the event id. Each folder contains the products of the event."
-    },
-    {
-      "name": "Event",
-      "description": "The event folder contains a JSON file with some details about the event and a folder for each product available for the event."
-    },
-    {
-      "name": "Finite source",
-      "description": "The finite source product is the central product of the catalog. It contains both images and texts describing the finite source of the event. It also contains a GeoJson file with the finite source data and a .zip file with all the data used to create the images and texts. If for an event the finite source product is not available, the folder is not present."
-    },
-    {
-      "name": "Scenarios",
-      "description": "The scenarios product is a collection of preliminary scenarios of the event. Each scenario is identified by its provider. Each scenario can contain images and texts describing the scenario. If for an event the scenarios product is not available, the folder is not present."
-    },
-    {
-      "name": "Footprint",
-      "description": "The footprint product contains the image and the description of the footprint of the event. If for an event the footprint product is not available, the folder is not present."
-    },
-    {
-      "name": "Finite source Android App",
-      "description": "The Finite source Android App is an Android application that allows to visualize the finite source and the other product of an the event on a map. In this folder there are custom JSON files containing the same data in the catalog but in a format to make the visualization on the map easier and faster."
-    }
-  ],
-  "components": {
-    "parameters": {
-      "EventId": {
-        "name": "eventId",
-        "in": "path",
-        "required": true,
-        "description": "The id of the event.",
-        "examples": {
-          "id_1": {
-            "value": "202302201704_01"
-          },
-          "id_2": {
-            "value": "202306030149_01"
-          },
-          "id_3": {
-            "value": "202309180310_01"
-          }
-        },
-        "schema": {
-          "type": "string",
-          "example": "201511170710_01"
-        }
-      },
-      "Language": {
-        "name": "language",
-        "in": "path",
-        "required": true,
-        "description": "The language of the description.",
-        "examples": {
-          "italian": {
-            "value": "it"
-          },
-          "english": {
-            "value": "en"
-          }
-        },
-        "schema": {
-          "type": "string",
-          "example": "it",
-          "enum": [
-            "it",
-            "en"
-          ]
-        }
-      },
-      "FocalPlane": {
-        "name": "focalPlane",
-        "in": "path",
-        "required": true,
-        "description": "The focal plane of the finite source.",
-        "examples": {
-          "fp1": {
-            "value": "FP1"
-          },
-          "fp2": {
-            "value": "FP2"
-          }
-        },
-        "schema": {
-          "type": "string",
-          "example": "FP1",
-          "enum": [
-            "FP1",
-            "FP2"
-          ]
-        }
-      },
-      "ScenarioId": {
-        "name": "scenarioId",
-        "in": "path",
-        "required": true,
-        "description": "The id of the scenario.",
-        "examples": {
-          "USGS": {
-            "value": "USGS"
-          },
-          "GCMT": {
-            "value": "GCMT"
-          },
-          "INGV": {
-            "value": "INGV"
-          }
-        },
-        "schema": {
-          "type": "string",
-          "example": "USGS"
-        }
-      },
-      "GeoJsonFileName": {
-        "name": "geoJsonFileName",
-        "in": "path",
-        "required": true,
-        "description": "The name of the GeoJson file. It is found in the config/GenericConfig.json file.",
-        "example": "Finite_source.json",
-        "schema": {
-          "type": "string",
-          "example": "Finite_source.json"
-        }
-      }
-    },
-    "schemas": {
-      "id_event": {
-        "type": "string",
-        "description": "Unique identifier of the event",
-        "example": "201504250611_01"
-      },
-      "name": {
-        "type": "string",
-        "description": "The name of the event",
-        "example": "Costa Greca Ionica (GRECIA)"
-      },
-      "bounding_box": {
-        "type": "array",
-        "items": {
-          "type": "number",
-          "format": "double"
-        },
-        "minItems": 4,
-        "maxItems": 4,
-        "example": [
-          38.37522,
-          20.42148,
-          38.77527,
-          20.60164
-        ],
-        "description": "The bounding box of the event. The order of the coordinates is: South, West, North, East."
-      }
-    },
-    "responses": {
-      "NotFound": {
-        "description": "The requested resource was not found",
-        "content": {
-          "text/html; charset=iso-8859-1": {
-            "schema": {
-              "type": "string"
-            },
-            "examples": {
-              "error": {
-                "value": "<!DOCTYPE HTML PUBLIC \"-//IETF//DTD HTML 2.0//EN\">\n<html><head>\n<title>404 Not Found</title>\n</head><body>\n<h1>Not Found</h1>\n<p>The requested URL was not found on this server.</p>\n<hr>\n<address>Apache/2.4.56 (Debian) Server at transit.rm.ingv.it Port 443</address>\n</body></html>\n"
-              }
-            }
-          }
-        }
-      }
-    }
-  },
-  "paths": {
-    "/Config/FocalMechanismProviders.json": {
-      "get": {
-        "tags": [
-          "Configuration files"
-        ],
-        "summary": "The list of the possible providers for the scenarios of an event",
-        "description": "The list of the possible providers for the scenarios of an event. The providers are identified by their id.",
-        "responses": {
-          "200": {
-            "description": "Successful operation",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "properties": {
-                      "provider_dir": {
-                        "type": "string",
-                        "example": "GFZ",
-                        "description": "The id of the provider."
-                      },
-                      "provider_name": {
-                        "type": "string",
-                        "example": "Geofon GFZ",
-                        "description": "The name of the provider."
-                      },
-                      "provider_url": {
-                        "type": "string",
-                        "format": "url",
-                        "example": "https://geofon.gfz-potsdam.de/",
-                        "description": "The URL of the provider."
-                      }
-                    }
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/Config/SlipColorPalette.json": {
-      "get": {
-        "tags": [
-          "Configuration files"
-        ],
-        "summary": "The color palette used to represent the slip in the finite source data",
-        "description": "The color palette used to represent the slip in the finite source data. The color palette is an array of hexadecimal. The first color in the list is used for the slip value 0, the last color is used for the slip value 1. The colors in between are used for the intermediate values.",
-        "responses": {
-          "200": {
-            "description": "Successful operation",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "type": "string",
-                    "minimum": 256,
-                    "maximum": 256,
-                    "example": "#1F77B4",
-                    "description": "The color in hexadecimal format without the alpha value."
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/Config/GeneralConfig.json": {
-      "get": {
-        "tags": [
-          "Configuration files"
-        ],
-        "summary": "A JSON file that contains some general data about the whole API",
-        "description": "The configuration contains the list of the available languages, the URL of the INGV server to append the INGV event id, the name of the GeoJson file containing the finite source data to plot on a map, the version of the color palette used to represent the slip in the finite source data and the list of the id of the possible available products for the events in the catalog. ",
-        "responses": {
-          "200": {
-            "description": "Successful operation",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "server_ingv_it": {
-                      "type": "string",
-                      "format": "url",
-                      "example": "http://terremoti.ingv.it/event/",
-                      "description": "The URL of the INGV server to append the INGV event id."
-                    },
-                    "server_ingv_en": {
-                      "type": "string",
-                      "format": "url",
-                      "example": "http://terremoti.ingv.it/en/event/",
-                      "description": "The URL of the INGV server to append the INGV event id."
-                    },
-                    "source_geojson": {
-                      "type": "string",
-                      "example": "Finite_source.json",
-                      "description": "The name of the GeoJson file containing the finite source data to plot on a map."
-                    },
-                    "palette_version": {
-                      "type": "integer",
-                      "example": 1,
-                      "description": "The version of the color palette used to represent the slip in the finite source data. This is useful to force the update of the color palette in the client."
-                    },
-                    "product_list": {
-                      "type": "array",
-                      "example": [
-                        "finite-source",
-                        "scenarios",
-                        "footprint"
-                      ],
-                      "description": "The list of the id of the possible available products for the events in the catalog.",
-                      "items": {
-                        "type": "string"
-                      }
-                    }
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/Catalog/event_list.json": {
-      "get": {
-        "tags": [
-          "Catalog"
-        ],
-        "summary": "The list of the events in the catalog",
-        "description": "The list of the events in the catalog. The list is a JSON file containing an array with all the id of the events in the catalog.",
-        "responses": {
-          "200": {
-            "description": "Successful operation",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "data": {
-                      "type": "array",
-                      "items": {
-                        "type": "string",
-                        "description": "Unique identifier of the event",
-                        "example": "201504250611_01"
-                      }
-                    },
-                    "meta": {
-                      "type": "object",
-                      "properties": {
-                        "total_event": {
-                          "type": "integer",
-                          "format": "number",
-                          "example": 8,
-                          "description": "The number of events in the catalog."
-                        }
-                      }
-                    }
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/Catalog/{eventId}/event_details.json": {
-      "get": {
-        "tags": [
-          "Event"
-        ],
-        "summary": "The details of the event",
-        "description": "All the details of the event like the id, the date, the magnitude, the depth, the location, the number of the scenarios and the number of the finite sources.",
-        "parameters": [
-          {
-            "name": "eventId",
-            "in": "path",
-            "required": true,
-            "description": "The id of the event.",
-            "examples": {
-              "id_1": {
-                "value": "202302201704_01"
-              },
-              "id_2": {
-                "value": "202306030149_01"
-              },
-              "id_3": {
-                "value": "202309180310_01"
-              }
-            },
-            "schema": {
-              "type": "string",
-              "example": "201511170710_01"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Successful operation",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "name": {
-                      "type": "string",
-                      "example": "Costa Greca Ionica (GRECIA)",
-                      "description": "The name of the event."
-                    },
-                    "id_event": {
-                      "type": "string",
-                      "description": "Unique identifier of the event",
-                      "example": "201504250611_01"
-                    },
-                    "longitude": {
-                      "description": "Longitude of a point expressed in:\n\n* the ETRS89 system for Italian and European territories\n* and in WGS84 for the others.",
-                      "example": 9.19289,
-                      "externalDocs": {
-                        "url": "http://dati.gov.it/onto/clvapit#long"
-                      },
-                      "format": "double",
-                      "maximum": 180,
-                      "minimum": -180,
-                      "type": "number"
-                    },
-                    "latitude": {
-                      "description": "Latitude of a point expressed in:\n\n* the ETRS89 system for Italian and European territories\n* and in WGS84 for the others.",
-                      "example": 45.492599,
-                      "externalDocs": {
-                        "url": "http://dati.gov.it/onto/clvapit#long"
-                      },
-                      "format": "double",
-                      "maximum": 90,
-                      "minimum": -90,
-                      "type": "number"
-                    },
-                    "depth": {
-                      "type": "number",
-                      "description": "Depth in Km | double",
-                      "format": "double",
-                      "example": 0.02
-                    },
-                    "occurring_time": {
-                      "type": "string",
-                      "format": "date-time",
-                      "description": "Origin time | datetime(3)",
-                      "example": "2016-06-22T16:52:06.260Z"
-                    },
-                    "magnitude": {
-                      "example": 6.5,
-                      "type": "number",
-                      "description": "Magnitude | double",
-                      "format": "double"
-                    },
-                    "mag_type": {
-                      "type": "string",
-                      "description": "Type of the magnitude | varchar(255)",
-                      "example": "ML-VAX"
-                    },
-                    "bounding_box": {
-                      "type": "array",
-                      "items": {
-                        "type": "number",
-                        "format": "double"
-                      },
-                      "minItems": 4,
-                      "maxItems": 4,
-                      "example": [
-                        38.37522,
-                        20.42148,
-                        38.77527,
-                        20.60164
-                      ],
-                      "description": "The bounding box of the event. The order of the coordinates is: South, West, North, East."
-                    },
-                    "products": {
-                      "type": "array",
-                      "items": {
-                        "type": "string"
-                      },
-                      "minItems": 1,
-                      "example": [
-                        "finite-source",
-                        "scenarios",
-                        "footprint"
-                      ],
-                      "description": "The list of the id of the available products for the event."
-                    },
-                    "id_ingv": {
-                      "type": "integer",
-                      "description": "Unique incremental id | bigint(20)",
-                      "format": "int64",
-                      "example": 14932631
-                    },
-                    "focal_plane": {
-                      "type": "integer",
-                      "format": "number",
-                      "example": 1,
-                      "minimum": 0,
-                      "maximum": 2,
-                      "description": "The number of focal planes available for the event. 0: both FP1 and FP2 available, 1: only FP1 available, 2: only FP2 available"
-                    }
-                  }
-                }
-              }
-            }
-          },
-          "404": {
-            "description": "The requested resource was not found",
-            "content": {
-              "text/html; charset=iso-8859-1": {
-                "schema": {
-                  "type": "string"
-                },
-                "examples": {
-                  "error": {
-                    "value": "<!DOCTYPE HTML PUBLIC \"-//IETF//DTD HTML 2.0//EN\">\n<html><head>\n<title>404 Not Found</title>\n</head><body>\n<h1>Not Found</h1>\n<p>The requested URL was not found on this server.</p>\n<hr>\n<address>Apache/2.4.56 (Debian) Server at transit.rm.ingv.it Port 443</address>\n</body></html>\n"
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/Catalog/{eventId}/INVERSE/InversionDescription_{language}.txt": {
-      "get": {
-        "tags": [
-          "Finite source"
-        ],
-        "summary": "The description of the finite source of the event",
-        "description": "The description of the finite source of the event. The description is a text file.",
-        "parameters": [
-          {
-            "name": "eventId",
-            "in": "path",
-            "required": true,
-            "description": "The id of the event.",
-            "examples": {
-              "id_1": {
-                "value": "202302201704_01"
-              },
-              "id_2": {
-                "value": "202306030149_01"
-              },
-              "id_3": {
-                "value": "202309180310_01"
-              }
-            },
-            "schema": {
-              "type": "string",
-              "example": "201511170710_01"
-            }
-          },
-          {
-            "name": "language",
-            "in": "path",
-            "required": true,
-            "description": "The language of the description.",
-            "examples": {
-              "italian": {
-                "value": "it"
-              },
-              "english": {
-                "value": "en"
-              }
-            },
-            "schema": {
-              "type": "string",
-              "example": "it",
-              "enum": [
-                "it",
-                "en"
-              ]
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Successful operation",
-            "content": {
-              "text/plain": {
-                "schema": {
-                  "type": "string",
-                  "format": "binary",
-                  "description": "The description of the finite source of the event."
-                }
-              }
-            }
-          },
-          "404": {
-            "description": "The requested resource was not found",
-            "content": {
-              "text/html; charset=iso-8859-1": {
-                "schema": {
-                  "type": "string"
-                },
-                "examples": {
-                  "error": {
-                    "value": "<!DOCTYPE HTML PUBLIC \"-//IETF//DTD HTML 2.0//EN\">\n<html><head>\n<title>404 Not Found</title>\n</head><body>\n<h1>Not Found</h1>\n<p>The requested URL was not found on this server.</p>\n<hr>\n<address>Apache/2.4.56 (Debian) Server at transit.rm.ingv.it Port 443</address>\n</body></html>\n"
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/Catalog/{eventId}/INVERSE/{focalPlane}/finite_source_details.json": {
-      "get": {
-        "summary": "The details of the finite source of the event",
-        "description": "The details of the finite source of the event. The details are the same for both the focal planes.",
-        "tags": [
-          "Finite source"
-        ],
-        "parameters": [
-          {
-            "name": "eventId",
-            "in": "path",
-            "required": true,
-            "description": "The id of the event.",
-            "examples": {
-              "id_1": {
-                "value": "202302201704_01"
-              },
-              "id_2": {
-                "value": "202306030149_01"
-              },
-              "id_3": {
-                "value": "202309180310_01"
-              }
-            },
-            "schema": {
-              "type": "string",
-              "example": "201511170710_01"
-            }
-          },
-          {
-            "name": "focalPlane",
-            "in": "path",
-            "required": true,
-            "description": "The focal plane of the finite source.",
-            "examples": {
-              "fp1": {
-                "value": "FP1"
-              },
-              "fp2": {
-                "value": "FP2"
-              }
-            },
-            "schema": {
-              "type": "string",
-              "example": "FP1",
-              "enum": [
-                "FP1",
-                "FP2"
-              ]
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Successful operation",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "last_updated": {
-                      "type": "string",
-                      "format": "date-time",
-                      "readOnly": true,
-                      "description": "Last Review | timestamp",
-                      "example": "2016-06-22T16:52:06.260Z"
-                    },
-                    "maximum_slip": {
-                      "type": "number",
-                      "format": "double",
-                      "example": 1.823,
-                      "description": "The maximum slip value of the finite source of the event in meters."
-                    },
-                    "minimum_slip": {
-                      "type": "number",
-                      "format": "double",
-                      "example": 0,
-                      "description": "The minimum slip value of the finite source of the event in meters."
-                    },
-                    "source_bounding_box": {
-                      "type": "array",
-                      "items": {
-                        "type": "number",
-                        "format": "double"
-                      },
-                      "minItems": 4,
-                      "maxItems": 4,
-                      "example": [
-                        38.37522,
-                        20.42148,
-                        38.77527,
-                        20.60164
-                      ],
-                      "description": "The bounding box of the event. The order of the coordinates is: South, West, North, East."
-                    }
-                  }
-                }
-              }
-            }
-          },
-          "404": {
-            "description": "The requested resource was not found",
-            "content": {
-              "text/html; charset=iso-8859-1": {
-                "schema": {
-                  "type": "string"
-                },
-                "examples": {
-                  "error": {
-                    "value": "<!DOCTYPE HTML PUBLIC \"-//IETF//DTD HTML 2.0//EN\">\n<html><head>\n<title>404 Not Found</title>\n</head><body>\n<h1>Not Found</h1>\n<p>The requested URL was not found on this server.</p>\n<hr>\n<address>Apache/2.4.56 (Debian) Server at transit.rm.ingv.it Port 443</address>\n</body></html>\n"
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/Catalog/{eventId}/INVERSE/{focalPlane}/data_and_model.zip": {
-      "get": {
-        "tags": [
-          "Finite source"
-        ],
-        "summary": "The original data used to create the finite source of the event",
-        "description": "The original data used to create the finite source of the event. The data is contained in a .zip file.",
-        "parameters": [
-          {
-            "name": "eventId",
-            "in": "path",
-            "required": true,
-            "description": "The id of the event.",
-            "examples": {
-              "id_1": {
-                "value": "202302201704_01"
-              },
-              "id_2": {
-                "value": "202306030149_01"
-              },
-              "id_3": {
-                "value": "202309180310_01"
-              }
-            },
-            "schema": {
-              "type": "string",
-              "example": "201511170710_01"
-            }
-          },
-          {
-            "name": "focalPlane",
-            "in": "path",
-            "required": true,
-            "description": "The focal plane of the finite source.",
-            "examples": {
-              "fp1": {
-                "value": "FP1"
-              },
-              "fp2": {
-                "value": "FP2"
-              }
-            },
-            "schema": {
-              "type": "string",
-              "example": "FP1",
-              "enum": [
-                "FP1",
-                "FP2"
-              ]
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Successful operation",
-            "content": {
-              "application/zip": {
-                "schema": {
-                  "type": "string",
-                  "format": "binary",
-                  "description": "The data and the model used to create the finite source of the event."
-                }
-              }
-            }
-          },
-          "404": {
-            "description": "The requested resource was not found",
-            "content": {
-              "text/html; charset=iso-8859-1": {
-                "schema": {
-                  "type": "string"
-                },
-                "examples": {
-                  "error": {
-                    "value": "<!DOCTYPE HTML PUBLIC \"-//IETF//DTD HTML 2.0//EN\">\n<html><head>\n<title>404 Not Found</title>\n</head><body>\n<h1>Not Found</h1>\n<p>The requested URL was not found on this server.</p>\n<hr>\n<address>Apache/2.4.56 (Debian) Server at transit.rm.ingv.it Port 443</address>\n</body></html>\n"
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/Catalog/{eventId}/INVERSE/{focalPlane}/SOURCES/{geoJsonFileName}": {
-      "get": {
-        "tags": [
-          "Finite source"
-        ],
-        "summary": "The finite source of the event",
-        "description": "The finite source of the event. The finite source is a GeoJson file. The GeoJson file contains a FeatureCollection with a Feature for each polygon of the finite source. Every Polygon has two properties, the slip and the rake. The GeoJson also contains the trace of the fault as a MultiLineString. The properties of the trace are empty.",
-        "parameters": [
-          {
-            "name": "eventId",
-            "in": "path",
-            "required": true,
-            "description": "The id of the event.",
-            "examples": {
-              "id_1": {
-                "value": "202302201704_01"
-              },
-              "id_2": {
-                "value": "202306030149_01"
-              },
-              "id_3": {
-                "value": "202309180310_01"
-              }
-            },
-            "schema": {
-              "type": "string",
-              "example": "201511170710_01"
-            }
-          },
-          {
-            "name": "focalPlane",
-            "in": "path",
-            "required": true,
-            "description": "The focal plane of the finite source.",
-            "examples": {
-              "fp1": {
-                "value": "FP1"
-              },
-              "fp2": {
-                "value": "FP2"
-              }
-            },
-            "schema": {
-              "type": "string",
-              "example": "FP1",
-              "enum": [
-                "FP1",
-                "FP2"
-              ]
-            }
-          },
-          {
-            "name": "geoJsonFileName",
-            "in": "path",
-            "required": true,
-            "description": "The name of the GeoJson file. It is found in the /config/GeneralConfig.json file. It is the same for all the events.",
-            "example": "Finite_source.json",
-            "schema": {
-              "type": "string",
-              "example": "Finite_source.json"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Successful operation",
-            "content": {
-              "text/plain": {
-                "schema": {
-                  "type": "string",
-                  "format": "binary",
-                  "description": "The finite source of this focal plane in the event as a GeoJson.",
-                  "example": "{ \"type\": \"FeatureCollection\", \"features\": [ { \"type\": \"Feature\", \"geometry\": { \"type\": \"Polygon\", \"coordinates\": [ [ 85.745, 27.459, -7240.8 ] ] }, \"properties\": { \"Slip_m\": 1.028, \"Rake_d\": 137.44 } } ] }"
-                }
-              }
-            }
-          },
-          "404": {
-            "description": "The requested resource was not found",
-            "content": {
-              "text/html; charset=iso-8859-1": {
-                "schema": {
-                  "type": "string"
-                },
-                "examples": {
-                  "error": {
-                    "value": "<!DOCTYPE HTML PUBLIC \"-//IETF//DTD HTML 2.0//EN\">\n<html><head>\n<title>404 Not Found</title>\n</head><body>\n<h1>Not Found</h1>\n<p>The requested URL was not found on this server.</p>\n<hr>\n<address>Apache/2.4.56 (Debian) Server at transit.rm.ingv.it Port 443</address>\n</body></html>\n"
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/Catalog/{eventId}/INVERSE/{focalPlane}/GRAPHICS/MainInversionMap.jpg": {
-      "get": {
-        "tags": [
-          "Finite source"
-        ],
-        "summary": "The main inversion map of the finite source of the event",
-        "description": "The main inversion map of the finite source of the event. The image is a JPEG file.",
-        "parameters": [
-          {
-            "name": "eventId",
-            "in": "path",
-            "required": true,
-            "description": "The id of the event.",
-            "examples": {
-              "id_1": {
-                "value": "202302201704_01"
-              },
-              "id_2": {
-                "value": "202306030149_01"
-              },
-              "id_3": {
-                "value": "202309180310_01"
-              }
-            },
-            "schema": {
-              "type": "string",
-              "example": "201511170710_01"
-            }
-          },
-          {
-            "name": "focalPlane",
-            "in": "path",
-            "required": true,
-            "description": "The focal plane of the finite source.",
-            "examples": {
-              "fp1": {
-                "value": "FP1"
-              },
-              "fp2": {
-                "value": "FP2"
-              }
-            },
-            "schema": {
-              "type": "string",
-              "example": "FP1",
-              "enum": [
-                "FP1",
-                "FP2"
-              ]
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Successful operation",
-            "content": {
-              "image/jpeg": {
-                "schema": {
-                  "type": "string",
-                  "format": "binary",
-                  "description": "The main inversion map of the finite source of the event."
-                }
-              }
-            }
-          },
-          "404": {
-            "description": "The requested resource was not found",
-            "content": {
-              "text/html; charset=iso-8859-1": {
-                "schema": {
-                  "type": "string"
-                },
-                "examples": {
-                  "error": {
-                    "value": "<!DOCTYPE HTML PUBLIC \"-//IETF//DTD HTML 2.0//EN\">\n<html><head>\n<title>404 Not Found</title>\n</head><body>\n<h1>Not Found</h1>\n<p>The requested URL was not found on this server.</p>\n<hr>\n<address>Apache/2.4.56 (Debian) Server at transit.rm.ingv.it Port 443</address>\n</body></html>\n"
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/Catalog/{eventId}/INVERSE/{focalPlane}/GRAPHICS/SlipDistribution.jpg": {
-      "get": {
-        "tags": [
-          "Finite source"
-        ],
-        "summary": "The slip distribution of the finite source of the event",
-        "description": "The slip distribution of the finite source of the event. The image is a JPEG file.",
-        "parameters": [
-          {
-            "name": "eventId",
-            "in": "path",
-            "required": true,
-            "description": "The id of the event.",
-            "examples": {
-              "id_1": {
-                "value": "202302201704_01"
-              },
-              "id_2": {
-                "value": "202306030149_01"
-              },
-              "id_3": {
-                "value": "202309180310_01"
-              }
-            },
-            "schema": {
-              "type": "string",
-              "example": "201511170710_01"
-            }
-          },
-          {
-            "name": "focalPlane",
-            "in": "path",
-            "required": true,
-            "description": "The focal plane of the finite source.",
-            "examples": {
-              "fp1": {
-                "value": "FP1"
-              },
-              "fp2": {
-                "value": "FP2"
-              }
-            },
-            "schema": {
-              "type": "string",
-              "example": "FP1",
-              "enum": [
-                "FP1",
-                "FP2"
-              ]
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Successful operation",
-            "content": {
-              "image/jpeg": {
-                "schema": {
-                  "type": "string",
-                  "format": "binary",
-                  "description": "The slip distribution of the finite source of the event."
-                }
-              }
-            }
-          },
-          "404": {
-            "description": "The requested resource was not found",
-            "content": {
-              "text/html; charset=iso-8859-1": {
-                "schema": {
-                  "type": "string"
-                },
-                "examples": {
-                  "error": {
-                    "value": "<!DOCTYPE HTML PUBLIC \"-//IETF//DTD HTML 2.0//EN\">\n<html><head>\n<title>404 Not Found</title>\n</head><body>\n<h1>Not Found</h1>\n<p>The requested URL was not found on this server.</p>\n<hr>\n<address>Apache/2.4.56 (Debian) Server at transit.rm.ingv.it Port 443</address>\n</body></html>\n"
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/Catalog/{eventId}/INVERSE/{focalPlane}/GRAPHICS/ResultDescription_{language}.txt": {
-      "get": {
-        "tags": [
-          "Finite source"
-        ],
-        "summary": "The description of the images of the finite source of the event",
-        "description": "The description of the images of the finite source of the event. The description is a text file.",
-        "parameters": [
-          {
-            "name": "eventId",
-            "in": "path",
-            "required": true,
-            "description": "The id of the event.",
-            "examples": {
-              "id_1": {
-                "value": "202302201704_01"
-              },
-              "id_2": {
-                "value": "202306030149_01"
-              },
-              "id_3": {
-                "value": "202309180310_01"
-              }
-            },
-            "schema": {
-              "type": "string",
-              "example": "201511170710_01"
-            }
-          },
-          {
-            "name": "focalPlane",
-            "in": "path",
-            "required": true,
-            "description": "The focal plane of the finite source.",
-            "examples": {
-              "fp1": {
-                "value": "FP1"
-              },
-              "fp2": {
-                "value": "FP2"
-              }
-            },
-            "schema": {
-              "type": "string",
-              "example": "FP1",
-              "enum": [
-                "FP1",
-                "FP2"
-              ]
-            }
-          },
-          {
-            "name": "language",
-            "in": "path",
-            "required": true,
-            "description": "The language of the description.",
-            "examples": {
-              "italian": {
-                "value": "it"
-              },
-              "english": {
-                "value": "en"
-              }
-            },
-            "schema": {
-              "type": "string",
-              "example": "it",
-              "enum": [
-                "it",
-                "en"
-              ]
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Successful operation",
-            "content": {
-              "text/plain": {
-                "schema": {
-                  "type": "string",
-                  "format": "binary",
-                  "description": "The description of the images of the finite source of the event."
-                }
-              }
-            }
-          },
-          "404": {
-            "description": "The requested resource was not found",
-            "content": {
-              "text/html; charset=iso-8859-1": {
-                "schema": {
-                  "type": "string"
-                },
-                "examples": {
-                  "error": {
-                    "value": "<!DOCTYPE HTML PUBLIC \"-//IETF//DTD HTML 2.0//EN\">\n<html><head>\n<title>404 Not Found</title>\n</head><body>\n<h1>Not Found</h1>\n<p>The requested URL was not found on this server.</p>\n<hr>\n<address>Apache/2.4.56 (Debian) Server at transit.rm.ingv.it Port 443</address>\n</body></html>\n"
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/Catalog/{eventId}/FOC_MECH_FWD/FocMechFwdDescription_{language}.txt": {
-      "get": {
-        "tags": [
-          "Scenarios"
-        ],
-        "summary": "The description of the scenarios of the event",
-        "description": "The description of the scenarios of the event. The description is a text file.",
-        "parameters": [
-          {
-            "name": "eventId",
-            "in": "path",
-            "required": true,
-            "description": "The id of the event.",
-            "examples": {
-              "id_1": {
-                "value": "202302201704_01"
-              },
-              "id_2": {
-                "value": "202306030149_01"
-              },
-              "id_3": {
-                "value": "202309180310_01"
-              }
-            },
-            "schema": {
-              "type": "string",
-              "example": "201511170710_01"
-            }
-          },
-          {
-            "name": "language",
-            "in": "path",
-            "required": true,
-            "description": "The language of the description.",
-            "examples": {
-              "italian": {
-                "value": "it"
-              },
-              "english": {
-                "value": "en"
-              }
-            },
-            "schema": {
-              "type": "string",
-              "example": "it",
-              "enum": [
-                "it",
-                "en"
-              ]
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Successful operation",
-            "content": {
-              "text/plain": {
-                "schema": {
-                  "type": "string",
-                  "format": "binary",
-                  "description": "The description of the scenarios of the event."
-                }
-              }
-            }
-          },
-          "404": {
-            "description": "The requested resource was not found",
-            "content": {
-              "text/html; charset=iso-8859-1": {
-                "schema": {
-                  "type": "string"
-                },
-                "examples": {
-                  "error": {
-                    "value": "<!DOCTYPE HTML PUBLIC \"-//IETF//DTD HTML 2.0//EN\">\n<html><head>\n<title>404 Not Found</title>\n</head><body>\n<h1>Not Found</h1>\n<p>The requested URL was not found on this server.</p>\n<hr>\n<address>Apache/2.4.56 (Debian) Server at transit.rm.ingv.it Port 443</address>\n</body></html>\n"
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/Catalog/{eventId}/FOC_MECH_FWD/scenarios_details.json": {
-      "get": {
-        "summary": "The details of the scenario product for the event",
-        "description": "The details of the scenario product for the event.",
-        "tags": [
-          "Scenarios"
-        ],
-        "parameters": [
-          {
-            "name": "eventId",
-            "in": "path",
-            "required": true,
-            "description": "The id of the event.",
-            "examples": {
-              "id_1": {
-                "value": "202302201704_01"
-              },
-              "id_2": {
-                "value": "202306030149_01"
-              },
-              "id_3": {
-                "value": "202309180310_01"
-              }
-            },
-            "schema": {
-              "type": "string",
-              "example": "201511170710_01"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Successful operation",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "last_updated": {
-                      "type": "string",
-                      "format": "date-time",
-                      "readOnly": true,
-                      "description": "Last Review | timestamp",
-                      "example": "2016-06-22T16:52:06.260Z"
-                    },
-                    "providers": {
-                      "type": "array",
-                      "items": {
-                        "type": "string"
-                      },
-                      "minItems": 1,
-                      "example": [
-                        "GFZ",
-                        "USGS",
-                        "INGV"
-                      ],
-                      "description": "The list of the id of the available providers for the scenario."
-                    }
-                  }
-                }
-              }
-            }
-          },
-          "404": {
-            "description": "The requested resource was not found",
-            "content": {
-              "text/html; charset=iso-8859-1": {
-                "schema": {
-                  "type": "string"
-                },
-                "examples": {
-                  "error": {
-                    "value": "<!DOCTYPE HTML PUBLIC \"-//IETF//DTD HTML 2.0//EN\">\n<html><head>\n<title>404 Not Found</title>\n</head><body>\n<h1>Not Found</h1>\n<p>The requested URL was not found on this server.</p>\n<hr>\n<address>Apache/2.4.56 (Debian) Server at transit.rm.ingv.it Port 443</address>\n</body></html>\n"
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/Catalog/{eventId}/FOC_MECH_FWD/{scenarioId}/{focalPlane}/GRAPHICS/DisplacementMap.jpg": {
-      "get": {
-        "tags": [
-          "Scenarios"
-        ],
-        "summary": "The displacement map of the scenario of the event",
-        "description": "The displacement map of the scenario of the event. The image is a JPEG file. This file might not be available for all the events. If this file is available, the displacement map description is also available.",
-        "parameters": [
-          {
-            "name": "eventId",
-            "in": "path",
-            "required": true,
-            "description": "The id of the event.",
-            "examples": {
-              "id_1": {
-                "value": "202302201704_01"
-              },
-              "id_2": {
-                "value": "202306030149_01"
-              },
-              "id_3": {
-                "value": "202309180310_01"
-              }
-            },
-            "schema": {
-              "type": "string",
-              "example": "201511170710_01"
-            }
-          },
-          {
-            "name": "scenarioId",
-            "in": "path",
-            "required": true,
-            "description": "The id of the scenario.",
-            "examples": {
-              "USGS": {
-                "value": "USGS"
-              },
-              "GCMT": {
-                "value": "GCMT"
-              },
-              "INGV": {
-                "value": "INGV"
-              }
-            },
-            "schema": {
-              "type": "string",
-              "example": "USGS"
-            }
-          },
-          {
-            "name": "focalPlane",
-            "in": "path",
-            "required": true,
-            "description": "The focal plane of the finite source.",
-            "examples": {
-              "fp1": {
-                "value": "FP1"
-              },
-              "fp2": {
-                "value": "FP2"
-              }
-            },
-            "schema": {
-              "type": "string",
-              "example": "FP1",
-              "enum": [
-                "FP1",
-                "FP2"
-              ]
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Successful operation",
-            "content": {
-              "image/jpeg": {
-                "schema": {
-                  "type": "string",
-                  "format": "binary",
-                  "description": "The displacement map of the scenario of the event."
-                }
-              }
-            }
-          },
-          "404": {
-            "description": "The requested resource was not found",
-            "content": {
-              "text/html; charset=iso-8859-1": {
-                "schema": {
-                  "type": "string"
-                },
-                "examples": {
-                  "error": {
-                    "value": "<!DOCTYPE HTML PUBLIC \"-//IETF//DTD HTML 2.0//EN\">\n<html><head>\n<title>404 Not Found</title>\n</head><body>\n<h1>Not Found</h1>\n<p>The requested URL was not found on this server.</p>\n<hr>\n<address>Apache/2.4.56 (Debian) Server at transit.rm.ingv.it Port 443</address>\n</body></html>\n"
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/Catalog/{eventId}/FOC_MECH_FWD/{scenarioId}/{focalPlane}/GRAPHICS/PredictedFringes.jpg": {
-      "get": {
-        "tags": [
-          "Scenarios"
-        ],
-        "summary": "The predicted fringes of the scenario of the event",
-        "description": "The predicted fringes of the scenario of the event. The image is a JPEG file. This file might not be available for all the events. If this file is available, the predicted fringes description is also available.",
-        "parameters": [
-          {
-            "name": "eventId",
-            "in": "path",
-            "required": true,
-            "description": "The id of the event.",
-            "examples": {
-              "id_1": {
-                "value": "202302201704_01"
-              },
-              "id_2": {
-                "value": "202306030149_01"
-              },
-              "id_3": {
-                "value": "202309180310_01"
-              }
-            },
-            "schema": {
-              "type": "string",
-              "example": "201511170710_01"
-            }
-          },
-          {
-            "name": "scenarioId",
-            "in": "path",
-            "required": true,
-            "description": "The id of the scenario.",
-            "examples": {
-              "USGS": {
-                "value": "USGS"
-              },
-              "GCMT": {
-                "value": "GCMT"
-              },
-              "INGV": {
-                "value": "INGV"
-              }
-            },
-            "schema": {
-              "type": "string",
-              "example": "USGS"
-            }
-          },
-          {
-            "name": "focalPlane",
-            "in": "path",
-            "required": true,
-            "description": "The focal plane of the finite source.",
-            "examples": {
-              "fp1": {
-                "value": "FP1"
-              },
-              "fp2": {
-                "value": "FP2"
-              }
-            },
-            "schema": {
-              "type": "string",
-              "example": "FP1",
-              "enum": [
-                "FP1",
-                "FP2"
-              ]
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Successful operation",
-            "content": {
-              "image/jpeg": {
-                "schema": {
-                  "type": "string",
-                  "format": "binary",
-                  "description": "The predicted fringes of the scenario of the event."
-                }
-              }
-            }
-          },
-          "404": {
-            "description": "The requested resource was not found",
-            "content": {
-              "text/html; charset=iso-8859-1": {
-                "schema": {
-                  "type": "string"
-                },
-                "examples": {
-                  "error": {
-                    "value": "<!DOCTYPE HTML PUBLIC \"-//IETF//DTD HTML 2.0//EN\">\n<html><head>\n<title>404 Not Found</title>\n</head><body>\n<h1>Not Found</h1>\n<p>The requested URL was not found on this server.</p>\n<hr>\n<address>Apache/2.4.56 (Debian) Server at transit.rm.ingv.it Port 443</address>\n</body></html>\n"
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/Catalog/{eventId}/FOC_MECH_FWD/{scenarioId}/{focalPlane}/GRAPHICS/DisplacementMap_{language}.txt": {
-      "get": {
-        "tags": [
-          "Scenarios"
-        ],
-        "summary": "The description of the displacement map of the scenario of the event",
-        "description": "The description of the displacement map of the scenario of the event. The description is a text file. This file might not be available for all the events. If this file is available, the displacement map image is also available.",
-        "parameters": [
-          {
-            "name": "eventId",
-            "in": "path",
-            "required": true,
-            "description": "The id of the event.",
-            "examples": {
-              "id_1": {
-                "value": "202302201704_01"
-              },
-              "id_2": {
-                "value": "202306030149_01"
-              },
-              "id_3": {
-                "value": "202309180310_01"
-              }
-            },
-            "schema": {
-              "type": "string",
-              "example": "201511170710_01"
-            }
-          },
-          {
-            "name": "scenarioId",
-            "in": "path",
-            "required": true,
-            "description": "The id of the scenario.",
-            "examples": {
-              "USGS": {
-                "value": "USGS"
-              },
-              "GCMT": {
-                "value": "GCMT"
-              },
-              "INGV": {
-                "value": "INGV"
-              }
-            },
-            "schema": {
-              "type": "string",
-              "example": "USGS"
-            }
-          },
-          {
-            "name": "focalPlane",
-            "in": "path",
-            "required": true,
-            "description": "The focal plane of the finite source.",
-            "examples": {
-              "fp1": {
-                "value": "FP1"
-              },
-              "fp2": {
-                "value": "FP2"
-              }
-            },
-            "schema": {
-              "type": "string",
-              "example": "FP1",
-              "enum": [
-                "FP1",
-                "FP2"
-              ]
-            }
-          },
-          {
-            "name": "language",
-            "in": "path",
-            "required": true,
-            "description": "The language of the description.",
-            "examples": {
-              "italian": {
-                "value": "it"
-              },
-              "english": {
-                "value": "en"
-              }
-            },
-            "schema": {
-              "type": "string",
-              "example": "it",
-              "enum": [
-                "it",
-                "en"
-              ]
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Successful operation",
-            "content": {
-              "text/plain": {
-                "schema": {
-                  "type": "string",
-                  "format": "binary",
-                  "description": "The description of the displacement map of the scenario of the event."
-                }
-              }
-            }
-          },
-          "404": {
-            "description": "The requested resource was not found",
-            "content": {
-              "text/html; charset=iso-8859-1": {
-                "schema": {
-                  "type": "string"
-                },
-                "examples": {
-                  "error": {
-                    "value": "<!DOCTYPE HTML PUBLIC \"-//IETF//DTD HTML 2.0//EN\">\n<html><head>\n<title>404 Not Found</title>\n</head><body>\n<h1>Not Found</h1>\n<p>The requested URL was not found on this server.</p>\n<hr>\n<address>Apache/2.4.56 (Debian) Server at transit.rm.ingv.it Port 443</address>\n</body></html>\n"
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/Catalog/{eventId}/FOC_MECH_FWD/{scenarioId}/{focalPlane}/GRAPHICS/PredictedFringes_{language}.txt": {
-      "get": {
-        "tags": [
-          "Scenarios"
-        ],
-        "summary": "The description of the predicted fringes of the scenario of the event",
-        "description": "The description of the predicted fringes of the scenario of the event. The description is a text file. This file might not be available for all the events. If this file is available, the predicted fringes image is also available.",
-        "parameters": [
-          {
-            "name": "eventId",
-            "in": "path",
-            "required": true,
-            "description": "The id of the event.",
-            "examples": {
-              "id_1": {
-                "value": "202302201704_01"
-              },
-              "id_2": {
-                "value": "202306030149_01"
-              },
-              "id_3": {
-                "value": "202309180310_01"
-              }
-            },
-            "schema": {
-              "type": "string",
-              "example": "201511170710_01"
-            }
-          },
-          {
-            "name": "scenarioId",
-            "in": "path",
-            "required": true,
-            "description": "The id of the scenario.",
-            "examples": {
-              "USGS": {
-                "value": "USGS"
-              },
-              "GCMT": {
-                "value": "GCMT"
-              },
-              "INGV": {
-                "value": "INGV"
-              }
-            },
-            "schema": {
-              "type": "string",
-              "example": "USGS"
-            }
-          },
-          {
-            "name": "focalPlane",
-            "in": "path",
-            "required": true,
-            "description": "The focal plane of the finite source.",
-            "examples": {
-              "fp1": {
-                "value": "FP1"
-              },
-              "fp2": {
-                "value": "FP2"
-              }
-            },
-            "schema": {
-              "type": "string",
-              "example": "FP1",
-              "enum": [
-                "FP1",
-                "FP2"
-              ]
-            }
-          },
-          {
-            "name": "language",
-            "in": "path",
-            "required": true,
-            "description": "The language of the description.",
-            "examples": {
-              "italian": {
-                "value": "it"
-              },
-              "english": {
-                "value": "en"
-              }
-            },
-            "schema": {
-              "type": "string",
-              "example": "it",
-              "enum": [
-                "it",
-                "en"
-              ]
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Successful operation",
-            "content": {
-              "text/plain": {
-                "schema": {
-                  "type": "string",
-                  "format": "binary",
-                  "description": "The description of the predicted fringes of the scenario of the event."
-                }
-              }
-            }
-          },
-          "404": {
-            "description": "The requested resource was not found",
-            "content": {
-              "text/html; charset=iso-8859-1": {
-                "schema": {
-                  "type": "string"
-                },
-                "examples": {
-                  "error": {
-                    "value": "<!DOCTYPE HTML PUBLIC \"-//IETF//DTD HTML 2.0//EN\">\n<html><head>\n<title>404 Not Found</title>\n</head><body>\n<h1>Not Found</h1>\n<p>The requested URL was not found on this server.</p>\n<hr>\n<address>Apache/2.4.56 (Debian) Server at transit.rm.ingv.it Port 443</address>\n</body></html>\n"
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/Catalog/{eventId}/ANCILLARY/footprints_details.json": {
-      "get": {
-        "summary": "The details of the footprint product for the event",
-        "description": "The details of the footprint product for the event.",
-        "tags": [
-          "Footprint"
-        ],
-        "parameters": [
-          {
-            "name": "eventId",
-            "in": "path",
-            "required": true,
-            "description": "The id of the event.",
-            "examples": {
-              "id_1": {
-                "value": "202302201704_01"
-              },
-              "id_2": {
-                "value": "202306030149_01"
-              },
-              "id_3": {
-                "value": "202309180310_01"
-              }
-            },
-            "schema": {
-              "type": "string",
-              "example": "201511170710_01"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Successful operation",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "last_updated": {
-                      "type": "string",
-                      "format": "date-time",
-                      "readOnly": true,
-                      "description": "Last Review | timestamp",
-                      "example": "2016-06-22T16:52:06.260Z"
-                    }
-                  }
-                }
-              }
-            }
-          },
-          "404": {
-            "description": "The requested resource was not found",
-            "content": {
-              "text/html; charset=iso-8859-1": {
-                "schema": {
-                  "type": "string"
-                },
-                "examples": {
-                  "error": {
-                    "value": "<!DOCTYPE HTML PUBLIC \"-//IETF//DTD HTML 2.0//EN\">\n<html><head>\n<title>404 Not Found</title>\n</head><body>\n<h1>Not Found</h1>\n<p>The requested URL was not found on this server.</p>\n<hr>\n<address>Apache/2.4.56 (Debian) Server at transit.rm.ingv.it Port 443</address>\n</body></html>\n"
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/Catalog/{eventId}/ANCILLARY/SentinelFootprint.jpg": {
-      "get": {
-        "tags": [
-          "Footprint"
-        ],
-        "summary": "The image for the footprint of the event",
-        "description": "The image for the footprint of the event. The image is a JPEG file.",
-        "parameters": [
-          {
-            "name": "eventId",
-            "in": "path",
-            "required": true,
-            "description": "The id of the event.",
-            "examples": {
-              "id_1": {
-                "value": "202302201704_01"
-              },
-              "id_2": {
-                "value": "202306030149_01"
-              },
-              "id_3": {
-                "value": "202309180310_01"
-              }
-            },
-            "schema": {
-              "type": "string",
-              "example": "201511170710_01"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Successful operation",
-            "content": {
-              "image/jpeg": {
-                "schema": {
-                  "type": "string",
-                  "format": "binary",
-                  "description": "The footprint of the event."
-                }
-              }
-            }
-          },
-          "404": {
-            "description": "The requested resource was not found",
-            "content": {
-              "text/html; charset=iso-8859-1": {
-                "schema": {
-                  "type": "string"
-                },
-                "examples": {
-                  "error": {
-                    "value": "<!DOCTYPE HTML PUBLIC \"-//IETF//DTD HTML 2.0//EN\">\n<html><head>\n<title>404 Not Found</title>\n</head><body>\n<h1>Not Found</h1>\n<p>The requested URL was not found on this server.</p>\n<hr>\n<address>Apache/2.4.56 (Debian) Server at transit.rm.ingv.it Port 443</address>\n</body></html>\n"
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/Catalog/{eventId}/ANCILLARY/FootprintDescription_{language}.txt": {
-      "get": {
-        "tags": [
-          "Footprint"
-        ],
-        "summary": "The description of the footprint of the event",
-        "description": "The description of the footprint of the event. The description is a text file.",
-        "parameters": [
-          {
-            "name": "eventId",
-            "in": "path",
-            "required": true,
-            "description": "The id of the event.",
-            "examples": {
-              "id_1": {
-                "value": "202302201704_01"
-              },
-              "id_2": {
-                "value": "202306030149_01"
-              },
-              "id_3": {
-                "value": "202309180310_01"
-              }
-            },
-            "schema": {
-              "type": "string",
-              "example": "201511170710_01"
-            }
-          },
-          {
-            "name": "language",
-            "in": "path",
-            "required": true,
-            "description": "The language of the description.",
-            "examples": {
-              "italian": {
-                "value": "it"
-              },
-              "english": {
-                "value": "en"
-              }
-            },
-            "schema": {
-              "type": "string",
-              "example": "it",
-              "enum": [
-                "it",
-                "en"
-              ]
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Successful operation",
-            "content": {
-              "text/plain": {
-                "schema": {
-                  "type": "string",
-                  "format": "binary",
-                  "description": "The description of the footprint of the event."
-                }
-              }
-            }
-          },
-          "404": {
-            "description": "The requested resource was not found",
-            "content": {
-              "text/html; charset=iso-8859-1": {
-                "schema": {
-                  "type": "string"
-                },
-                "examples": {
-                  "error": {
-                    "value": "<!DOCTYPE HTML PUBLIC \"-//IETF//DTD HTML 2.0//EN\">\n<html><head>\n<title>404 Not Found</title>\n</head><body>\n<h1>Not Found</h1>\n<p>The requested URL was not found on this server.</p>\n<hr>\n<address>Apache/2.4.56 (Debian) Server at transit.rm.ingv.it Port 443</address>\n</body></html>\n"
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/Finite_source_app/app.json": {
-      "get": {
-        "summary": "A JSON file that contains all the data necessary to the initial visualization of the events on the map",
-        "description": "A JSON file that contains all the data necessary to the initial visualization of the events on the map. The JSON file contains an array of objects. Each object contains the data of an event. The data in this file is the same as the data in the catalog but put together to avoid multiple requests to the server.",
-        "tags": [
-          "Finite source Android App"
-        ],
-        "responses": {
-          "200": {
-            "description": "Successful operation",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "type": "object",
-                    "properties": {
-                      "id_event": {
-                        "type": "string",
-                        "description": "Unique identifier of the event",
-                        "example": "201504250611_01"
-                      },
-                      "name": {
-                        "type": "string",
-                        "description": "The name of the event",
-                        "example": "Costa Greca Ionica (GRECIA)"
-                      },
-                      "occurring_time": {
-                        "type": "string",
-                        "format": "date-time",
-                        "description": "Origin time | datetime(3)",
-                        "example": "2016-06-22T16:52:06.260Z"
-                      },
-                      "longitude": {
-                        "description": "Longitude of a point expressed in:\n\n* the ETRS89 system for Italian and European territories\n* and in WGS84 for the others.",
-                        "example": 9.19289,
-                        "externalDocs": {
-                          "url": "http://dati.gov.it/onto/clvapit#long"
-                        },
-                        "format": "double",
-                        "maximum": 180,
-                        "minimum": -180,
-                        "type": "number"
-                      },
-                      "latitude": {
-                        "description": "Latitude of a point expressed in:\n\n* the ETRS89 system for Italian and European territories\n* and in WGS84 for the others.",
-                        "example": 45.492599,
-                        "externalDocs": {
-                          "url": "http://dati.gov.it/onto/clvapit#long"
-                        },
-                        "format": "double",
-                        "maximum": 90,
-                        "minimum": -90,
-                        "type": "number"
-                      },
-                      "depth": {
-                        "type": "number",
-                        "description": "Depth in Km | double",
-                        "format": "double",
-                        "example": 0.02
-                      },
-                      "magnitude": {
-                        "example": 6.5,
-                        "type": "number",
-                        "description": "Magnitude | double",
-                        "format": "double"
-                      },
-                      "bounding_box": {
-                        "type": "array",
-                        "items": {
-                          "type": "number",
-                          "format": "double"
-                        },
-                        "minItems": 4,
-                        "maxItems": 4,
-                        "example": [
-                          38.37522,
-                          20.42148,
-                          38.77527,
-                          20.60164
-                        ],
-                        "description": "The bounding box of the event. The order of the coordinates is: South, West, North, East."
-                      },
-                      "finite_source_last_updated": {
-                        "nullable": true,
-                        "description": "The date of the last update of the product or the date of the time it was published if never updated. If the product is not available, this field is null.",
-                        "type": "string",
-                        "format": "date-time",
-                        "example": "2016-06-22T16:52:06.260Z"
-                      }
-                    }
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
-    }
-  }
-}
+openapi: "3.0.3"
+info:
+  title: INGV Finite Source API
+  description: |
+    This API provides access to the INGV Finite Source Catalog. The catalog contains data about seismic events, including the location, depth, magnitude, and other relevant data.
+  version: 2.0.0
+servers:
+  - url: https://source.rm.ingv.it/v2/
+paths:
+  /query:
+    get:
+      description: |
+        ## Query the INGV Finite Source Catalog
+        The query can be of two types:
+          - by `ID`: specify the `ID` of the event to retrieve. The `ID` can be either the `INGV ID` or the internal `ID` used in the catalog.
+        
+          - by parameters: specify the parameters of the event to retrieve. The parameters can be the location, magnitude, occurring time of the event and the last updated time of the event.
+        
+        The result is a list of events that match the query. If the query was by `ID` or `INGV ID`, the list will contain only one event.
+        If the query did not match any event, a `204 No Content` status code will be returned.
+        
+        ## Examples
+        - Query by `ID`:
+        
+          [/query?id=201504250611_01](query?id=201504250611_01)
+        
+        - Query by `INGV ID`: 
+        
+          [/query?ingvId=5336361](query?ingvId=5336361)
+        
+        - Query by `minLatitude`, `maxLatitude`, `minLongitude`, `maxLongitude` to define a bounding box:
+        
+          [/query?minLatitude=42.0&maxLatitude=43.0&minLongitude=13.0&maxLongitude=14.0](query?minLatitude=42.0&maxLatitude=43.0&minLongitude=13.0&maxLongitude=14.0)
+        
+        - Query by `minMagnitude`, `maxMagnitude`:
+        
+          [/query?minMagnitude=4.0&maxMagnitude=5.0](query?minMagnitude=4.0&maxMagnitude=5.0)
+        
+        - Query by `updatedAfter` to get the events updated after a specific date-time:
+        
+          [/query?updatedAfter=2023-03-09T15:05:41.870Z](query?updatedAfter=2023-03-09T15:05:41.870Z)
+        
+        - Combined query:
+        
+          [/query?minMagnitude=4.0&maxMagnitude=5.0&updatedAfter=2023-03-09T15:05:41.870Z](query?minMagnitude=4.0&maxMagnitude=5.0&updatedAfter=2023-03-09T15:05:41.870Z)
+
+        ## Rate Limiting
+        The API has a rate limit *per IP*. 
+        
+        In the header of the response, the following headers are returned:
+        
+        - `X-RateLimit-Limit`: The maximum number of requests that the consumer is permitted to make in a given period.
+        
+        - `X-RateLimit-Remaining`: The number of requests remaining in the current rate limit window.
+        
+        - `X-RateLimit-Reset`: The time at which the current rate limit window resets in UTC epoch seconds.
+
+      parameters:
+        - name: id
+          in: query
+          description: The internal ID of the event to retrieve.
+          schema:
+            $ref: "#/components/schemas/Id"
+        - name: ingvId
+          in: query
+          description: The INGV ID of the event to retrieve.
+          schema:
+            $ref: "#/components/schemas/IdIngv"
+        - name: startDateTime
+          in: query
+          description: |
+            The start date-time of the period to filter the events.
+            
+            If not specified in the request, the default value is `1970-01-01T00:00:00.000Z`.
+          schema:
+            $ref: "#/components/schemas/Instant"
+        - name: endDateTime
+          in: query
+          description: |
+            The end date-time of the period to filter the events.
+            
+            If not specified in the request, the default value is the current date-time.
+          schema:
+            $ref: "#/components/schemas/Instant"
+        - name: minMagnitude
+          in: query
+          description: |
+            The minimum magnitude to filter the events.
+            
+            If not specified in the request, the default value is `0.0`.
+          schema:
+            $ref: "#/components/schemas/Magnitude"
+        - name: maxMagnitude
+          in: query
+          description: |
+            The maximum magnitude to filter the events.
+            
+            If not specified in the request, the default value is `10.0`.
+          schema:
+            $ref: "#/components/schemas/Magnitude"
+        - name: minLatitude
+          in: query
+          description: |
+            The minimum latitude to filter the events.
+            
+            If not specified in the request, the default value is `-90.0`.
+          schema:
+            $ref: "#/components/schemas/Latitude"
+        - name: maxLatitude
+          in: query
+          description: |
+            The maximum latitude to filter the events.
+            
+            If not specified in the request, the default value is `90.0`.
+          schema:
+            $ref: "#/components/schemas/Latitude"
+        - name: minLongitude
+          in: query
+          description: |
+            The minimum longitude to filter the events.
+            
+            If not specified in the request, the default value is `-180.0`.
+          schema:
+            $ref: "#/components/schemas/Longitude"
+        - name: maxLongitude
+          in: query
+          description: |
+            The maximum longitude to filter the events.
+            
+            If not specified in the request, the default value is `180.0`.
+          schema:
+            $ref: "#/components/schemas/Longitude"
+        - name: updatedAfter
+          in: query
+          description: |
+            The date after which the events were updated.
+            
+            If not specified in the request, the default value is `1970-01-01T00:00:00.000Z`.
+          schema:
+            $ref: "#/components/schemas/Instant"
+
+      responses:
+        200:
+          description: "The events that match the query."
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/EventMetadata"
+          headers:
+            X-RateLimit-Limit:
+              $ref: "#/components/headers/X-RateLimit-Limit"
+            X-RateLimit-Remaining:
+              $ref: "#/components/headers/X-RateLimit-Remaining"
+            X-RateLimit-Reset:
+              $ref: "#/components/headers/X-RateLimit-Reset"
+        204:
+          description: "No events match the query."
+          headers:
+            X-RateLimit-Limit:
+              $ref: "#/components/headers/X-RateLimit-Limit"
+            X-RateLimit-Remaining:
+              $ref: "#/components/headers/X-RateLimit-Remaining"
+            X-RateLimit-Reset:
+              $ref: "#/components/headers/X-RateLimit-Reset"
+        400:
+          description: "Invalid query parameters."
+          headers:
+            X-RateLimit-Limit:
+              $ref: "#/components/headers/X-RateLimit-Limit"
+            X-RateLimit-Remaining:
+              $ref: "#/components/headers/X-RateLimit-Remaining"
+            X-RateLimit-Reset:
+              $ref: "#/components/headers/X-RateLimit-Reset"
+          content:
+            text/plain:
+              schema:
+                type: string
+                example: "The magnitude range must be between 0.0 and 10.0"
+        429:
+          description: "Too many requests."
+          headers:
+            X-RateLimit-Limit:
+              $ref: "#/components/headers/X-RateLimit-Limit"
+            X-RateLimit-Remaining:
+              $ref: "#/components/headers/X-RateLimit-Remaining"
+            X-RateLimit-Reset:
+              $ref: "#/components/headers/X-RateLimit-Reset"
+          content:
+            text/plain:
+              schema:
+                type: string
+                example: "Too many requests. Retry after 59 seconds."
+        503:
+          description: "Service unavailable."
+          headers:
+            X-RateLimit-Limit:
+              $ref: "#/components/headers/X-RateLimit-Limit"
+            X-RateLimit-Remaining:
+              $ref: "#/components/headers/X-RateLimit-Remaining"
+            X-RateLimit-Reset:
+              $ref: "#/components/headers/X-RateLimit-Reset"
+          content:
+            text/plain:
+              schema:
+                type: string
+                example: "Service temporarily unavailable, please try again in 7198 seconds"
+
+components:
+  headers:
+    X-RateLimit-Limit:
+      description: The maximum number of requests that the consumer is permitted to make in a given period.
+      schema:
+        type: integer
+        format: int64
+    X-RateLimit-Remaining:
+      description: The number of requests remaining in the current rate limit window.
+      schema:
+        type: integer
+        format: int64
+    X-RateLimit-Reset:
+      description: The time at which the current rate limit window resets in UTC epoch seconds.
+      schema:
+        type: integer
+        format: int64
+  schemas:
+    # Query parameters
+    Id:
+      type: string
+      description: The internal ID used in the catalog.
+      pattern: "^[0-9]{12}_[0-9]{2}$"
+      example: "201504250611_01"
+    IdIngv:
+      type: integer
+      description: Unique incremental id | bigint(20) used by the INGV.
+      format: int64
+      example: 14932631
+    Instant:
+      type: string
+      format: date-time
+      description: |
+        The instant when an event occurred. In **ISO 8601** format. 
+        
+        *NOTE:* The time zone *must* be specified.
+      example: "2023-03-09T15:05:41.870Z"
+    Magnitude:
+      type: number
+      format: float
+      description: The magnitude of an event.
+      minimum: 0
+      maximum: 10.0
+      example: 4.5
+    Latitude:
+      type: number
+      format: float
+      description: The latitude coordinate of an event.
+      minimum: -90
+      maximum: 90
+      example: 42.5
+    Longitude:
+      type: number
+      format: float
+      description: The longitude coordinate of an event.
+      minimum: -180
+      maximum: 180
+      example: 13.4
+    EventMetadata:
+      type: object
+      properties:
+        event_count:
+          type: integer
+          format: int64
+          description: The number of events that match the query.
+          example: 1
+        events:
+          type: array
+          items:
+            $ref: "#/components/schemas/Event"
+      required:
+        - event_count
+        - events
+
+
+    Event:
+      description: An event in the INGV Finite Source Catalog.
+      type: object
+      properties:
+        name:
+          type: string
+          description: The name of the event.
+          example: "Nepal"
+        id_event:
+          $ref: "#/components/schemas/Id"
+        id_ingv:
+          $ref: "#/components/schemas/IdIngv"
+        occurring_time:
+          $ref: "#/components/schemas/Instant"
+        magnitude:
+          $ref: "#/components/schemas/Magnitude"
+        latitude:
+          $ref: "#/components/schemas/Latitude"
+        longitude:
+          $ref: "#/components/schemas/Longitude"
+        depth:
+          type: number
+          format: float
+          description: The depth of an event in kilometers.
+          minimum: 0.0
+          example: 10.0
+        bounding_box:
+          description: A bounding box that defines a region on the Earth's surface.
+          type: object
+          properties:
+            south:
+              $ref: "#/components/schemas/Latitude"
+            north:
+              $ref: "#/components/schemas/Latitude"
+            west:
+              $ref: "#/components/schemas/Longitude"
+            east:
+              $ref: "#/components/schemas/Longitude"
+        mag_type:
+          type: string
+          description: The type of magnitude used to measure an event.
+          example: "Mw"
+        hypocenter_provider:
+          type: string
+          description: The provider of the hypocenter data.
+          example: "INGV"
+        catalog_doi:
+          type: string
+          nullable: true
+          example: "https://doi.org/10.1016/j.jag.2023.103445"
+        available_products:
+          type: array
+          description: The available products for the event.
+          minimum: 1
+          items:
+            type: string
+            enum:
+              - "finite_source"
+              - "scenarios"
+              - "footprints"
+          example: [ "scenarios", "footprints" ]
+        finite_source:
+          type: array
+          description: The available finite sources for the event relative to the focal plane.
+          items:
+            $ref: "#/components/schemas/FiniteSource"
+
+        scenarios:
+          type: object
+          description: The available scenarios for the event.
+          properties:
+            last_updated:
+              $ref: "#/components/schemas/Instant"
+            providers:
+              type: array
+              items:
+                type: string
+              example: [ "INGV", "USGS" ]
+            scenario_overall_caption_en:
+              type: string
+              example: "In questa sezione vengono mostrate le mappe di spostamento generate immediatamente dopo un evento sismico in base a meccanismi focali forniti da vari istituti a scala globale. Le immagini contengono <strong> mappe generate in base a regole statistiche e non dati di deformazione misurata</strong> e hanno lo scopo di fornire indicazioni qualitative sulle deformazioni attese per l’area interessata. Selezionare dal menu a tendina le soluzioni disponibili."
+            scenario_overall_caption_it:
+              type: string
+              example: "This section shows maps of predicted surface displacement based on a finite fault derived from focal mechanisms. Images below contain <strong>maps generated with statistical rules and not real measured data</strong>; they only provide qualitative indications about expected surface displacement in the area. Use the pull-down menu to select a scenario from those currently available. Finite fault dimensions and mean slip are based on the <em>Leonard (2010)</em>, doi 10.1785/0120090189, scaling factors. <strong>Scenarios are available only for a limited period after the event</strong>"
+            provider_details:
+              type: array
+              #description: TODO
+              items:
+                type: object
+                properties:
+                  provider_name:
+                    type: string
+                    example: "INGV"
+                  magnitude:
+                    $ref: "#/components/schemas/Magnitude"
+                  mag_type:
+                    type: string
+                    example: "Mw"
+                  centroid_latitude:
+                    $ref: "#/components/schemas/Latitude"
+                  centroid_longitude:
+                    $ref: "#/components/schemas/Longitude"
+                  centroid_depth:
+                    type: number
+                    format: float
+                    example: 10.0
+                  moment:
+                    type: number
+                    format: float
+                    example: "3.03956E15"
+                  moment_unit:
+                    type: string
+                    example: "Nm"
+                  plane1strike:
+                    type: number
+                    format: float
+                    example: 279.0
+                  plane1dip:
+                    type: number
+                    format: float
+                    example: 48.0
+                  plane1rake:
+                    type: number
+                    format: float
+                    example: 93.0
+                  plane2strike:
+                    type: number
+                    format: float
+                    example: 94.0
+                  plane2dip:
+                    type: number
+                    format: float
+                    example: 42.0
+                  plane2rake:
+                    type: number
+                    format: float
+                    example: 87.0
+                  products:
+                    type: array
+                    #description: TODO
+                    items:
+                      type: object
+                      properties:
+                        focal_plane:
+                          type: number
+                          format: integer
+                          example: 1
+                        finite_source_shape:
+                          type: string
+                          format: url
+                          example: "https://transit.rm.ingv.it/files/sar/V1/Catalog/202310070712_01/FOC_MECH_FWD/GCMT/FP1/Finite_source.shp.zip"
+                        predicted_displacement_up:
+                          type: string
+                          format: url
+                          example: "https://transit.rm.ingv.it/files/sar/V1/Catalog/202310070712_01/FOC_MECH_FWD/GCMT/FP1/DISPLACEMENTS/Displ_up.tif"
+                        predicted_displacement_east:
+                          type: string
+                          format: url
+                          example: "https://transit.rm.ingv.it/files/sar/V1/Catalog/202310070712_01/FOC_MECH_FWD/GCMT/FP1/DISPLACEMENTS/Displ_east.tif"
+                        predicted_displacement_north:
+                          type: string
+                          format: url
+                          example: "https://transit.rm.ingv.it/files/sar/V1/Catalog/202310070712_01/FOC_MECH_FWD/GCMT/FP1/DISPLACEMENTS/Displ_north.tif"
+                        predicted_displacement_los_asc:
+                          type: string
+                          format: url
+                          example: "https://transit.rm.ingv.it/files/sar/V1/Catalog/202310070712_01/FOC_MECH_FWD/GCMT/FP1/DISPLACEMENTS/Displ_los_asc.tif"
+                        predicted_displacement_los_dsc:
+                          type: string
+                          format: url
+                          example: "https://transit.rm.ingv.it/files/sar/V1/Catalog/202310070712_01/FOC_MECH_FWD/GCMT/FP1/DISPLACEMENTS/Displ_los_dsc.tif"
+                        predicted_displacement_wrapped_asc:
+                          type: string
+                          format: url
+                          example: "https://transit.rm.ingv.it/files/sar/V1/Catalog/202310070712_01/FOC_MECH_FWD/GCMT/FP1/DISPLACEMENTS/Displ_wr_asc.tif"
+                        predicted_displacement_wrapped_dsc:
+                          type: string
+                          format: url
+                          example: "https://transit.rm.ingv.it/files/sar/V1/Catalog/202310070712_01/FOC_MECH_FWD/GCMT/FP1/DISPLACEMENTS/Displ_wr_dsc.tif"
+                        predicted_displacement_points_shape:
+                          type: string
+                          format: url
+                          example: "https://transit.rm.ingv.it/files/sar/V1/Catalog/202310070712_01/FOC_MECH_FWD/GCMT/FP1/DISPLACEMENTS/Point_displ.shp.zip"
+                        predicted_displacement_graphics:
+                          type: string
+                          format: url
+                          example: "https://transit.rm.ingv.it/files/sar/V1/Catalog/202310070712_01/FOC_MECH_FWD/GCMT/FP1/GRAPHICS/DisplacementMap.jpg"
+                        predicted_displacement_caption_it:
+                          type: string
+                          example: "In queste mappa, basata sul meccanismo focale fornito da Global CMT, i colori indicano lo spostamento verticale e le frecce quello orizzontale."
+                        predicted_displacement_caption_en:
+                          type: string
+                          example: "This map, based on the Global CMT focal mechanism, shows vertical and horizontal displacements with colors and arrows, respectively."
+                        predicted_fringes_graphics:
+                          type: string
+                          format: url
+                          example: "https://transit.rm.ingv.it/files/sar/V1/Catalog/202310070712_01/FOC_MECH_FWD/GCMT/FP1/GRAPHICS/PredictedFringes.jpg"
+                        predicted_fringes_caption_it:
+                          type: string
+                          example: "Frange interferometriche, per orbita ascendente e discendente Sentinel-1, simulate in base allo scenario dello spostamento."
+                        predicted_fringes_caption_en:
+                          type: string
+                          example: "predicted InSAR fringes for ascending and descending Sentinel-1 orbits, based on the displacement scenario."
+                    required:
+                      - finite_source_shape
+                      - focal_plane
+                      - predicted_displacement_caption_en
+                      - predicted_displacement_caption_it
+                      - predicted_displacement_graphics
+                      - predicted_displacement_points_shape
+                      - predicted_displacement_up
+                      - predicted_displacement_east
+                      - predicted_displacement_north
+              required:
+                - provider_name
+                - magnitude
+                - mag_type
+                - centroid_latitude
+                - centroid_longitude
+                - centroid_depth
+                - moment
+                - moment_unit
+                - plane1strike
+                - plane1dip
+                - plane1rake
+                - plane2strike
+                - plane2dip
+                - plane2rake
+          required:
+            - last_updated
+            - providers
+            - scenario_overall_caption_en
+            - scenario_overall_caption_it
+            - provider_details
+        footprints:
+          type: object
+          properties:
+            expected_affected_area_shapefile:
+              type: string
+              format: url
+              example: "https://transit.rm.ingv.it/files/sar/V1/Catalog/202303091505_01/ANCILLARY/expected_affected_area.shp.zip"
+            footprint_caption_en:
+              type: string
+              example: "SAR image footprints and acquisition time for the Sentinel-1 (European Space Agency) satellite constellation."
+            footprint_caption_it:
+              type: string
+              example: "Footprints delle immagini SAR e relative date di acquisizione previste con la costellazione Sentinel-1 (Agenzia Spaziale Europea)"
+            footprint_jpg:
+              type: string
+              format: url
+              example: "https://transit.rm.ingv.it/files/sar/V1/Catalog/202303091505_01/ANCILLARY/SentinelFootprint.jpg"
+            footprint_shape:
+              type: string
+              format: url
+              example: "https://transit.rm.ingv.it/files/sar/V1/Catalog/202303091505_01/ANCILLARY/SE1_footprints.shp.zip"
+            last_updated:
+              $ref: "#/components/schemas/Instant"
+          required:
+            - expected_affected_area_shapefile
+            - footprint_caption_en
+            - footprint_caption_it
+            - footprint_jpg
+            - footprint_shape
+            - last_updated
+      required:
+        - id_event
+        - name
+        - occurring_time
+        - magnitude
+        - depth
+        - latitude
+        - longitude
+        - bounding_box
+        - mag_type
+        - hypocenter_provider
+        - available_products
+
+    FiniteSource:
+      description: A finite source for a focal plane
+      type: object
+      properties:
+        focal_plane:
+          type: integer
+          description: The "id" of the focal plane.
+          enum:
+            - 1
+            - 2
+          example: 1
+        average_dip:
+          type: number
+          format: float
+          description: The average dip of the fault plane.
+          example: 54.0
+        average_rake:
+          type: number
+          format: float
+          description: The average rake of the fault plane.
+          example: -75.87
+        average_strike:
+          type: number
+          format: float
+          description: The average strike of the fault plane.
+          example: 133.79
+        event_type:
+          type: string
+          description: The type of event.
+          example: "earthquake"
+        inversion_reference:
+          type: string
+          #description: TODO
+          example: "https://doi.org/10.1016/j.jag.2023.103445"
+        inversion_software:
+          type: string
+          #description: TODO
+          example: "modelit (INGV modeling software)"
+        inverted_datasets:
+          type: array
+          items:
+            type: string
+          example: [ "https://transit.rm.ingv.it/files/sar/V1/Catalog/202303091505_01/INVERSE/FP1/SOURCES/SE1_27FEB2023_11MAR2023_D_refined.shp.zip", "https://transit.rm.ingv.it/files/sar/V1/Catalog/202303091505_01/INVERSE/FP1/SOURCES/SE1_28FEB2023_12MAR2023_A_refined.shp.zip" ]
+        maximum_slip:
+          type: number
+          format: float
+          #description: TODO
+          example: 0.24
+        moment_unit:
+          type: string
+          #description: TODO
+          example: "Nm"
+        processing_time:
+          $ref: "#/components/schemas/Instant"
+        product_doi:
+          type: string
+          #description: TODO
+          example: "https://doi.org/10.1016/j.jag.2023.103445"
+        product_link:
+          type: string
+          #description: TODO
+          example: "https://transit.rm.ingv.it/files/sar/V1/Catalog/202303091505_01/INVERSE/FP1/MOD_INGV_202303091505_01.zip"
+        product_size:
+          type: number
+          format: integer
+          #description: TODO
+          example: 934284
+        production_level:
+          type: string
+          #description: TODO
+          example: "reviewed"
+        slip_distribution_graphic:
+          type: string
+          #description: TODO
+          example: "https://transit.rm.ingv.it/files/sar/V1/Catalog/202303091505_01/INVERSE/FP1/GRAPHICS/SlipDistribution.jpg"
+        source_geodetic_moment:
+          type: number
+          format: float
+          #description: TODO
+          example: 7.18128E15
+        source_graphic_caption_en:
+          type: string
+          example: "This source model, derived from 2 InSAR dataset(s) including from 2 to 3 days after the event, is characterized by a single NW-SE oriented fault (strike 132°), dipping towards the SW at 54° degrees and a mainly normal rupture with a left-lateral component (rake -76°). The strike and dip angles have been fixed according to the focal mechanism. Slip peak is approximately 0.2 m at a depth of 1.1 km. The energy released is  7.2E+15 Nm, corresponding to an M 4.5 earthquake. InSAR data, model and ancillary information can be found in the <em>data_and_model.zip</em> file, available for download"
+        source_graphic_caption_it:
+          type: string
+          example: "Il modello di sorgente, ottenuto con 2 dataset InSAR che includono da 2 a 3 giorni dopo l'evento, è caratterizzato da una faglia orientata NO-SE (strike 132°), immergente verso SO con dip 54° e un meccanismo di rottura normale con componente laterale sinstra (rake -76°). Gli angoli di strike e dip sono stati fissati in base al meccanismo focale. Il picco della rottura è di circa 0.2 m a una profondità di 1.1 km. Il rilascio di energia è pari a  7.2E+15 Nm, corrispondente a un terremoto di magnitudo 4.5. Dati InSAR, modelli di sorgente e informazioni accessorie sono contenuti nel file <em>data_and_model.zip</em>, disponibile per il download"
+        source_graphics_map:
+          type: string
+          format: url
+          #description: TODO
+          example: "https://transit.rm.ingv.it/files/sar/V1/Catalog/202303091505_01/INVERSE/FP1/GRAPHICS/MainInversionMap.jpg"
+        source_magnitude:
+          $ref: "#/components/schemas/Magnitude"
+        source_shapefiles:
+          type: array
+          #description: TODO
+          items:
+            type: string
+            format: url
+            example: "https://transit.rm.ingv.it/files/sar/V1/Catalog/202303091505_01/INVERSE/FP1/SOURCES/Finite_source.shp.zip"
+        source_json:
+          type: string
+          format: url
+          example: "https://transit.rm.ingv.it/files/sar/V1/Catalog/202312181559_01/INVERSE/FP2/SOURCES/Finite_source.json"
+          description: An URL to the JSON file containing the source model as a GeoJSON object.
+      required:
+        - focal_plane
+        - average_dip
+        - average_rake
+        - average_strike
+        - event_type
+        - inversion_reference
+        - inversion_software
+        - inverted_datasets
+        - maximum_slip
+        - moment_unit
+        - processing_time
+        #- product_doi
+        - product_link
+        #- product_size
+        - production_level
+        - slip_distribution_graphic
+        - source_geodetic_moment
+        - source_graphic_caption_en
+        - source_graphic_caption_it
+        - source_graphics_map
+        - source_magnitude
+        - source_shapefiles
+        - source_json
