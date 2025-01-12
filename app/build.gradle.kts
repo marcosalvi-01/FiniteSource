@@ -113,7 +113,7 @@ dependencies {
 
 
 openApiGenerate {
-	inputSpec.set("$rootDir/openapi/finite_source_api.yaml")
+	inputSpec.set("$rootDir/openapi/finite_source_api_2.yaml")
 	generatorName.set("kotlin")
 	library.set("jvm-retrofit2")
 }

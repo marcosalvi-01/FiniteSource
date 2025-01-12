@@ -19,7 +19,7 @@ enum class Products(
 ) : Parcelable {
 	// the order of the tabs is the order of the enum
 	FINITE_SOURCE(
-		"finite-source",
+		"finite_source",
 		::FiniteSourceFragment,
 		R.string.finite_source_tab_name,
 		R.string.finite_source_not_available,
