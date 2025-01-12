@@ -1,0 +1,707 @@
+openapi: "3.0.3"
+info:
+  title: INGV Finite Source API
+  description: |
+    This API provides access to the INGV Finite Source Catalog. The catalog contains data about seismic events, including the location, depth, magnitude, and other relevant data.
+
+    You can explore the catalog contents either using the `query` endpoint or by going to [https://finitesource.ingv.it/v3](https://finitesource.ingv.it/v3).
+  version: 2.0.0
+servers:
+  - url: https://finitesource.ingv.it/v3/
+paths:
+  /query:
+    get:
+      description: |
+        ## Query the INGV Finite Source Catalog
+        The query can be of two types:
+          - by `ID`: specify the `ID` of the event to retrieve. The `ID` can be either the `INGV ID` or the internal `ID` used in the catalog.
+
+          - by parameters: specify the parameters of the event to retrieve. The parameters can be the location, magnitude, occurring time of the event and the last updated time of the event.
+
+        The result is a list of events that match the query. If the query was by `ID` or `INGV ID`, the list will contain only one event.
+        If the query did not match any event, a `204 No Content` status code will be returned.
+
+        ## Examples
+        - Query by `ID`:
+
+          [/query?id=201504250611_01](query?id=201504250611_01)
+
+        - Query by `INGV ID`: 
+
+          [/query?ingvId=5336361](query?ingvId=5336361)
+
+        - Query by `minLatitude`, `maxLatitude`, `minLongitude`, `maxLongitude` to define a bounding box:
+
+          [/query?minLatitude=42.0&maxLatitude=43.0&minLongitude=13.0&maxLongitude=14.0](query?minLatitude=42.0&maxLatitude=43.0&minLongitude=13.0&maxLongitude=14.0)
+
+        - Query by `minMagnitude`, `maxMagnitude`:
+
+          [/query?minMagnitude=4.0&maxMagnitude=5.0](query?minMagnitude=4.0&maxMagnitude=5.0)
+
+        - Query by `updatedAfter` to get the events updated after a specific date-time:
+
+          [/query?updatedAfter=2023-03-09T15:05:41.870Z](query?updatedAfter=2023-03-09T15:05:41.870Z)
+
+        - Combined query:
+
+          [/query?minMagnitude=4.0&maxMagnitude=5.0&updatedAfter=2023-03-09T15:05:41.870Z](query?minMagnitude=4.0&maxMagnitude=5.0&updatedAfter=2023-03-09T15:05:41.870Z)
+
+        ## Rate Limiting
+        The API has a rate limit *per IP*. 
+
+        In the header of the response, the following headers are returned:
+
+        - `X-RateLimit-Limit`: The maximum number of requests that the consumer is permitted to make in a given period.
+
+        - `X-RateLimit-Remaining`: The number of requests remaining in the current rate limit window.
+
+        - `X-RateLimit-Reset`: The time at which the current rate limit window resets in UTC epoch seconds.
+
+      parameters:
+        - name: id
+          in: query
+          description: The internal ID of the event to retrieve.
+          schema:
+            $ref: "#/components/schemas/Id"
+        - name: ingvId
+          in: query
+          description: The INGV ID of the event to retrieve.
+          schema:
+            $ref: "#/components/schemas/IdIngv"
+        - name: startDateTime
+          in: query
+          description: |
+            The start date-time of the period to filter the events.
+
+            If not specified in the request, the default value is `1970-01-01T00:00:00.000Z`.
+          schema:
+            $ref: "#/components/schemas/Instant"
+        - name: endDateTime
+          in: query
+          description: |
+            The end date-time of the period to filter the events.
+
+            If not specified in the request, the default value is the current date-time.
+          schema:
+            $ref: "#/components/schemas/Instant"
+        - name: minMagnitude
+          in: query
+          description: |
+            The minimum magnitude to filter the events.
+
+            If not specified in the request, the default value is `0.0`.
+          schema:
+            $ref: "#/components/schemas/Magnitude"
+        - name: maxMagnitude
+          in: query
+          description: |
+            The maximum magnitude to filter the events.
+
+            If not specified in the request, the default value is `10.0`.
+          schema:
+            $ref: "#/components/schemas/Magnitude"
+        - name: minLatitude
+          in: query
+          description: |
+            The minimum latitude to filter the events.
+
+            If not specified in the request, the default value is `-90.0`.
+          schema:
+            $ref: "#/components/schemas/Latitude"
+        - name: maxLatitude
+          in: query
+          description: |
+            The maximum latitude to filter the events.
+
+            If not specified in the request, the default value is `90.0`.
+          schema:
+            $ref: "#/components/schemas/Latitude"
+        - name: minLongitude
+          in: query
+          description: |
+            The minimum longitude to filter the events.
+
+            If not specified in the request, the default value is `-180.0`.
+          schema:
+            $ref: "#/components/schemas/Longitude"
+        - name: maxLongitude
+          in: query
+          description: |
+            The maximum longitude to filter the events.
+
+            If not specified in the request, the default value is `180.0`.
+          schema:
+            $ref: "#/components/schemas/Longitude"
+        - name: updatedAfter
+          in: query
+          description: |
+            The date after which the events were updated.
+
+            If not specified in the request, the default value is `1970-01-01T00:00:00.000Z`.
+          schema:
+            $ref: "#/components/schemas/Instant"
+        - name: details
+          in: query
+          description: |
+            Controls the level of detail in the response. When set to `true`, the response includes 
+            details of the available products. When `false`, returns only 
+            basic event information for a lighter response. Defaults to `true` if not specified.
+          schema:
+            type: boolean
+            default: true
+            example: true
+
+      responses:
+        200:
+          description: "The events that match the query."
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/EventMetadata"
+          headers:
+            X-RateLimit-Limit:
+              $ref: "#/components/headers/X-RateLimit-Limit"
+            X-RateLimit-Remaining:
+              $ref: "#/components/headers/X-RateLimit-Remaining"
+            X-RateLimit-Reset:
+              $ref: "#/components/headers/X-RateLimit-Reset"
+        204:
+          description: "No events match the query."
+          headers:
+            X-RateLimit-Limit:
+              $ref: "#/components/headers/X-RateLimit-Limit"
+            X-RateLimit-Remaining:
+              $ref: "#/components/headers/X-RateLimit-Remaining"
+            X-RateLimit-Reset:
+              $ref: "#/components/headers/X-RateLimit-Reset"
+        400:
+          description: "Invalid query parameters."
+          headers:
+            X-RateLimit-Limit:
+              $ref: "#/components/headers/X-RateLimit-Limit"
+            X-RateLimit-Remaining:
+              $ref: "#/components/headers/X-RateLimit-Remaining"
+            X-RateLimit-Reset:
+              $ref: "#/components/headers/X-RateLimit-Reset"
+          content:
+            text/plain:
+              schema:
+                type: string
+                example: "The magnitude range must be between 0.0 and 10.0"
+        429:
+          description: "Too many requests."
+          headers:
+            X-RateLimit-Limit:
+              $ref: "#/components/headers/X-RateLimit-Limit"
+            X-RateLimit-Remaining:
+              $ref: "#/components/headers/X-RateLimit-Remaining"
+            X-RateLimit-Reset:
+              $ref: "#/components/headers/X-RateLimit-Reset"
+          content:
+            text/plain:
+              schema:
+                type: string
+                example: "Too many requests. Retry after 59 seconds."
+        503:
+          description: "Service unavailable."
+          headers:
+            X-RateLimit-Limit:
+              $ref: "#/components/headers/X-RateLimit-Limit"
+            X-RateLimit-Remaining:
+              $ref: "#/components/headers/X-RateLimit-Remaining"
+            X-RateLimit-Reset:
+              $ref: "#/components/headers/X-RateLimit-Reset"
+          content:
+            text/plain:
+              schema:
+                type: string
+                example: "Service temporarily unavailable, please try again in 7198 seconds"
+
+components:
+  headers:
+    X-RateLimit-Limit:
+      description: The maximum number of requests that the consumer is permitted to make in a given period.
+      schema:
+        type: integer
+        format: int64
+    X-RateLimit-Remaining:
+      description: The number of requests remaining in the current rate limit window.
+      schema:
+        type: integer
+        format: int64
+    X-RateLimit-Reset:
+      description: The time at which the current rate limit window resets in UTC epoch seconds.
+      schema:
+        type: integer
+        format: int64
+  schemas:
+    # Query parameters
+    Id:
+      type: string
+      description: The internal ID used in the catalog.
+      pattern: "^[0-9]{12}_[0-9]{2}$"
+      example: "201504250611_01"
+    IdIngv:
+      type: integer
+      description: Unique incremental id | bigint(20) used by the INGV.
+      format: int64
+      example: 14932631
+    Instant:
+      type: string
+      format: date-time
+      description: |
+        The instant when an event occurred. In **ISO 8601** format. 
+
+        *NOTE:* The time zone *must* be specified.
+      example: "2023-03-09T15:05:41.870Z"
+    Magnitude:
+      type: number
+      format: float
+      description: The magnitude of an event.
+      minimum: 0
+      maximum: 10.0
+      example: 4.5
+    Latitude:
+      type: number
+      format: float
+      description: The latitude coordinate of an event.
+      minimum: -90
+      maximum: 90
+      example: 42.5
+    Longitude:
+      type: number
+      format: float
+      description: The longitude coordinate of an event.
+      minimum: -180
+      maximum: 180
+      example: 13.4
+    EventMetadata:
+      type: object
+      properties:
+        event_count:
+          type: integer
+          format: int64
+          description: The number of events that match the query.
+          example: 1
+        events:
+          type: array
+          items:
+            $ref: "#/components/schemas/Event"
+      required:
+        - event_count
+        - events
+
+    Event:
+      description: An event in the INGV Finite Source Catalog.
+      type: object
+      properties:
+        id_event:
+          $ref: "#/components/schemas/Id"
+        name:
+          type: string
+          description: The name of the event in the catalog
+        id_ingv:
+          $ref: "#/components/schemas/IdIngv"
+        occurring_time:
+          $ref: "#/components/schemas/Instant"
+        magnitude:
+          $ref: "#/components/schemas/Magnitude"
+        latitude:
+          $ref: "#/components/schemas/Latitude"
+        longitude:
+          $ref: "#/components/schemas/Longitude"
+        depth:
+          type: number
+          format: float
+          description: The depth of an event in kilometers.
+          minimum: 0.0
+          example: 10.0
+        bounding_box:
+          description: A bounding box that defines a region on the Earth's surface.
+          type: object
+          properties:
+            south:
+              $ref: "#/components/schemas/Latitude"
+            north:
+              $ref: "#/components/schemas/Latitude"
+            west:
+              $ref: "#/components/schemas/Longitude"
+            east:
+              $ref: "#/components/schemas/Longitude"
+        mag_type:
+          type: string
+          description: The type of magnitude used to measure an event.
+          example: "Mw"
+        focal_plane:
+          type: number
+          format: integer
+          description: "The focal planes available for this event: 0 both focal planes available, 1 only focal plane 1 available, 2 only focal plane 2 available"
+          example: 1
+        hypocenter_provider:
+          type: string
+          description: The provider of the hypocenter data.
+          example: "INGV"
+        catalog_doi:
+          type: string
+          #description: TODO
+          example: "https://doi.org/10.1016/j.jag.2023.103445"
+        available_products:
+          type: array
+          description: The available products for the event.
+          minimum: 1
+          items:
+            type: string
+            enum:
+              - "finite_source"
+              - "scenarios"
+              - "footprints"
+          example: ["scenarios", "footprints"]
+        finite_source:
+          type: array
+          description: The available finite sources for the event relative to the focal plane.
+          items:
+            type: object
+            properties:
+              focal_plane:
+                type: number
+                format: integer
+                description: The "id" of the focal plane.
+                example: 1
+              average_dip:
+                type: number
+                format: float
+                description: The average dip of the fault plane.
+                example: 54.0
+              average_rake:
+                type: number
+                format: float
+                description: The average rake of the fault plane.
+                example: -75.87
+              average_strike:
+                type: number
+                format: float
+                description: The average strike of the fault plane.
+                example: 133.79
+              event_type:
+                type: string
+                description: The type of event.
+                example: "earthquake"
+              inversion_reference:
+                type: string
+                #description: TODO
+                example: "https://doi.org/10.1016/j.jag.2023.103445"
+              inversion_software:
+                type: string
+                #description: TODO
+                example: "modelit (INGV modeling software)"
+              inverted_datasets:
+                type: array
+                items:
+                  type: string
+                example:
+                  [
+                    "https://transit.rm.ingv.it/files/sar/V1/Catalog/202303091505_01/INVERSE/FP1/SOURCES/SE1_27FEB2023_11MAR2023_D_refined.shp.zip",
+                    "https://transit.rm.ingv.it/files/sar/V1/Catalog/202303091505_01/INVERSE/FP1/SOURCES/SE1_28FEB2023_12MAR2023_A_refined.shp.zip",
+                  ]
+              maximum_slip:
+                type: number
+                format: float
+                #description: TODO
+                example: 0.24
+              moment_unit:
+                type: string
+                #description: TODO
+                example: "Nm"
+              processing_time:
+                $ref: "#/components/schemas/Instant"
+              product_doi:
+                type: string
+                #description: TODO
+                example: "https://doi.org/10.1016/j.jag.2023.103445"
+              product_link:
+                type: string
+                #description: TODO
+                example: "https://transit.rm.ingv.it/files/sar/V1/Catalog/202303091505_01/INVERSE/FP1/MOD_INGV_202303091505_01.zip"
+              product_size:
+                type: number
+                format: integer
+                #description: TODO
+                example: 934284
+              production_level:
+                type: string
+                #description: TODO
+                example: "reviewed"
+              slip_distribution_graphic:
+                type: string
+                #description: TODO
+                example: "https://transit.rm.ingv.it/files/sar/V1/Catalog/202303091505_01/INVERSE/FP1/GRAPHICS/SlipDistribution.jpg"
+              source_geodetic_moment:
+                type: number
+                format: float
+                #description: TODO
+                example: 7.18128E15
+              inversion_description_caption_it:
+                type: string
+                example: "Distribuzione della rottura sul piano della sorgente sismica, derivata dall'analisi di mappe di spostamento (InSAR) ottenute con dati Sentinel-1 dell'Agenzia Spaziale Europea. Dati InSAR prodotti dal servizio EPOSAR (IREA-CNR)"
+              inversion_description_caption_en:
+                type: string
+                example: "The rupture distribution along the seismic source is derived from the analysis of displacement maps (InSAR) obtained through the processing of Sentinel-1, European Space Agency, radar images. InSAR data are produced by the EPOSAR (IREA-CNR) service."
+              source_graphic_caption_en:
+                type: string
+                example: "This source model, derived from 2 InSAR dataset(s) including from 2 to 3 days after the event, is characterized by a single NW-SE oriented fault (strike 132°), dipping towards the SW at 54° degrees and a mainly normal rupture with a left-lateral component (rake -76°). The strike and dip angles have been fixed according to the focal mechanism. Slip peak is approximately 0.2 m at a depth of 1.1 km. The energy released is  7.2E+15 Nm, corresponding to an M 4.5 earthquake. InSAR data, model and ancillary information can be found in the <em>data_and_model.zip</em> file, available for download"
+              source_graphic_caption_it:
+                type: string
+                example: "Il modello di sorgente, ottenuto con 2 dataset InSAR che includono da 2 a 3 giorni dopo l'evento, è caratterizzato da una faglia orientata NO-SE (strike 132°), immergente verso SO con dip 54° e un meccanismo di rottura normale con componente laterale sinstra (rake -76°). Gli angoli di strike e dip sono stati fissati in base al meccanismo focale. Il picco della rottura è di circa 0.2 m a una profondità di 1.1 km. Il rilascio di energia è pari a  7.2E+15 Nm, corrispondente a un terremoto di magnitudo 4.5. Dati InSAR, modelli di sorgente e informazioni accessorie sono contenuti nel file <em>data_and_model.zip</em>, disponibile per il download"
+              source_graphics_map:
+                type: string
+                format: url
+                #description: TODO
+                example: "https://transit.rm.ingv.it/files/sar/V1/Catalog/202303091505_01/INVERSE/FP1/GRAPHICS/MainInversionMap.jpg"
+              source_magnitude:
+                $ref: "#/components/schemas/Magnitude"
+              source_shapefiles:
+                type: array
+                #description: TODO
+                items:
+                  type: string
+                  format: url
+                  example: "https://transit.rm.ingv.it/files/sar/V1/Catalog/202303091505_01/INVERSE/FP1/SOURCES/Finite_source.shp.zip"
+              source_json:
+                type: string
+                format: url
+                example: "https://transit.rm.ingv.it/files/sar/V1/Catalog/202312181559_01/INVERSE/FP2/SOURCES/Finite_source.json"
+                description: An URL to the JSON file containing the source model as a GeoJSON object.
+          required:
+            - focal_plane
+            - average_dip
+            - average_rake
+            - average_strike
+            - event_type
+            - inversion_reference
+            - inversion_software
+            - inverted_datasets
+            - maximum_slip
+            - moment_unit
+            - processing_time
+            #- product_doi
+            - product_link
+            #- product_size
+            - production_level
+            - slip_distribution_graphic
+            - source_geodetic_moment
+            - source_graphic_caption_en
+            - source_graphic_caption_it
+            - source_graphics_map
+            - source_magnitude
+            - source_shapefiles
+            - source_json
+        scenarios:
+          type: object
+          description: The available scenarios for the event.
+          properties:
+            last_updated:
+              $ref: "#/components/schemas/Instant"
+            providers:
+              type: array
+              items:
+                type: string
+              example: ["INGV", "USGS"]
+            scenario_overall_caption_en:
+              type: string
+              example: "In questa sezione vengono mostrate le mappe di spostamento generate immediatamente dopo un evento sismico in base a meccanismi focali forniti da vari istituti a scala globale. Le immagini contengono <strong> mappe generate in base a regole statistiche e non dati di deformazione misurata</strong> e hanno lo scopo di fornire indicazioni qualitative sulle deformazioni attese per l’area interessata. Selezionare dal menu a tendina le soluzioni disponibili."
+            scenario_overall_caption_it:
+              type: string
+              example: "This section shows maps of predicted surface displacement based on a finite fault derived from focal mechanisms. Images below contain <strong>maps generated with statistical rules and not real measured data</strong>; they only provide qualitative indications about expected surface displacement in the area. Use the pull-down menu to select a scenario from those currently available. Finite fault dimensions and mean slip are based on the <em>Leonard (2010)</em>, doi 10.1785/0120090189, scaling factors. <strong>Scenarios are available only for a limited period after the event</strong>"
+            provider_details:
+              type: array
+              #description: TODO
+              items:
+                type: object
+                properties:
+                  provider_name:
+                    type: string
+                    example: "INGV"
+                  magnitude:
+                    $ref: "#/components/schemas/Magnitude"
+                  mag_type:
+                    type: string
+                    example: "Mw"
+                  centroid_latitude:
+                    $ref: "#/components/schemas/Latitude"
+                  centroid_longitude:
+                    $ref: "#/components/schemas/Longitude"
+                  centroid_depth:
+                    type: number
+                    format: float
+                    example: 10.0
+                  moment:
+                    type: number
+                    format: float
+                    example: "3.03956E15"
+                  moment_unit:
+                    type: string
+                    example: "Nm"
+                  plane1strike:
+                    type: number
+                    format: float
+                    example: 279.0
+                  plane1dip:
+                    type: number
+                    format: float
+                    example: 48.0
+                  plane1rake:
+                    type: number
+                    format: float
+                    example: 93.0
+                  plane2strike:
+                    type: number
+                    format: float
+                    example: 94.0
+                  plane2dip:
+                    type: number
+                    format: float
+                    example: 42.0
+                  plane2rake:
+                    type: number
+                    format: float
+                    example: 87.0
+                  products:
+                    type: array
+                    #description: TODO
+                    items:
+                      type: object
+                      properties:
+                        focal_plane:
+                          type: number
+                          format: integer
+                          example: 1
+                        finite_source_shape:
+                          type: string
+                          format: url
+                          example: "https://transit.rm.ingv.it/files/sar/V1/Catalog/202310070712_01/FOC_MECH_FWD/GCMT/FP1/Finite_source.shp.zip"
+                        predicted_displacement_up:
+                          type: string
+                          format: url
+                          example: "https://transit.rm.ingv.it/files/sar/V1/Catalog/202310070712_01/FOC_MECH_FWD/GCMT/FP1/DISPLACEMENTS/Displ_up.tif"
+                        predicted_displacement_east:
+                          type: string
+                          format: url
+                          example: "https://transit.rm.ingv.it/files/sar/V1/Catalog/202310070712_01/FOC_MECH_FWD/GCMT/FP1/DISPLACEMENTS/Displ_east.tif"
+                        predicted_displacement_north:
+                          type: string
+                          format: url
+                          example: "https://transit.rm.ingv.it/files/sar/V1/Catalog/202310070712_01/FOC_MECH_FWD/GCMT/FP1/DISPLACEMENTS/Displ_north.tif"
+                        predicted_displacement_los_asc:
+                          type: string
+                          format: url
+                          example: "https://transit.rm.ingv.it/files/sar/V1/Catalog/202310070712_01/FOC_MECH_FWD/GCMT/FP1/DISPLACEMENTS/Displ_los_asc.tif"
+                        predicted_displacement_los_dsc:
+                          type: string
+                          format: url
+                          example: "https://transit.rm.ingv.it/files/sar/V1/Catalog/202310070712_01/FOC_MECH_FWD/GCMT/FP1/DISPLACEMENTS/Displ_los_dsc.tif"
+                        predicted_displacement_wrapped_asc:
+                          type: string
+                          format: url
+                          example: "https://transit.rm.ingv.it/files/sar/V1/Catalog/202310070712_01/FOC_MECH_FWD/GCMT/FP1/DISPLACEMENTS/Displ_wr_asc.tif"
+                        predicted_displacement_wrapped_dsc:
+                          type: string
+                          format: url
+                          example: "https://transit.rm.ingv.it/files/sar/V1/Catalog/202310070712_01/FOC_MECH_FWD/GCMT/FP1/DISPLACEMENTS/Displ_wr_dsc.tif"
+                        predicted_displacement_points_shape:
+                          type: string
+                          format: url
+                          example: "https://transit.rm.ingv.it/files/sar/V1/Catalog/202310070712_01/FOC_MECH_FWD/GCMT/FP1/DISPLACEMENTS/Point_displ.shp.zip"
+                        predicted_displacement_graphics:
+                          type: string
+                          format: url
+                          example: "https://transit.rm.ingv.it/files/sar/V1/Catalog/202310070712_01/FOC_MECH_FWD/GCMT/FP1/GRAPHICS/DisplacementMap.jpg"
+                        predicted_displacement_caption_it:
+                          type: string
+                          example: "In queste mappa, basata sul meccanismo focale fornito da Global CMT, i colori indicano lo spostamento verticale e le frecce quello orizzontale."
+                        predicted_displacement_caption_en:
+                          type: string
+                          example: "This map, based on the Global CMT focal mechanism, shows vertical and horizontal displacements with colors and arrows, respectively."
+                        predicted_fringes_graphics:
+                          type: string
+                          format: url
+                          example: "https://transit.rm.ingv.it/files/sar/V1/Catalog/202310070712_01/FOC_MECH_FWD/GCMT/FP1/GRAPHICS/PredictedFringes.jpg"
+                        predicted_fringes_caption_it:
+                          type: string
+                          example: "Frange interferometriche, per orbita ascendente e discendente Sentinel-1, simulate in base allo scenario dello spostamento."
+                        predicted_fringes_caption_en:
+                          type: string
+                          example: "predicted InSAR fringes for ascending and descending Sentinel-1 orbits, based on the displacement scenario."
+                    required:
+                      - finite_source_shape
+                      - focal_plane
+                      - predicted_displacement_caption_en
+                      - predicted_displacement_caption_it
+                      - predicted_displacement_graphics
+                      - predicted_displacement_points_shape
+                      - predicted_displacement_up
+                      - predicted_displacement_east
+                      - predicted_displacement_north
+              required:
+                - provider_name
+                - magnitude
+                - mag_type
+                - centroid_latitude
+                - centroid_longitude
+                - centroid_depth
+                - moment
+                - moment_unit
+                - plane1strike
+                - plane1dip
+                - plane1rake
+                - plane2strike
+                - plane2dip
+                - plane2rake
+          required:
+            - last_updated
+            - providers
+            - scenario_overall_caption_en
+            - scenario_overall_caption_it
+            - provider_details
+        footprints:
+          type: object
+          properties:
+            expected_affected_area_shapefile:
+              type: string
+              format: url
+              example: "https://transit.rm.ingv.it/files/sar/V1/Catalog/202303091505_01/ANCILLARY/expected_affected_area.shp.zip"
+            footprint_caption_en:
+              type: string
+              example: "SAR image footprints and acquisition time for the Sentinel-1 (European Space Agency) satellite constellation."
+            footprint_caption_it:
+              type: string
+              example: "Footprints delle immagini SAR e relative date di acquisizione previste con la costellazione Sentinel-1 (Agenzia Spaziale Europea)"
+            footprint_jpg:
+              type: string
+              format: url
+              example: "https://transit.rm.ingv.it/files/sar/V1/Catalog/202303091505_01/ANCILLARY/SentinelFootprint.jpg"
+            footprint_shape:
+              type: string
+              format: url
+              example: "https://transit.rm.ingv.it/files/sar/V1/Catalog/202303091505_01/ANCILLARY/SE1_footprints.shp.zip"
+            last_updated:
+              $ref: "#/components/schemas/Instant"
+          required:
+            - expected_affected_area_shapefile
+            - footprint_caption_en
+            - footprint_caption_it
+            - footprint_jpg
+            - footprint_shape
+            - last_updated
+      required:
+        - id_event
+        - name
+        - focal_plane
+        - occurring_time
+        - magnitude
+        - depth
+        - latitude
+        - longitude
+        - bounding_box
+        - mag_type
+        - hypocenter_provider
+        - available_products

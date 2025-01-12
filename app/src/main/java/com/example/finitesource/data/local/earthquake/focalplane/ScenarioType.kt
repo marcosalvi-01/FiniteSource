@@ -6,9 +6,9 @@ import com.example.finitesource.data.local.database.dao.ScenarioTypeDao
 
 @Entity
 open class ScenarioType(
-	@PrimaryKey var id: String,
-	var name: String,
-	var url: String
+	@PrimaryKey val id: String,
+	val name: String,
+	val url: String
 ) {
 	override fun toString(): String {
 		return "$id,$name,$url"

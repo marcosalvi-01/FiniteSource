@@ -14,6 +14,6 @@ interface ScenarioTypeDao {
 	@Query("SELECT * FROM scenariotype")
 	fun getAll(): List<ScenarioType>
 
-	@Query("SELECT * FROM scenariotype WHERE id = :id")
+	@Query("SELECT * FROM scenariotype WHERE name = :id")
 	fun getById(id: String): ScenarioType
 }

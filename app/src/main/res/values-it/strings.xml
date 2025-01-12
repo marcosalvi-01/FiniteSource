@@ -51,4 +51,11 @@
     <string name="new_earthquakes_title">Terremoti aggiunti:</string>
     <string name="catalog_updates_title">Aggiornamenti catalogo</string>
     <string name="no_updates">Non ci sono aggiornamenti per il catalogo</string>
+    <string name="info_activity_title">Informazioni</string>
+    <string name="catalog_info_text">The INGV finite soruce catalog is a set international earthquakes for which some information are made accessible or something</string>
+    <string name="catalog_info_title">Il catalogo INGV</string>
+    <string name="visit_website">Vai sul sito</string>
+    <string name="application_info_title">Info sull\'App</string>
+    <string name="application_info_text">L\'applicazione è completamente open source. Il codice sorgente è disponibile su GitHub.</string>
+    <string name="open_on_github">Apri su GitHub</string>
 </resources>
