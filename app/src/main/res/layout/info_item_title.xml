@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<TextView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/catalog_info_title"
+    style="@style/TitleTextStyle"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:paddingBottom="8dp"
+    android:textStyle="bold"
+    android:text="@string/catalog_info_title"
+    android:textAlignment="textStart" />
