@@ -2,6 +2,7 @@ package com.example.finitesource.data.local.earthquake
 
 import androidx.room.Embedded
 import androidx.room.Entity
+import androidx.room.Ignore
 import androidx.room.PrimaryKey
 import com.example.finitesource.data.local.earthquake.focalplane.FocalPlane
 import com.example.finitesource.data.local.earthquake.focalplane.FocalPlaneType
@@ -22,8 +23,9 @@ data class Earthquake(
     val longitude: Double,
     val boundingBox: BoundingBox,
     var finiteSourceLastUpdate: Calendar? = null,
-    @Embedded var details: EarthquakeDetails? = null,
 ) {
+    @Ignore
+    var details: EarthquakeDetails? = null
     /**
      * Returns the focal plane of the given type.
      * Returns null if the earthquake doesn't have the details or if the focal plane doesn't exist.
@@ -103,7 +105,6 @@ fun toEarthquake(event: Event): Earthquake? {
                     it.east!!.toDouble()
                 )
             }),
-            details = null,
         )
 //		Earthquake(
 //			id = response.idEvent!!,

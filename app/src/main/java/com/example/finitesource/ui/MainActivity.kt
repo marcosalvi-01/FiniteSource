@@ -86,6 +86,9 @@ class MainActivity : AppCompatActivity() {
 				savedInstanceState.getFloat(COMPASS_BUTTON_ROTATION_TAG)
 		}
 
+		// clear the glide cache to avoid showing old images
+		Glide.get(this).clearMemory()
+
 		// give the viewmodel to the mapview
 		binding.customMapView.earthquakesViewModel = earthquakesViewModel
 		// vige the viewmodel to the bottom sheet
@@ -122,8 +125,6 @@ class MainActivity : AppCompatActivity() {
 				if (it.hasUpdates() && !isFirstLaunch) {
 					// show the updates dialog
 					UpdatesDialog(this, it).show()
-					// clear the glide cache to avoid showing old images
-					Glide.get(this).clearMemory()
 				} else if (isFirstLaunch) {
 					// TODO show a greeting message
 					// tell the repository that the updates need to be null
