@@ -115,7 +115,7 @@ class ApiCalls @Inject constructor(
             val scenarios: MutableList<Scenario> = mutableListOf()
             for (scenarioType in availableScenarios) {
                 for (scenario in event.scenarios!!.providerDetails) {
-                    if (scenario.providerName!! == scenarioType.id) {
+                    if (scenario.providerName!! == scenarioType.name) {
                         for (product in scenario.products!!) {
                             if (product.focalPlane!!.intValueExact() == focalPlaneType.ordinal + 1) {
                                 val displacementMapDescription =
@@ -207,7 +207,7 @@ class ApiCalls @Inject constructor(
         } ?: throw Exception("Error loading the event details")
     }
 
-    fun getAvailableScenarios(id: String): List<ScenarioType> {
+    fun getAvailableScenarios(id: String): List<ScenarioType>? {
         val events = service.queryGet(id = id).executeApiCall()
         if (events.eventCount != 1.toLong()) {
             throw Exception("The service returned a wrong number of events: " + events.eventCount)
@@ -215,7 +215,7 @@ class ApiCalls @Inject constructor(
         val event = events.events[0]
         return event.scenarios?.providers?.map {
             EarthquakesRepository.parseScenarioType(it)
-        } ?: throw Exception("Error loading the scenario details")
+        }
 //        return getScenarioDetails(id).providers?.map {
 //            EarthquakesRepository.parseScenarioType(it)
 //        } ?: throw Exception("Error loading the scenario details")

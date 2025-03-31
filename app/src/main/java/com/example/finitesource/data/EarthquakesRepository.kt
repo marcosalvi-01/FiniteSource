@@ -342,7 +342,7 @@ private fun buildFocalPlane(
     focalPlaneType: FocalPlaneType,
     apiCalls: ApiCalls,
     availableProducts: List<Products>,
-    availableScenarios: List<ScenarioType>
+    availableScenarios: List<ScenarioType>?
 ): FocalPlane {
     var scenarios: Scenarios? = null
     var finiteSource: FiniteSource? = null
@@ -350,6 +350,9 @@ private fun buildFocalPlane(
     for (product in availableProducts) {
         when (product) {
             Products.SCENARIOS -> {
+                if (availableScenarios == null) {
+                    throw Exception("No scenarios found even though they should be available")
+                }
                 scenarios = apiCalls.getScenarios(earthquake, focalPlaneType, availableScenarios)
 //                if (scenarios == null)
 //                    throw Exception("Error loading the scenarios")

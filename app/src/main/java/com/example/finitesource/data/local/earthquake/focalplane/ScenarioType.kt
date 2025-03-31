@@ -6,23 +6,23 @@ import com.example.finitesource.data.local.database.dao.ScenarioTypeDao
 
 @Entity
 open class ScenarioType(
-	@PrimaryKey val id: String,
-	val name: String,
+	@PrimaryKey val name: String,
+	val dir: String,
 	val url: String
 ) {
 	override fun toString(): String {
-		return "$id,$name,$url"
+		return "$dir,$name,$url"
 	}
 
 	override fun equals(other: Any?): Boolean {
 		if (other == null || other !is ScenarioType) {
 			return false
 		}
-		return id == other.id
+		return dir == other.dir
 	}
 
 	override fun hashCode(): Int {
-		return id.hashCode()
+		return dir.hashCode()
 	}
 
 	companion object {
