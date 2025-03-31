@@ -115,7 +115,7 @@ class ApiCalls @Inject constructor(
             val scenarios: MutableList<Scenario> = mutableListOf()
             for (scenarioType in availableScenarios) {
                 for (scenario in event.scenarios!!.providerDetails) {
-                    if (scenario.providerName!! == scenarioType.id) {
+                    if (scenario.providerName!! == scenarioType.name) {
                         for (product in scenario.products!!) {
                             if (product.focalPlane!!.intValueExact() == focalPlaneType.ordinal + 1) {
                                 val displacementMapDescription =

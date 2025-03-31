@@ -13,9 +13,9 @@ const val RAKE_KEY = "Rake_d"
 // okhttp client
 val okHttpClient = OkHttpClient().newBuilder().build()
 
-val configUrl = "https://finitesource.ingv.it/v3/config/GeneralConfig.json"
-val providersUrl = "https://finitesource.ingv.it/v3/config/FocalMechanismProviders.json"
-val paletteUrl = "https://finitesource.ingv.it/v3/config/SlipColorPalette.json"
+const val configUrl = "https://finitesource.ingv.it/v3/config/GeneralConfig.json"
+const val providersUrl = "https://finitesource.ingv.it/v3/config/FocalMechanismProviders.json"
+const val paletteUrl = "https://finitesource.ingv.it/v3/config/SlipColorPalette.json"
 
 // INGV URL
 const val INGV_URL_IT = "https://terremoti.ingv.it/finitesource"

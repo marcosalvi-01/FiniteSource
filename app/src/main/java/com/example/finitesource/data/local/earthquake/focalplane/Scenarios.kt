@@ -21,7 +21,7 @@ class Scenario(
 	val displacementMapUrl: String,
 	val predictedFringesDescription: String?,
 	val predictedFringesUrl: String?
-) : ScenarioType(scenarioType.id, scenarioType.name, scenarioType.url) {
+) : ScenarioType(scenarioType.dir, scenarioType.name, scenarioType.url) {
 	override fun toString(): String {
 		return super.toString() +
 				"|$displacementMapDescription|$displacementMapUrl" +
