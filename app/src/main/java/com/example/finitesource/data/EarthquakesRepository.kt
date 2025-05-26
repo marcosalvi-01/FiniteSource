@@ -350,7 +350,7 @@ private fun buildFocalPlane(
     for (product in availableProducts) {
         when (product) {
             Products.SCENARIOS -> {
-                if (availableScenarios == null) {
+                if (availableScenarios == null || availableScenarios.isEmpty()) {
                     throw Exception("No scenarios found even though they should be available")
                 }
                 scenarios = apiCalls.getScenarios(earthquake, focalPlaneType, availableScenarios)
