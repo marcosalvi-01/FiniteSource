@@ -103,6 +103,7 @@
             android:paddingBottom="4sp"
             android:paddingTop="2sp"
             android:textSize="12sp"
+            android:textColor="@color/on_background"
             android:clickable="true"
             android:focusable="true"
             app:tint="@color/on_background" />
