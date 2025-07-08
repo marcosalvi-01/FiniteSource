@@ -32,181 +32,186 @@ import com.example.finitesource.shareImage
  * The popup menu has two options: save the image and share the image.
  */
 class ImageTextView(
-	context: Context,
-	attrs: AttributeSet
+    context: Context,
+    attrs: AttributeSet
 ) : FrameLayout(context, attrs) {
-	private val binding: ImageTextViewBinding by lazy {
-		ImageTextViewBinding.inflate(LayoutInflater.from(context), this, true)
-	}
+    private val binding: ImageTextViewBinding by lazy {
+        ImageTextViewBinding.inflate(LayoutInflater.from(context), this, true)
+    }
 
-	/**
-	 * The image view that shows the image
-	 */
-	val imageView = binding.imageView
+    var textColor = android.R.attr.textColor
+        set(value) {
+            binding.textView.setTextColor(value)
+        }
 
-	/**
-	 * The text view that shows the text
-	 */
-	val textView = binding.textView
+    /**
+     * The image view that shows the image
+     */
+    val imageView = binding.imageView
 
-	/**
-	 * The url of the image to be shown in the [imageView]
-	 */
-	var imageUrl: String? = null
-		set(value) {
-			field = value
-			setGlideImage(value)
-		}
+    /**
+     * The text view that shows the text
+     */
+    val textView = binding.textView
 
-	/**
-	 * The text to be shown in the [textView]
-	 */
-	var text: String? = null
-		set(value) {
-			field = value
-			_setText(value)
-		}
+    /**
+     * The url of the image to be shown in the [imageView]
+     */
+    var imageUrl: String? = null
+        set(value) {
+            field = value
+            setGlideImage(value)
+        }
 
-	/**
-	 * The resource id of the title of the image to be shown in the [FullScreenImageActivity]
-	 */
-	var fullScreenImageTitleId: Int? = null
+    /**
+     * The text to be shown in the [textView]
+     */
+    var text: String? = null
+        set(value) {
+            field = value
+            _setText(value)
+        }
 
-	init {
-		// set the long onclick listener to show the popup menu
-		binding.imageViewContainer.setOnLongClickListener {
-			// show the popup menu
-			showContextMenu()
-			true
-		}
+    /**
+     * The resource id of the title of the image to be shown in the [FullScreenImageActivity]
+     */
+    var fullScreenImageTitleId: Int? = null
 
-		// show the image full screen when clicked
-		binding.imageViewContainer.setOnClickListener {
-			val intent = Intent(getContext(), FullScreenImageActivity::class.java)
-			intent.putExtra(IMAGE_URL_KEY, imageUrl)
-			intent.putExtra(TITLE_ID_KEY, fullScreenImageTitleId)
-			// Pass the transition name to the next activity
-			val options = ActivityOptionsCompat.makeSceneTransitionAnimation(
-				context as Activity,
-				// @string/full_screen_image_transition_name
-				// is the transition name of the ImageView
-				binding.imageView, ViewCompat.getTransitionName(binding.imageView)!!
-			)
-			// Start the activity with the transition
-			ActivityCompat.startActivity(context, intent, options.toBundle())
-		}
-	}
+    init {
+        // set the long onclick listener to show the popup menu
+        binding.imageViewContainer.setOnLongClickListener {
+            // show the popup menu
+            showContextMenu()
+            true
+        }
 
-	/**
-	 * Sets the image to the [imageView] using Glide
-	 */
-	private fun setGlideImage(imageUrl: String?) {
-		hideRootIfBothEmpty(imageUrl, text)
-		// hide the image view and the progress bar if the image source is null
-		if (imageUrl == null) {
-			binding.imageView.visibility = GONE
-			binding.progressBar.visibility = GONE
-		} else {
-			// else show the image
-			binding.imageView.visibility = VISIBLE
-			// Glide is used to load the image into the ImageView
-			Glide.with(this)
-				.asBitmap()
-				.load(imageUrl)
-				.fitCenter()
-				// this is because if the image is too big, the imageView can't hold it, so we scale it down
-				// the problem with this is that if the imageview is bigger than the image, there will be borders
-				.override(2000, Target.SIZE_ORIGINAL)    // TODO find a better way to do this
-				.into(object : CustomTarget<Bitmap?>() {
-					override fun onResourceReady(
-						resource: Bitmap,
-						transition: Transition<in Bitmap?>?
-					) {
-						// set the size of the image
-						setImageSize(resource, binding.imageView)
-						// set the image
-						binding.imageView.setImageBitmap(resource)
-						binding.imageView.visibility = VISIBLE
-						binding.progressBar.visibility = GONE
-					}
+        // show the image full screen when clicked
+        binding.imageViewContainer.setOnClickListener {
+            val intent = Intent(getContext(), FullScreenImageActivity::class.java)
+            intent.putExtra(IMAGE_URL_KEY, imageUrl)
+            intent.putExtra(TITLE_ID_KEY, fullScreenImageTitleId)
+            // Pass the transition name to the next activity
+            val options = ActivityOptionsCompat.makeSceneTransitionAnimation(
+                context as Activity,
+                // @string/full_screen_image_transition_name
+                // is the transition name of the ImageView
+                binding.imageView, ViewCompat.getTransitionName(binding.imageView)!!
+            )
+            // Start the activity with the transition
+            ActivityCompat.startActivity(context, intent, options.toBundle())
+        }
+    }
 
-					override fun onLoadFailed(errorDrawable: Drawable?) {
-						super.onLoadFailed(errorDrawable)
-						// clear the image url
-						this@ImageTextView.imageUrl = null
-						// TODO show an error message
-					}
+    /**
+     * Sets the image to the [imageView] using Glide
+     */
+    private fun setGlideImage(imageUrl: String?) {
+        hideRootIfBothEmpty(imageUrl, text)
+        // hide the image view and the progress bar if the image source is null
+        if (imageUrl == null) {
+            binding.imageView.visibility = GONE
+            binding.progressBar.visibility = GONE
+        } else {
+            // else show the image
+            binding.imageView.visibility = VISIBLE
+            // Glide is used to load the image into the ImageView
+            Glide.with(this)
+                .asBitmap()
+                .load(imageUrl)
+                .fitCenter()
+                // this is because if the image is too big, the imageView can't hold it, so we scale it down
+                // the problem with this is that if the imageview is bigger than the image, there will be borders
+                .override(2000, Target.SIZE_ORIGINAL)    // TODO find a better way to do this
+                .into(object : CustomTarget<Bitmap?>() {
+                    override fun onResourceReady(
+                        resource: Bitmap,
+                        transition: Transition<in Bitmap?>?
+                    ) {
+                        // set the size of the image
+                        setImageSize(resource, binding.imageView)
+                        // set the image
+                        binding.imageView.setImageBitmap(resource)
+                        binding.imageView.visibility = VISIBLE
+                        binding.progressBar.visibility = GONE
+                    }
 
-					override fun onLoadCleared(placeholder: Drawable?) {
-						// clear the image
-						binding.imageView.setImageDrawable(null)
-					}
-				})
-		}
-	}
+                    override fun onLoadFailed(errorDrawable: Drawable?) {
+                        super.onLoadFailed(errorDrawable)
+                        // clear the image url
+                        this@ImageTextView.imageUrl = null
+                        // TODO show an error message
+                    }
 
-	override fun showContextMenu(): Boolean {
-		PopupMenu(context, binding.imageView).apply {
-			// inflate the menu
-			inflate(R.menu.fullscreen_image_options_menu)
-			// set the listener to the menu items
-			setOnMenuItemClickListener { item ->
-				when (item.itemId) {
-					R.id.save_image -> {
-						saveImage(context, imageUrl!!, true)
-						true
-					}
+                    override fun onLoadCleared(placeholder: Drawable?) {
+                        // clear the image
+                        binding.imageView.setImageDrawable(null)
+                    }
+                })
+        }
+    }
 
-					R.id.share_image -> {
-						shareImage(context, imageUrl!!)
-						true
-					}
+    override fun showContextMenu(): Boolean {
+        PopupMenu(context, binding.imageView).apply {
+            // inflate the menu
+            inflate(R.menu.fullscreen_image_options_menu)
+            // set the listener to the menu items
+            setOnMenuItemClickListener { item ->
+                when (item.itemId) {
+                    R.id.save_image -> {
+                        saveImage(context, imageUrl!!, true)
+                        true
+                    }
 
-					else -> false
-				}
-			}
-			// show the popup menu
-			show()
-		}
-		return true
-	}
+                    R.id.share_image -> {
+                        shareImage(context, imageUrl!!)
+                        true
+                    }
 
-	private fun _setText(text: String?) {
-		hideRootIfBothEmpty(imageUrl, text)
-		if (text == null) {
-			binding.textView.visibility = GONE
-			binding.progressBar.visibility = GONE
-		} else {
-			binding.textView.visibility = VISIBLE
-			binding.textView.text = text
-		}
-	}
+                    else -> false
+                }
+            }
+            // show the popup menu
+            show()
+        }
+        return true
+    }
 
-	private fun setImageSize(resource: Bitmap, view: ImageView) {
-		// TODO don't use the dimen padding and margin but use the actual distance from the border
-		// get the screen width
-		val screenWidth = resources.displayMetrics.widthPixels
-		val maxHeight = resources.getDimension(R.dimen.images_max_height).toInt()
-		// calculate the dimension to keep the aspect ratio and fill the parent
-		val width = screenWidth -
-				(resources.getDimension(R.dimen.images_margin_horizontal) * 2).toInt() -
-				(resources.getDimension(R.dimen.bottom_sheet_padding) * 2).toInt()
-		val height =
-			(width.toFloat() / resource.width.toFloat() * resource.height.toFloat())
-		// set the dimension
-		if (height > maxHeight) {
-			view.layoutParams.height = maxHeight
-			view.layoutParams.width =
-				(maxHeight.toFloat() / height * width.toFloat()).toInt()
-		} else
-			view.layoutParams.height = height.toInt()
-	}
+    private fun _setText(text: String?) {
+        hideRootIfBothEmpty(imageUrl, text)
+        if (text == null) {
+            binding.textView.visibility = GONE
+            binding.progressBar.visibility = GONE
+        } else {
+            binding.textView.visibility = VISIBLE
+            binding.textView.text = text
+        }
+    }
 
-	/**
-	 * Hides the root view if both the [imageUrl] and the [text] are null
-	 */
-	private fun hideRootIfBothEmpty(imageUrl: String?, text: String?) {
-		if (imageUrl == null && text == null)
-			visibility = GONE
-	}
+    private fun setImageSize(resource: Bitmap, view: ImageView) {
+        // TODO don't use the dimen padding and margin but use the actual distance from the border
+        // get the screen width
+        val screenWidth = resources.displayMetrics.widthPixels
+        val maxHeight = resources.getDimension(R.dimen.images_max_height).toInt()
+        // calculate the dimension to keep the aspect ratio and fill the parent
+        val width = screenWidth -
+                (resources.getDimension(R.dimen.images_margin_horizontal) * 2).toInt() -
+                (resources.getDimension(R.dimen.bottom_sheet_padding) * 2).toInt()
+        val height =
+            (width.toFloat() / resource.width.toFloat() * resource.height.toFloat())
+        // set the dimension
+        if (height > maxHeight) {
+            view.layoutParams.height = maxHeight
+            view.layoutParams.width =
+                (maxHeight.toFloat() / height * width.toFloat()).toInt()
+        } else
+            view.layoutParams.height = height.toInt()
+    }
+
+    /**
+     * Hides the root view if both the [imageUrl] and the [text] are null
+     */
+    private fun hideRootIfBothEmpty(imageUrl: String?, text: String?) {
+        if (imageUrl == null && text == null)
+            visibility = GONE
+    }
 }

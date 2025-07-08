@@ -12,9 +12,9 @@
         android:layout_width="match_parent"
         android:layout_height="?attr/actionBarSize"
         android:background="@color/primary"
+        android:theme="@style/ToolbarMenuTheme"
         app:layout_constraintTop_toTopOf="parent"
-        app:navigationIcon="@drawable/back_icon"
-        app:navigationIconTint="?android:attr/textColor" />
+        app:navigationIcon="@drawable/back_icon" />
 
     <com.davemorrissey.labs.subscaleview.SubsamplingScaleImageView
         android:id="@+id/full_screen_image_view"

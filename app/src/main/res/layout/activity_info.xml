@@ -13,11 +13,11 @@
         android:layout_width="0dp"
         android:layout_height="?attr/actionBarSize"
         android:background="@color/primary"
+        android:theme="@style/ToolbarMenuTheme"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:navigationIcon="@drawable/back_icon"
-        app:navigationIconTint="?android:attr/textColor"
         app:title="@string/info_activity_title" />
 
     <!-- ScrollView so the items can scroll if they exceed the screen height -->

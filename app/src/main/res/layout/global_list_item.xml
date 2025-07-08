@@ -14,6 +14,7 @@
         android:layout_alignParentStart="true"
         android:layout_alignParentTop="true"
         android:paddingTop="3dp"
+        android:textColor="@color/on_primary"
         android:textAppearance="?android:attr/textAppearanceMedium"
         android:textStyle="bold" />
 
@@ -42,7 +43,7 @@
             android:layout_alignParentStart="true"
             android:layout_centerVertical="true"
             android:background="@drawable/clock_icon"
-            android:backgroundTint="?android:attr/textColor" />
+            android:backgroundTint="@color/on_primary" />
 
         <TextView
             android:id="@+id/event_date"
@@ -50,6 +51,7 @@
             android:layout_height="wrap_content"
             android:layout_toEndOf="@+id/clock_icon"
             android:paddingHorizontal="4dp"
+            android:textColor="@color/on_primary"
             android:textAppearance="?android:attr/textAppearanceMedium" />
     </RelativeLayout>
 
@@ -67,7 +69,7 @@
             android:layout_alignParentStart="true"
             android:layout_centerVertical="true"
             android:background="@drawable/depth_icon"
-            android:backgroundTint="?android:attr/textColor" />
+            android:backgroundTint="@color/on_primary" />
 
         <TextView
             android:id="@+id/event_depth"
@@ -75,6 +77,7 @@
             android:layout_height="wrap_content"
             android:layout_toEndOf="@+id/depth_icon"
             android:paddingHorizontal="4dp"
+            android:textColor="@color/on_primary"
             android:textAppearance="?android:attr/textAppearanceMedium" />
     </RelativeLayout>
 
@@ -90,7 +93,7 @@
             android:layout_height="25dp"
             android:layout_centerVertical="true"
             android:background="@drawable/magnitude_icon"
-            android:backgroundTint="?android:attr/textColor" />
+            android:backgroundTint="@color/on_primary" />
 
         <TextView
             android:id="@+id/event_magnitude"
@@ -101,6 +104,7 @@
             android:paddingEnd="3dp"
             android:textAppearance="?android:attr/textAppearanceMedium"
             android:textSize="@dimen/global_list_item_magnitude_text_size"
+            android:textColor="@color/on_primary"
             android:textStyle="bold" />
     </RelativeLayout>
 </RelativeLayout>

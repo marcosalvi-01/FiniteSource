@@ -9,9 +9,9 @@
         android:layout_width="match_parent"
         android:layout_height="?attr/actionBarSize"
         android:background="@color/primary"
+        android:theme="@style/ToolbarMenuTheme"
         app:layout_constraintTop_toTopOf="parent"
         app:navigationIcon="@drawable/back_icon"
-        app:navigationIconTint="?android:attr/textColor"
         app:title="@string/catalog_updates_title" />
 
     <TextView
@@ -45,9 +45,9 @@
                 android:id="@+id/new_earthquakes_container"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_margin="8dp"
                 android:background="@drawable/scenarios_item_background"
                 android:padding="8dp"
-                android:layout_margin="8dp"
                 app:layout_maxWidth="@dimen/updates_max_width">
 
                 <androidx.constraintlayout.widget.ConstraintLayout
@@ -60,6 +60,7 @@
                         android:id="@+id/new_earthquakes_item_title"
                         style="@style/TitleTextStyle"
                         android:layout_width="0dp"
+                        android:textColor="@color/on_primary"
                         android:layout_height="wrap_content"
                         android:text="@string/new_earthquakes_title"
                         app:layout_constraintBottom_toBottomOf="parent"
@@ -107,6 +108,7 @@
                         android:id="@+id/new_finite_source_earthquakes_item_title"
                         style="@style/TitleTextStyle"
                         android:layout_width="0dp"
+                        android:textColor="@color/on_primary"
                         android:layout_height="wrap_content"
                         android:text="@string/new_finite_source_earthquakes_title"
                         app:layout_constraintBottom_toBottomOf="parent"
@@ -154,6 +156,7 @@
                         android:id="@+id/updated_finite_source_item_title"
                         style="@style/TitleTextStyle"
                         android:layout_width="0dp"
+                        android:textColor="@color/on_primary"
                         android:layout_height="wrap_content"
                         android:text="@string/updated_finite_source_earthquakes_title"
                         app:layout_constraintBottom_toBottomOf="parent"

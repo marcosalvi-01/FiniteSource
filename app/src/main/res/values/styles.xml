@@ -29,4 +29,11 @@
     <style name="NavigationViewTextStyle">
         <item name="android:ellipsize">end</item>
     </style>
+
+    <style name="ToolbarMenuTheme" parent="ThemeOverlay.MaterialComponents.Light">
+        <item name="android:tint">@color/on_primary</item>
+        <item name="navigationIconTint">@color/on_primary</item>
+        <item name="titleTextColor">@color/on_primary</item>
+    </style>
+
 </resources>

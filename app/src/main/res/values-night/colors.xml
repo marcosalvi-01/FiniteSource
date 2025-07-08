@@ -1,14 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="primary">#414150</color>
-    <color name="secondary">#6AB0E5</color>
+    <color name="primary">#C95F11</color>
+    <color name="on_primary">@color/white</color>
     <color name="background">#23232D</color>
     <color name="bottom_sheet_line">#B1B1B1</color>
     <color name="on_background">#E3E3E3</color>
     <color name="stroke_color">#28282D</color>
     <color name="slip_palette_stroke_color">#5A5A5A</color>
     <color name="color_subtitle_text">#B1B1B1</color>
-    <color name="tab_selected_color">@color/secondary</color>
+    <color name="tab_selected_color">@color/primary</color>
     <color name="popup_menu_background">@color/primary</color>
     <color name="ingv_logo_stoke_color">@color/transparent</color>
 </resources>

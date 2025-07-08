@@ -5,5 +5,5 @@
     android:layout_height="wrap_content"
     android:backgroundTint="@color/primary"
     android:text="@string/visit_website"
-    android:textColor="?android:attr/textColor"
+    android:textColor="@color/on_primary"
     android:textSize="16sp" />
