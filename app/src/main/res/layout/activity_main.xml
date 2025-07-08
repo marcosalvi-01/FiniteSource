@@ -97,15 +97,15 @@
             android:layout_marginEnd="16dp"
             android:layout_marginBottom="16dp"
             android:background="@drawable/rounded_background"
-            android:importantForAccessibility="no"
-            android:translationY="@dimen/map_overlay_margin_top"
-            android:paddingHorizontal="8sp"
-            android:paddingBottom="4sp"
-            android:paddingTop="2sp"
-            android:textSize="12sp"
-            android:textColor="@color/on_background"
             android:clickable="true"
             android:focusable="true"
+            android:importantForAccessibility="no"
+            android:paddingHorizontal="8sp"
+            android:paddingTop="2sp"
+            android:paddingBottom="4sp"
+            android:textColor="@color/on_background"
+            android:textSize="12sp"
+            android:translationY="@dimen/map_overlay_margin_top"
             app:tint="@color/on_background" />
 
         <!-- Search view -->
@@ -171,8 +171,8 @@
                 android:id="@+id/persistent_bottom_sheet"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                app:layout_behavior=".ui.persistentbottomsheet.behavior.ViewPagerBottomSheetBehavior"
-                android:background="@drawable/persistent_bottom_sheet_background" />
+                android:background="@drawable/persistent_bottom_sheet_background"
+                app:layout_behavior=".ui.persistentbottomsheet.behavior.ViewPagerBottomSheetBehavior" />
         </androidx.coordinatorlayout.widget.CoordinatorLayout>
 
         <!-- Search bar -->
@@ -215,12 +215,30 @@
         </androidx.constraintlayout.widget.ConstraintLayout>
     </androidx.coordinatorlayout.widget.CoordinatorLayout>
 
-    <com.google.android.material.navigation.NavigationView
-        android:id="@+id/navigation_view"
+    <LinearLayout
         android:layout_width="wrap_content"
         android:layout_height="match_parent"
         android:layout_gravity="start"
-        app:headerLayout="@layout/navigation_drawer_header"
-        android:theme="@style/NavigationViewTextStyle"
-        app:menu="@menu/navigation_items" />
+        android:orientation="vertical">
+
+        <com.google.android.material.navigation.NavigationView
+            android:id="@+id/navigation_view"
+            android:layout_width="wrap_content"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:theme="@style/NavigationViewTextStyle"
+            app:headerLayout="@layout/navigation_drawer_header"
+            app:menu="@menu/navigation_items" />
+
+        <LinearLayout
+            android:id="@+id/footer_container"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/background"
+            android:orientation="vertical">
+
+            <include layout="@layout/navigation_drawer_footer" />
+        </LinearLayout>
+
+    </LinearLayout>
 </androidx.drawerlayout.widget.DrawerLayout>

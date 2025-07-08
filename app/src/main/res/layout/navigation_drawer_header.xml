@@ -16,30 +16,38 @@
 
         <com.google.android.material.card.MaterialCardView
             android:id="@+id/logo_container"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_alignParentStart="true"
             android:layout_centerVertical="true"
             app:cardCornerRadius="10dp"
             app:strokeColor="@color/ingv_logo_stoke_color">
 
-            <ImageView
-                android:layout_width="@dimen/map_overlay_icon_size"
-                android:layout_height="@dimen/map_overlay_icon_size"
-                android:scaleType="fitCenter"
-                android:src="@drawable/ingv_logo" />
+            <FrameLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@color/white"
+                android:paddingHorizontal="8dp"
+                android:paddingBottom="9dp">
 
+                <ImageView
+                    android:layout_width="match_parent"
+                    android:layout_height="60dp"
+                    android:scaleType="fitCenter"
+                    android:background="@color/white"
+                    android:src="@drawable/ingv_logo" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_horizontal|bottom"
+                    android:layout_marginBottom="-5dp"
+                    android:text="@string/finite_source"
+                    android:textAlignment="center"
+                    android:background="@color/white"
+                    android:textColor="@color/primary"
+                    android:textStyle="bold" />
+            </FrameLayout>
         </com.google.android.material.card.MaterialCardView>
-
-        <TextView
-            style="@style/TitleTextStyle"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_centerVertical="true"
-            android:layout_marginStart="16dp"
-            android:layout_toEndOf="@id/logo_container"
-            android:text="@string/app_name" />
-
     </RelativeLayout>
-
 </androidx.constraintlayout.widget.ConstraintLayout>

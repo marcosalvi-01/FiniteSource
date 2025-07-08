@@ -3,7 +3,9 @@ package com.example.finitesource.ui
 import android.content.Intent
 import android.content.res.ColorStateList
 import android.graphics.Color
+import android.widget.ImageButton;
 import android.graphics.drawable.LayerDrawable
+import android.widget.LinearLayout
 import android.net.Uri
 import android.os.Bundle
 import android.preference.PreferenceManager
@@ -519,6 +521,36 @@ class MainActivity : AppCompatActivity() {
 
             override fun onDrawerStateChanged(newState: Int) {}
         })
+
+        setupSocialMediaButtons()
+    }
+
+    private fun setupSocialMediaButtons() {
+        findViewById<ImageButton>(R.id.facebook_button).setOnClickListener {
+            openUrl("https://www.facebook.com/pages/INGVterremoti/436853586390357")
+        }
+
+        findViewById<ImageButton>(R.id.twitter_button).setOnClickListener {
+            openUrl("https://x.com/#!/INGVterremoti")
+        }
+
+        findViewById<ImageButton>(R.id.youtube_button).setOnClickListener {
+            openUrl("https://www.youtube.com/user/INGVterremoti")
+        }
+
+        findViewById<ImageButton>(R.id.instagram_button).setOnClickListener {
+            openUrl("https://www.instagram.com/ingvterremoti/")
+        }
+    }
+
+    private fun openUrl(url: String) {
+        try {
+            val intent = Intent(Intent.ACTION_VIEW, url.toUri())
+            startActivity(intent)
+        } catch (e: Exception) {
+            // Handle case where no browser is available
+            Toast.makeText(this, "Unable to open link", Toast.LENGTH_SHORT).show()
+        }
     }
 
     /**

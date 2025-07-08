@@ -60,4 +60,5 @@
     <string name="application_info_text">The application source code has been made open source on github</string>
     <string name="open_on_github">Open on GitHub</string>
     <string name="version_format" translatable="false">"%1$s v%2$s"</string>
+    <string name="finite_source">Finite Source</string>
 </resources>
