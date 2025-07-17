@@ -8,6 +8,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.finitesource.databinding.ActivityUpdatesBinding
 import com.example.finitesource.isDarkTheme
 import com.example.finitesource.lightStatusBar
+import androidx.core.view.isGone
 
 class UpdatesActivity : AppCompatActivity() {
 	private val binding by lazy {
@@ -81,7 +82,7 @@ class UpdatesActivity : AppCompatActivity() {
 
 	private fun setupExpandableList(header: View, list: View, expandButton: View) {
 		header.setOnClickListener {
-			if (list.visibility == View.GONE) {
+			if (list.isGone) {
 				// Rotate the arrow and expand the item
 				expandButton.animate().rotation(180F).start()
 				list.visibility = View.VISIBLE

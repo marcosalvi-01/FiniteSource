@@ -60,9 +60,9 @@
                         android:id="@+id/new_earthquakes_item_title"
                         style="@style/TitleTextStyle"
                         android:layout_width="0dp"
-                        android:textColor="@color/on_primary"
                         android:layout_height="wrap_content"
                         android:text="@string/new_earthquakes_title"
+                        android:textColor="@color/on_primary"
                         app:layout_constraintBottom_toBottomOf="parent"
                         app:layout_constraintEnd_toStartOf="@id/new_earthquakes_item_expand_button"
                         app:layout_constraintStart_toStartOf="parent"
@@ -77,7 +77,7 @@
                         app:layout_constraintBottom_toBottomOf="parent"
                         app:layout_constraintEnd_toEndOf="parent"
                         app:layout_constraintTop_toTopOf="parent"
-                        app:tint="?android:attr/textColor" />
+                        app:tint="@color/on_primary" />
                 </androidx.constraintlayout.widget.ConstraintLayout>
 
                 <androidx.recyclerview.widget.RecyclerView
@@ -108,9 +108,9 @@
                         android:id="@+id/new_finite_source_earthquakes_item_title"
                         style="@style/TitleTextStyle"
                         android:layout_width="0dp"
-                        android:textColor="@color/on_primary"
                         android:layout_height="wrap_content"
                         android:text="@string/new_finite_source_earthquakes_title"
+                        android:textColor="@color/on_primary"
                         app:layout_constraintBottom_toBottomOf="parent"
                         app:layout_constraintEnd_toStartOf="@id/new_finite_source_earthquakes_item_expand_button"
                         app:layout_constraintStart_toStartOf="parent"
@@ -125,7 +125,7 @@
                         app:layout_constraintBottom_toBottomOf="parent"
                         app:layout_constraintEnd_toEndOf="parent"
                         app:layout_constraintTop_toTopOf="parent"
-                        app:tint="?android:attr/textColor" />
+                        app:tint="@color/on_primary" />
                 </androidx.constraintlayout.widget.ConstraintLayout>
 
                 <androidx.recyclerview.widget.RecyclerView
@@ -156,9 +156,9 @@
                         android:id="@+id/updated_finite_source_item_title"
                         style="@style/TitleTextStyle"
                         android:layout_width="0dp"
-                        android:textColor="@color/on_primary"
                         android:layout_height="wrap_content"
                         android:text="@string/updated_finite_source_earthquakes_title"
+                        android:textColor="@color/on_primary"
                         app:layout_constraintBottom_toBottomOf="parent"
                         app:layout_constraintEnd_toStartOf="@id/updated_finite_source_item_expand_button"
                         app:layout_constraintStart_toStartOf="parent"

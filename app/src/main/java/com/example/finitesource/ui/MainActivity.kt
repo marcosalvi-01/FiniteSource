@@ -527,15 +527,15 @@ class MainActivity : AppCompatActivity() {
 
     private fun setupSocialMediaButtons() {
         findViewById<ImageButton>(R.id.facebook_button).setOnClickListener {
-            openUrl("https://www.facebook.com/pages/INGVterremoti/436853586390357")
+            openUrl("https://www.facebook.com/profile.php?id=100064312406420")
         }
 
         findViewById<ImageButton>(R.id.twitter_button).setOnClickListener {
-            openUrl("https://x.com/#!/INGVterremoti")
+            openUrl("https://x.com/INGVterremoti")
         }
 
         findViewById<ImageButton>(R.id.youtube_button).setOnClickListener {
-            openUrl("https://www.youtube.com/user/INGVterremoti")
+            openUrl("https://www.youtube.com/INGVterremoti")
         }
 
         findViewById<ImageButton>(R.id.instagram_button).setOnClickListener {

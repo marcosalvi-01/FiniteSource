@@ -21,14 +21,14 @@
             android:layout_alignParentStart="true"
             android:layout_centerVertical="true"
             app:cardCornerRadius="10dp"
-            app:strokeColor="@color/ingv_logo_stoke_color">
+            app:strokeColor="@color/transparent">
 
             <FrameLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:background="@color/white"
                 android:paddingHorizontal="8dp"
-                android:paddingBottom="9dp">
+                android:paddingBottom="15dp">
 
                 <ImageView
                     android:layout_width="match_parent"
@@ -41,7 +41,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center_horizontal|bottom"
-                    android:layout_marginBottom="-5dp"
+                    android:layout_marginTop="45dp"
                     android:text="@string/finite_source"
                     android:textAlignment="center"
                     android:background="@color/white"

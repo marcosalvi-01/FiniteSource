@@ -16,7 +16,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:strokeColor="@color/ingv_logo_stoke_color">
+        app:strokeColor="@color/transparent">
 
         <ImageView
             android:id="@+id/ingv_terremoti_logo"
