@@ -197,7 +197,7 @@
         </androidx.constraintlayout.widget.ConstraintLayout>
 
         <!-- Tool bar -->
-        <androidx.constraintlayout.widget.ConstraintLayout
+        <com.google.android.material.appbar.AppBarLayout
             android:id="@+id/tool_bar_container"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -208,11 +208,12 @@
                 android:layout_width="match_parent"
                 android:layout_height="?attr/actionBarSize"
                 android:backgroundTint="@color/background"
+                app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
                 app:navigationIcon="@drawable/down_icon"
                 app:navigationIconTint="?attr/colorOnBackground"
                 app:title="@string/event_details_title" />
-        </androidx.constraintlayout.widget.ConstraintLayout>
+        </com.google.android.material.appbar.AppBarLayout>
     </androidx.coordinatorlayout.widget.CoordinatorLayout>
 
     <LinearLayout
