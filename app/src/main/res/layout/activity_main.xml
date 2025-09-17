@@ -89,24 +89,32 @@
                 android:thumbOffset="0dp" />
         </FrameLayout>
 
-        <TextView
-            android:id="@+id/osm_contributions"
+        <FrameLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="bottom|end"
-            android:layout_marginEnd="16dp"
-            android:layout_marginBottom="16dp"
-            android:background="@drawable/rounded_background"
-            android:clickable="true"
-            android:focusable="true"
-            android:importantForAccessibility="no"
-            android:paddingHorizontal="8sp"
-            android:paddingTop="2sp"
-            android:paddingBottom="4sp"
-            android:textColor="@color/on_background"
-            android:textSize="12sp"
-            android:translationY="@dimen/map_overlay_margin_top"
-            app:tint="@color/on_background" />
+            android:fitsSystemWindows="true">
+
+            <TextView
+                android:id="@+id/osm_contributions"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@drawable/rounded_background"
+                android:clickable="true"
+                android:focusable="true"
+                android:importantForAccessibility="no"
+                android:paddingHorizontal="8sp"
+                android:paddingTop="2sp"
+                android:paddingBottom="4sp"
+                android:layout_gravity="bottom|end"
+                android:layout_marginBottom="10sp"
+                android:layout_marginEnd="16dp"
+                android:textColor="@color/on_background"
+                android:textSize="12sp"
+                android:translationY="@dimen/map_overlay_margin_top"
+                app:tint="@color/on_background" />
+
+        </FrameLayout>
 
         <!-- Search view -->
         <com.google.android.material.search.SearchView
