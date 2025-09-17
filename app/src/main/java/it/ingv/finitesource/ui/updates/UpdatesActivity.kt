@@ -1,7 +1,8 @@
 package it.ingv.finitesource.ui.updates
 
+import android.graphics.Color
 import android.os.Bundle
-import android.view.View
+import android.view.View // For SYSTEM_UI_FLAG constants
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -11,9 +12,9 @@ import it.ingv.finitesource.lightStatusBar
 import androidx.core.view.isGone
 
 class UpdatesActivity : AppCompatActivity() {
-	private val binding by lazy {
-		ActivityUpdatesBinding.inflate(layoutInflater)
-	}
+    private val binding by lazy {
+        ActivityUpdatesBinding.inflate(layoutInflater)
+    }
 
 	override fun onCreate(savedInstanceState: Bundle?) {
 		super.onCreate(savedInstanceState)
@@ -26,9 +27,8 @@ class UpdatesActivity : AppCompatActivity() {
 			finish()
 		}
 
-		// if is light theme, set the status bar to light
-		if (!isDarkTheme(this))
-			lightStatusBar(window, true)
+        if (!isDarkTheme(this))
+            lightStatusBar(window, true)
 
 		// set the listener for the expandable text views
 		// Set click listener to handle item expansion/collapse
@@ -83,32 +83,28 @@ class UpdatesActivity : AppCompatActivity() {
 	private fun setupExpandableList(header: View, list: View, expandButton: View) {
 		header.setOnClickListener {
 			if (list.isGone) {
-				// Rotate the arrow and expand the item
 				expandButton.animate().rotation(180F).start()
 				list.visibility = View.VISIBLE
 			} else {
-				// Collapse the item and rotate the arrow
 				list.visibility = View.GONE
 				expandButton.animate().rotation(0F).start()
 			}
 		}
 	}
 
-	private fun setupRecyclerView(
-		recyclerView: RecyclerView,
-		data: List<EarthquakeData>,
-		container: View
-	) {
-		// TODO maybe is better to use something else than a recycler view
-		if (data.isNotEmpty()) {
-			recyclerView.adapter = UpdatesItemAdapter(data)
-			recyclerView.layoutManager = object : LinearLayoutManager(this) {
-				// disable scrolling
-				override fun canScrollVertically(): Boolean {
-					return false
-				}
-			}
-		} else
-			container.visibility = View.GONE
-	}
+    private fun setupRecyclerView(
+        recyclerView: RecyclerView,
+        data: List<EarthquakeData>,
+        container: View
+    ) {
+        if (data.isNotEmpty()) {
+            recyclerView.adapter = UpdatesItemAdapter(data)
+            recyclerView.layoutManager = object : LinearLayoutManager(this) {
+                override fun canScrollVertically(): Boolean {
+                    return false
+                }
+            }
+        } else
+            container.visibility = View.GONE
+    }
 }

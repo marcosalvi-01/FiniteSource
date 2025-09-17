@@ -7,14 +7,23 @@
     android:background="@color/black"
     tools:context=".ui.imagetextview.FullScreenImageActivity">
 
-    <com.google.android.material.appbar.MaterialToolbar
-        android:id="@+id/toolbar"
+    <com.google.android.material.appbar.AppBarLayout
+        android:id="@+id/app_bar"
         android:layout_width="match_parent"
-        android:layout_height="?attr/actionBarSize"
+        android:layout_height="wrap_content"
         android:background="@color/primary"
-        android:theme="@style/ToolbarMenuTheme"
-        app:layout_constraintTop_toTopOf="parent"
-        app:navigationIcon="@drawable/back_icon" />
+        android:fitsSystemWindows="true"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <com.google.android.material.appbar.MaterialToolbar
+            android:id="@+id/toolbar"
+            android:layout_width="match_parent"
+            android:layout_height="?attr/actionBarSize"
+            android:background="@color/primary"
+            android:theme="@style/ToolbarMenuTheme"
+            app:layout_constraintTop_toTopOf="parent"
+            app:navigationIcon="@drawable/back_icon" />
+    </com.google.android.material.appbar.AppBarLayout>
 
     <com.davemorrissey.labs.subscaleview.SubsamplingScaleImageView
         android:id="@+id/full_screen_image_view"
@@ -22,6 +31,6 @@
         android:layout_height="0dp"
         android:transitionName="@string/full_screen_image_transition_name"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/toolbar" />
+        app:layout_constraintTop_toBottomOf="@id/app_bar" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

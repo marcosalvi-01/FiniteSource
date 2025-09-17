@@ -4,15 +4,25 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <com.google.android.material.appbar.MaterialToolbar
-        android:id="@+id/toolbar"
+    <com.google.android.material.appbar.AppBarLayout
+        android:id="@+id/app_bar"
         android:layout_width="match_parent"
-        android:layout_height="?attr/actionBarSize"
+        android:layout_height="wrap_content"
         android:background="@color/primary"
-        android:theme="@style/ToolbarMenuTheme"
-        app:layout_constraintTop_toTopOf="parent"
-        app:navigationIcon="@drawable/back_icon"
-        app:title="@string/catalog_updates_title" />
+        android:fitsSystemWindows="true"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <com.google.android.material.appbar.MaterialToolbar
+            android:id="@+id/toolbar"
+            android:layout_width="match_parent"
+            android:layout_height="?attr/actionBarSize"
+            android:background="@color/primary"
+            android:theme="@style/ToolbarMenuTheme"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:navigationIcon="@drawable/back_icon"
+            app:title="@string/catalog_updates_title" />
+    </com.google.android.material.appbar.AppBarLayout>
 
     <TextView
         android:id="@+id/no_updates_text"
@@ -33,7 +43,7 @@
         android:layout_width="match_parent"
         android:layout_height="0dp"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/toolbar">
+        app:layout_constraintTop_toBottomOf="@+id/app_bar">
 
         <com.google.android.flexbox.FlexboxLayout
             android:layout_width="match_parent"
