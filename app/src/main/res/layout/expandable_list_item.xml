@@ -52,14 +52,14 @@
             app:layout_constraintTop_toBottomOf="@id/item_header"
             app:layout_wrapBefore="true" />
 
-        <com.example.finitesource.ui.imagetextview.ImageTextView
+        <it.ingv.finitesource.ui.imagetextview.ImageTextView
             android:id="@+id/displacement_map"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             app:layout_flexGrow="1"
             app:layout_wrapBefore="true" />
 
-        <com.example.finitesource.ui.imagetextview.ImageTextView
+        <it.ingv.finitesource.ui.imagetextview.ImageTextView
             android:id="@+id/predicted_fringes"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"

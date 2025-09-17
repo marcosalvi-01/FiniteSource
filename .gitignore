@@ -1,14 +1,46 @@
+# IntelliJ / Android Studio specific files & folders
 *.iml
-.gradle
-/local.properties
-/.idea/caches
-/.idea/libraries
+/.idea/caches/
+/.idea/libraries/
 /.idea/modules.xml
 /.idea/workspace.xml
 /.idea/navEditor.xml
 /.idea/assetWizardSettings.xml
+
+# Gradle
+.gradle/
+
+# Local configuration - Never commit this
+/local.properties
+
+# Build output
+/build/
+/app/build/
+/.outputs/
+*.apk
+*.aab
+
+# Keystore files - Never commit these as they contain signing keys
+*.jks
+*.keystore
+
+# Android Studio profiling data
+*.hprof
+*.prof
+*.snap
+*.snapshot
+
+# Lint results
+lint-results.txt
+lint-results-*.xml
+lint-results-*.html
+
+# OS specific
 .DS_Store
-/captures
-.externalNativeBuild
-.cxx
-local.properties
+
+# Captures (e.g. from Emulator)
+/captures/
+
+# Native build temporary files
+.externalNativeBuild/
+.cxx/

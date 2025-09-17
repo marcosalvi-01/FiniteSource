@@ -12,7 +12,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
-        <com.example.finitesource.ui.mapview.CustomMapView
+        <it.ingv.finitesource.ui.mapview.CustomMapView
             android:id="@+id/custom_map_view"
             android:layout_width="match_parent"
             android:layout_height="match_parent" />
@@ -54,7 +54,7 @@
         </FrameLayout>
 
         <!--         Focal Plane Switch -->
-        <com.example.finitesource.ui.mapoverlays.FocalPlaneSwitch
+        <it.ingv.finitesource.ui.mapoverlays.FocalPlaneSwitch
             android:id="@+id/focal_plane_switch"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -74,7 +74,7 @@
             app:layout_anchor="@id/search_bar"
             app:layout_anchorGravity="bottom|start">
 
-            <com.example.finitesource.ui.mapoverlays.SlipAlphaSlider
+            <it.ingv.finitesource.ui.mapoverlays.SlipAlphaSlider
                 android:id="@+id/slip_alpha_slider"
                 android:layout_width="@dimen/slip_alpha_slider_height"
                 android:layout_height="@dimen/slip_alpha_slider_width"
@@ -167,7 +167,7 @@
                 app:layout_anchor="@id/persistent_bottom_sheet"
                 app:layout_anchorGravity="top" />
 
-            <com.example.finitesource.ui.persistentbottomsheet.PersistentBottomSheetLayout
+            <it.ingv.finitesource.ui.persistentbottomsheet.PersistentBottomSheetLayout
                 android:id="@+id/persistent_bottom_sheet"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"

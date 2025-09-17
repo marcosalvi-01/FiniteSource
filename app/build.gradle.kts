@@ -8,11 +8,11 @@ plugins {
 }
 
 android {
-	namespace = "com.example.finitesource"
+	namespace = "it.ingv.finitesource"
 	compileSdk = 34
 
 	defaultConfig {
-		applicationId = "com.example.finitesource"
+		applicationId = "it.ingv.finitesource"
 		minSdk = 26
 		targetSdk = 34
 		versionCode = 1
@@ -75,10 +75,6 @@ dependencies {
 	implementation("com.squareup.retrofit2:converter-moshi:2.9.0")
 	implementation("com.squareup.retrofit2:converter-scalars:2.9.0")
 	testImplementation("io.kotlintest:kotlintest-runner-junit5:3.4.2")
-
-	// osmdroid
-//	implementation("com.github.MKergall:osmbonuspack:6.9.0")
-//	implementation("org.osmdroid:osmdroid-android:6.1.17")
 
 	// other
 	implementation("androidx.core:core-ktx:1.12.0")
