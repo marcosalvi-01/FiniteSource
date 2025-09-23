@@ -1,7 +1,8 @@
 package it.ingv.finitesource.data.remote
 
-import android.os.Environment
-import it.ingv.finitesource.getLocaleSuffix
+import android.content.ClipData
+import android.content.ClipboardManager
+import android.content.Context
 import it.ingv.finitesource.data.EarthquakesRepository
 import it.ingv.finitesource.data.local.Products
 import it.ingv.finitesource.data.local.earthquake.Earthquake
@@ -12,17 +13,14 @@ import it.ingv.finitesource.data.local.earthquake.focalplane.Scenario
 import it.ingv.finitesource.data.local.earthquake.focalplane.ScenarioType
 import it.ingv.finitesource.data.local.earthquake.focalplane.Scenarios
 import it.ingv.finitesource.data.local.earthquake.focalplane.geojson.CustomGeoJson
+import it.ingv.finitesource.getLocaleSuffix
 import it.ingv.finitesource.okHttpClient
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import okhttp3.Request
-import okio.BufferedSink
-import okio.buffer
-import okio.sink
 import org.openapitools.client.apis.DefaultApi
 import org.openapitools.client.infrastructure.ApiClient
 import retrofit2.Call
-import java.io.File
 import javax.inject.Inject
 
 class ApiCalls @Inject constructor(
@@ -221,57 +219,32 @@ class ApiCalls @Inject constructor(
 //        } ?: throw Exception("Error loading the scenario details")
     }
 
-    /**
-     * Downloads the zip file containing data and model for a specific earthquake and focal plane.
-     *
-     * This function uses the `FiniteSourceApi` service to start the download of the zip file.
-     * The zip file is saved in the public downloads directory of the device with the provided destination file name.
-     *
-     * @param earthquakeId The id of the earthquake for which the zip file is to be downloaded.
-     * @param focalPlaneType The type of the focal plane for which the zip file is to be downloaded. See [FocalPlaneType].
-     * @param destinationFileName The name of the file in which the downloaded zip file is to be saved.
-     * @return A Boolean indicating whether the download was successful. Returns true if the download was successful, false otherwise.
-     */
-    fun downloadZipToFile(
+    fun copyZipUrlToClipboard(
         earthquakeId: String,
         focalPlaneType: FocalPlaneType,
-        destinationFileName: String
+        context: Context
     ): Boolean = try {
-        // Create a file in the public downloads directory with the provided destination file name
-        val destinationFile = File(
-            Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS),
-            destinationFileName
-        )
-
         val events = service.queryGet(id = earthquakeId).executeApiCall()
         if (events.eventCount != 1.toLong()) {
             throw Exception("The service returned a wrong number of events: " + events.eventCount)
         }
         val event = events.events[0]
-        // Start the download of the zip file
-        val response = okHttpClient.newCall(
-            Request.Builder()
-                .url(event.finiteSource?.first {
-                    it.focalPlane!!.intValueExact() == focalPlaneType.ordinal + 1
-                }?.productLink ?: throw Exception("Error getting zip url"))
-                .build()
-        ).execute().let {
-            if (it.isSuccessful) {
-                it.body
-            } else {
-                throw Exception("Error getting zip")
-            }
-        }
 
-        // Write the downloaded data to the destination file
-        val sink: BufferedSink = destinationFile.sink().buffer()
-        sink.writeAll(response!!.source())
-        sink.close()
+        // Get the zip URL
+        val zipUrl = event.finiteSource?.first {
+            it.focalPlane!!.intValueExact() == focalPlaneType.ordinal + 1
+        }?.productLink ?: throw Exception("Error getting zip url")
 
-        // Return true to indicate that the download was successful
+        // Copy URL to clipboard
+        val clipboardManager =
+            context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
+        val clipData = ClipData.newPlainText("Zip File URL", zipUrl)
+        clipboardManager.setPrimaryClip(clipData)
+
+        // Return true to indicate that the URL was successfully copied to clipboard
         true
     } catch (e: Exception) {
-        // Print the stack trace of the exception and return false to indicate that the download failed
+        // Print the stack trace of the exception and return false to indicate that copying failed
         e.printStackTrace()
         false
     }

@@ -1,5 +1,6 @@
 package it.ingv.finitesource.data
 
+import android.content.Context
 import it.ingv.finitesource.configUrl
 import it.ingv.finitesource.data.local.CatalogConfig
 import it.ingv.finitesource.data.local.EarthquakeUpdates
@@ -30,8 +31,6 @@ import org.openapitools.client.apis.DefaultApi
 import org.openapitools.client.infrastructure.ApiClient
 import org.openapitools.client.models.Event
 import javax.inject.Inject
-
-const val ZIP_FILE_NAME = "data_and_model.zip"
 
 class EarthquakesRepository @Inject constructor(
     private val earthquakeDao: EarthquakeDao,
@@ -289,19 +288,12 @@ class EarthquakesRepository @Inject constructor(
         }
     }
 
-    /**
-     * Initiates the download of a zip file for a specific earthquake and focal plane type.
-     *
-     * This function uses the `apiCalls` object to start the download of a zip file for the given earthquake and focal plane type.
-     * The zip file is saved with a name that includes the id of the earthquake.
-     *
-     * @param earthquake The earthquake for which the zip file is to be downloaded.
-     * @param focalPlaneType The type of the focal plane for which the zip file is to be downloaded.
-     * @return A Boolean indicating whether the download was successful. Returns true if the download was successful, false otherwise.
-     */
-    fun downloadZipToFile(earthquake: Earthquake, focalPlaneType: FocalPlaneType): Boolean {
-        val destinationFileName = ZIP_FILE_NAME.replace(".zip", "_${earthquake.id}.zip")
-        return apiCalls.downloadZipToFile(earthquake.id, focalPlaneType, destinationFileName)
+    fun copyZipUrlToClipboard(
+        earthquake: Earthquake,
+        focalPlaneType: FocalPlaneType,
+        context: Context
+    ): Boolean {
+        return apiCalls.copyZipUrlToClipboard(earthquake.id, focalPlaneType, context)
     }
 
     fun isFirstRun(firstRun: Boolean) {

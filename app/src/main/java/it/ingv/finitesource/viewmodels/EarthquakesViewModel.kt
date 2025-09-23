@@ -1,5 +1,6 @@
 package it.ingv.finitesource.viewmodels
 
+import android.content.Context
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -130,11 +131,12 @@ class EarthquakesViewModel @Inject constructor(
 	 * @param focalPlaneType The type of the focal plane for which the zip file is to be downloaded.
 	 * @return A LiveData<Boolean> object that emits the result of the download. The Boolean value is true if the download was successful, false otherwise.
 	 */
-	fun downloadZipToFile(
+	fun copyZipUrlToClipboard(
 		earthquake: Earthquake,
-		focalPlaneType: FocalPlaneType
+		focalPlaneType: FocalPlaneType,
+		context: Context
 	): LiveData<Boolean> =
 		liveData(viewModelScope.coroutineContext + Dispatchers.IO) {
-			emit(repository.downloadZipToFile(earthquake, focalPlaneType))
+			emit(repository.copyZipUrlToClipboard(earthquake, focalPlaneType, context))
 		}
 }

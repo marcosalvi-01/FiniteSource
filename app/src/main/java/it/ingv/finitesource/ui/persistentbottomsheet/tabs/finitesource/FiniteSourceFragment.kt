@@ -85,9 +85,10 @@ class FiniteSourceFragment : ProductFragment() {
 		binding.downloadZipProgressBar.visibility = View.VISIBLE
 
 		// Start the download and listen for the result
-		earthquakesViewModel.downloadZipToFile(
+		earthquakesViewModel.copyZipUrlToClipboard(
 			uiState.selectedEarthquake!!,
-			uiState.selectedFocalPlane!!
+			uiState.selectedFocalPlane!!,
+			requireContext(),
 		).observe(
 			viewLifecycleOwner
 		) {

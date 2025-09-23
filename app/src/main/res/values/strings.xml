@@ -17,9 +17,9 @@
     <string name="scenarios_not_available">Scenarios not available</string>
     <string name="footprints_not_available">Footprints not available</string>
     <string name="event_error">Error while downloading the event details</string>
-    <string name="download_zip_button_text">Download data_and_model.zip</string>
-    <string name="download_completed">Download completed</string>
-    <string name="download_failed">Error while downloading</string>
+    <string name="download_zip_button_text">Copy data_and_model.zip URL</string>
+    <string name="download_completed">URL copied to clipboard</string>
+    <string name="download_failed">Error copying URL to clipboard</string>
     <string name="full_screen_image_transition_name" translatable="false">full_screen_image_transistion</string>
     <string name="share_event">Share event</string>
     <string name="see_online">See on the INGV website</string>
