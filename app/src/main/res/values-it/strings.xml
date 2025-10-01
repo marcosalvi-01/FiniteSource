@@ -14,7 +14,7 @@
     <string name="scenarios_not_available">Scenari non disponibili</string>
     <string name="footprints_not_available">Footprints non disponibili</string>
     <string name="event_error">Errore nel download dei dettagli evento</string>
-    <string name="download_zip_button_text">Copia link data_and_model.zip</string>
+    <string name="download_zip_button_text">Copia link per il download dei dati</string>
     <string name="download_completed">Link copiato negli appunti</string>
     <string name="download_failed">Errore nel copiare il link negli appunti</string>
     <string name="share_event">Condividi evento</string>
