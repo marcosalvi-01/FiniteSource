@@ -13,7 +13,7 @@
     <dimen name="global_list_item_vertical_margin">5dp</dimen>
     <dimen name="global_list_icon_size">20dp</dimen>
     <dimen name="global_list_item_magnitude_text_size">19sp</dimen>
-    <dimen name="bottom_sheet_peek_height">105dp</dimen>
+    <dimen name="bottom_sheet_peek_height">90dp</dimen>
     <dimen name="map_overlay_icon_size">40dp</dimen>
     <dimen name="map_overlay_margin_top">8dp</dimen>
     <dimen name="stroke_width">2dp</dimen>

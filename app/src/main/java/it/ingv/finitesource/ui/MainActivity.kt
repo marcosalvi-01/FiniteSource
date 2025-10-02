@@ -209,7 +209,7 @@ class MainActivity : AppCompatActivity() {
         // Initialize and set up the bottom sheet behavior
         val bottomSheetBehavior =
             ViewPagerBottomSheetBehavior.from(binding.persistentBottomSheet).apply {
-                peekHeight = resources.getDimension(R.dimen.bottom_sheet_peek_height).toInt()
+                peekHeight = resources.getDimension(R.dimen.bottom_sheet_peek_height).toInt() + getStatusBarHeight(resources)
                 isHideable = false
                 expandedOffset = getStatusBarHeight(resources)
             }

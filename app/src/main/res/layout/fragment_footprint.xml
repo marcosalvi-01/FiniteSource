@@ -8,7 +8,8 @@
     <com.google.android.flexbox.FlexboxLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:paddingVertical="@dimen/bottom_sheet_padding"
+        android:paddingTop="@dimen/bottom_sheet_padding"
+        android:paddingBottom="?attr/actionBarSize"
         app:flexWrap="wrap"
         app:justifyContent="center">
 

@@ -160,28 +160,35 @@
 
         </com.google.android.material.search.SearchView>
 
-        <!-- Bottom sheet -->
-        <androidx.coordinatorlayout.widget.CoordinatorLayout
-            android:id="@+id/bottom_sheet_container"
+        <FrameLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:visibility="gone">
-            <!-- Shadow -->
-            <View
-                android:layout_width="match_parent"
-                android:layout_height="15dp"
-                android:background="@drawable/bottom_sheet_shadow"
-                android:translationY="3dp"
-                app:layout_anchor="@id/persistent_bottom_sheet"
-                app:layout_anchorGravity="top" />
 
-            <it.ingv.finitesource.ui.persistentbottomsheet.PersistentBottomSheetLayout
-                android:id="@+id/persistent_bottom_sheet"
+            >
+
+            <!-- Bottom sheet -->
+            <androidx.coordinatorlayout.widget.CoordinatorLayout
+                android:id="@+id/bottom_sheet_container"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:background="@drawable/persistent_bottom_sheet_background"
-                app:layout_behavior=".ui.persistentbottomsheet.behavior.ViewPagerBottomSheetBehavior" />
-        </androidx.coordinatorlayout.widget.CoordinatorLayout>
+                android:visibility="gone">
+                <!-- Shadow -->
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="15dp"
+                    android:background="@drawable/bottom_sheet_shadow"
+                    android:translationY="3dp"
+                    app:layout_anchor="@id/persistent_bottom_sheet"
+                    app:layout_anchorGravity="top" />
+
+                <it.ingv.finitesource.ui.persistentbottomsheet.PersistentBottomSheetLayout
+                    android:id="@+id/persistent_bottom_sheet"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:background="@drawable/persistent_bottom_sheet_background"
+                    app:layout_behavior=".ui.persistentbottomsheet.behavior.ViewPagerBottomSheetBehavior" />
+            </androidx.coordinatorlayout.widget.CoordinatorLayout>
+        </FrameLayout>
 
         <!-- Search bar -->
         <androidx.constraintlayout.widget.ConstraintLayout
@@ -244,6 +251,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:background="@color/background"
+            android:fitsSystemWindows="true"
             android:orientation="vertical">
 
             <include layout="@layout/navigation_drawer_footer" />
