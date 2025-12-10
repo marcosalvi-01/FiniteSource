@@ -11,7 +11,7 @@ open class ScenarioType(
 	val url: String
 ) {
 	override fun toString(): String {
-		return "$dir,$name,$url"
+		return "$name,$dir,$url"
 	}
 
 	override fun equals(other: Any?): Boolean {

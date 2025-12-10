@@ -28,8 +28,8 @@ class Converters {
 			for (scenario in scenarios) {
 				writer.writeNext(
 					arrayOf(
-						scenario.dir,
 						scenario.name,
+						scenario.dir,
 						scenario.url,
 						scenario.displacementMapDescription,
 						scenario.displacementMapUrl,
