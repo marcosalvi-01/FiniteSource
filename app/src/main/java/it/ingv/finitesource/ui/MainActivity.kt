@@ -48,6 +48,7 @@ import it.ingv.finitesource.ui.updates.UpdatesDialog
 import it.ingv.finitesource.viewmodels.EarthquakesViewModel
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import org.osmdroid.config.Configuration
 import java.text.DateFormat
@@ -95,6 +96,9 @@ class MainActivity : AppCompatActivity() {
 
         // clear the glide cache to avoid showing old images
         Glide.get(this).clearMemory()
+        lifecycleScope.launch(Dispatchers.IO) {
+            Glide.get(applicationContext).clearDiskCache()
+        }
 
         // give the viewmodel to the mapview
         binding.customMapView.earthquakesViewModel = earthquakesViewModel
@@ -662,5 +666,4 @@ class MainActivity : AppCompatActivity() {
 const val BOTTOM_SHEET_MAXIMIZED_SLIDE_OFFSET = 0.93f
 const val TOOL_BAR_SHOWN_TAG = "toolbarShown"
 const val COMPASS_BUTTON_ROTATION_TAG = "compassButtonRotation"
-
 
