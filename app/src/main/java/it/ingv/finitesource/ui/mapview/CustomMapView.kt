@@ -4,9 +4,9 @@ import android.content.Context
 import android.graphics.Color
 import android.os.Bundle
 import android.os.Parcelable
+import androidx.core.os.BundleCompat
 import android.util.AttributeSet
 import android.util.DisplayMetrics
-import android.view.WindowManager
 import android.widget.ImageButton
 import android.widget.Toast
 import androidx.lifecycle.LifecycleOwner
@@ -505,10 +505,7 @@ class CustomMapView(context: Context, attributeSet: AttributeSet) : MapView(cont
     }
 
     private fun getDisplayMetrics(): DisplayMetrics {
-        val displayMetrics = DisplayMetrics()
-        val windowManager = context.getSystemService(Context.WINDOW_SERVICE) as WindowManager
-        windowManager.defaultDisplay.getMetrics(displayMetrics)
-        return displayMetrics
+        return resources.displayMetrics
     }
 
     override fun onSaveInstanceState(): Parcelable {
@@ -547,7 +544,7 @@ class CustomMapView(context: Context, attributeSet: AttributeSet) : MapView(cont
                 // consume the old state
                 savedState = null
             }
-            state.getParcelable(SUPER_STATE_KEY)
+            BundleCompat.getParcelable(state, SUPER_STATE_KEY, Parcelable::class.java)
         } else state
         super.onRestoreInstanceState(superState)
     }

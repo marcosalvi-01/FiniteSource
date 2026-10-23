@@ -71,7 +71,7 @@ class ApiCalls @Inject constructor(
                     .build()
             ).execute().let {
                 if (it.isSuccessful) {
-                    it.body?.string()
+                    it.body.string()
                 } else {
                     throw Exception("Error getting geojson")
                 }
@@ -82,7 +82,7 @@ class ApiCalls @Inject constructor(
                 resultDescription!!,
                 mainInversionMapImageUrl!!,
                 slipDistributionImageUrl!!,
-                CustomGeoJson.parseString(source!!)
+                CustomGeoJson.parseString(source)
             )
         } catch (e: Exception) {
             e.printStackTrace()

@@ -70,7 +70,7 @@ class InfoActivity : AppCompatActivity() {
                         // Handle error (show message, etc.)
                         return
                     }
-                    val responseBody = response.body?.string() ?: "[]"
+                    val responseBody = response.body.string()
                     val jsonArray = JSONArray(responseBody)
 
                     // Update UI on main thread

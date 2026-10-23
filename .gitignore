@@ -6,9 +6,27 @@
 /.idea/workspace.xml
 /.idea/navEditor.xml
 /.idea/assetWizardSettings.xml
+/.idea/deploymentTargetSelector.xml
+/.idea/deploymentTargetDropDown.xml
+/.idea/deviceManager.xml
+/.idea/androidTestResultsUserPreferences.xml
+/.idea/planningMode.xml
+/.idea/studiobot.xml
+/.idea/gradle.xml
+/.idea/misc.xml
+/.idea/compiler.xml
+/.idea/kotlinc.xml
+
+# Generated Eclipse / Buildship project metadata
+/.project
+/.settings/
+/app/.project
+/app/.classpath
+/app/.settings/
 
 # Gradle
 .gradle/
+.kotlin/
 
 # Local configuration - Never commit this
 /local.properties
@@ -16,6 +34,7 @@
 # Build output
 /build/
 /app/build/
+/app/bin/
 /.outputs/
 *.apk
 *.aab

@@ -3,6 +3,7 @@ package it.ingv.finitesource.ui.persistentbottomsheet
 import android.content.Context
 import android.os.Bundle
 import android.os.Parcelable
+import androidx.core.os.BundleCompat
 import android.util.AttributeSet
 import android.view.LayoutInflater
 import android.widget.LinearLayout
@@ -126,7 +127,7 @@ class PersistentBottomSheetLayout(context: Context, attr: AttributeSet) :
 	override fun onRestoreInstanceState(state: Parcelable?) {
 		val superState = if (state is Bundle) {
 			savedState = state.getInt(BOTTOM_SHEET_STATE_KEY)
-			state.getParcelable(SUPER_STATE_KEY)
+			BundleCompat.getParcelable(state, SUPER_STATE_KEY, Parcelable::class.java)
 		} else {
 			state
 		}

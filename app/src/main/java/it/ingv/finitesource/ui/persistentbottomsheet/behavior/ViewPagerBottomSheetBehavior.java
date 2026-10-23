@@ -228,7 +228,7 @@ public class ViewPagerBottomSheetBehavior<V extends View> extends CoordinatorLay
 
 	@Override
 	public boolean onLayoutChild(@NotNull CoordinatorLayout parent, @NotNull V child, int layoutDirection) {
-		if (ViewCompat.getFitsSystemWindows(parent) && !ViewCompat.getFitsSystemWindows(child)) {
+		if (parent.getFitsSystemWindows() && !child.getFitsSystemWindows()) {
 			child.setFitsSystemWindows(true);
 		}
 		int savedTop = child.getTop();
@@ -249,13 +249,13 @@ public class ViewPagerBottomSheetBehavior<V extends View> extends CoordinatorLay
 		mMinOffset = Math.max(0, mParentHeight - child.getHeight() + expandedOffset);
 		mMaxOffset = Math.max(mParentHeight - peekHeight, mMinOffset);
 		if (mState == STATE_EXPANDED) {
-			ViewCompat.offsetTopAndBottom(child, mMinOffset);
+			child.offsetTopAndBottom(mMinOffset);
 		} else if (mHideable && mState == STATE_HIDDEN) {
-			ViewCompat.offsetTopAndBottom(child, mParentHeight);
+			child.offsetTopAndBottom(mParentHeight);
 		} else if (mState == STATE_COLLAPSED) {
-			ViewCompat.offsetTopAndBottom(child, mMaxOffset);
+			child.offsetTopAndBottom(mMaxOffset);
 		} else if (mState == STATE_DRAGGING || mState == STATE_SETTLING) {
-			ViewCompat.offsetTopAndBottom(child, savedTop - child.getTop());
+			child.offsetTopAndBottom(savedTop - child.getTop());
 		}
 		if (mViewDragHelper == null) {
 			mViewDragHelper = ViewDragHelper.create(parent, mDragCallback);
@@ -349,14 +349,16 @@ public class ViewPagerBottomSheetBehavior<V extends View> extends CoordinatorLay
 
 	@Override
 	public boolean onStartNestedScroll(@NotNull CoordinatorLayout coordinatorLayout, @NotNull V child,
-									   @NotNull View directTargetChild, @NotNull View target, int nestedScrollAxes) {
+									   @NotNull View directTargetChild, @NotNull View target, int nestedScrollAxes, int type) {
+		if (type != ViewCompat.TYPE_TOUCH) return false;
 		mNestedScrolled = false;
 		return (nestedScrollAxes & ViewCompat.SCROLL_AXIS_VERTICAL) != 0;
 	}
 
 	@Override
 	public void onNestedPreScroll(@NotNull CoordinatorLayout coordinatorLayout, @NotNull V child, @NotNull View target, int dx,
-								  int dy, @NotNull int[] consumed) {
+								  int dy, @NotNull int[] consumed, int type) {
+		if (type != ViewCompat.TYPE_TOUCH) return;
 		View scrollingChild = mNestedScrollingChildRef.get();
 		if (target != scrollingChild) {
 			return;
@@ -366,22 +368,22 @@ public class ViewPagerBottomSheetBehavior<V extends View> extends CoordinatorLay
 		if (dy > 0) { // Upward
 			if (newTop < mMinOffset) {
 				consumed[1] = currentTop - mMinOffset;
-				ViewCompat.offsetTopAndBottom(child, -consumed[1]);
+				child.offsetTopAndBottom(-consumed[1]);
 				setStateInternal(STATE_EXPANDED);
 			} else {
 				consumed[1] = dy;
-				ViewCompat.offsetTopAndBottom(child, -dy);
+				child.offsetTopAndBottom(-dy);
 				setStateInternal(STATE_DRAGGING);
 			}
 		} else if (dy < 0) { // Downward
 			if (!target.canScrollVertically(-1)) {
 				if (newTop <= mMaxOffset || mHideable) {
 					consumed[1] = dy;
-					ViewCompat.offsetTopAndBottom(child, -dy);
+					child.offsetTopAndBottom(-dy);
 					setStateInternal(STATE_DRAGGING);
 				} else {
 					consumed[1] = currentTop - mMaxOffset;
-					ViewCompat.offsetTopAndBottom(child, -consumed[1]);
+					child.offsetTopAndBottom(-consumed[1]);
 					setStateInternal(STATE_COLLAPSED);
 				}
 			}
@@ -391,7 +393,8 @@ public class ViewPagerBottomSheetBehavior<V extends View> extends CoordinatorLay
 	}
 
 	@Override
-	public void onStopNestedScroll(@NotNull CoordinatorLayout coordinatorLayout, V child, @NotNull View target) {
+	public void onStopNestedScroll(@NotNull CoordinatorLayout coordinatorLayout, V child, @NotNull View target, int type) {
+		if (type != ViewCompat.TYPE_TOUCH) return;
 		if (child.getTop() == mMinOffset) {
 			setStateInternal(STATE_EXPANDED);
 			return;
@@ -430,7 +433,7 @@ public class ViewPagerBottomSheetBehavior<V extends View> extends CoordinatorLay
 
 		if (mViewDragHelper.smoothSlideViewTo(child, child.getLeft(), top)) {
 			setStateInternal(STATE_SETTLING);
-			ViewCompat.postOnAnimation(child, new SettleRunnable(child, targetState));
+			child.postOnAnimation(new SettleRunnable(child, targetState));
 		} else {
 			setStateInternal(targetState);
 		}
@@ -570,7 +573,7 @@ public class ViewPagerBottomSheetBehavior<V extends View> extends CoordinatorLay
 		}
 		// Start the animation; wait until a pending layout if there is one.
 		ViewParent parent = child.getParent();
-		if (parent != null && parent.isLayoutRequested() && ViewCompat.isAttachedToWindow(child)) {
+		if (parent != null && parent.isLayoutRequested() && child.isAttachedToWindow()) {
 			child.post(new Runnable() {
 				@Override
 				public void run() {
@@ -630,7 +633,7 @@ public class ViewPagerBottomSheetBehavior<V extends View> extends CoordinatorLay
 
 	@VisibleForTesting
 	View findScrollingChild(View view) {
-		if (ViewCompat.isNestedScrollingEnabled(view) && view.isShown()) {
+		if (view.isNestedScrollingEnabled() && view.isShown()) {
 			return view;
 		}
 
@@ -685,7 +688,7 @@ public class ViewPagerBottomSheetBehavior<V extends View> extends CoordinatorLay
 		}
 		if (mViewDragHelper.smoothSlideViewTo(child, child.getLeft(), top)) {
 			setStateInternal(STATE_SETTLING);
-			ViewCompat.postOnAnimation(child, new SettleRunnable(child, state));
+			child.postOnAnimation(new SettleRunnable(child, state));
 		} else {
 			setStateInternal(state);
 		}
@@ -761,7 +764,7 @@ public class ViewPagerBottomSheetBehavior<V extends View> extends CoordinatorLay
 
 			if (mViewDragHelper.settleCapturedViewAt(releasedChild.getLeft(), top)) {
 				setStateInternal(STATE_SETTLING);
-				ViewCompat.postOnAnimation(releasedChild,
+				releasedChild.postOnAnimation(
 						new SettleRunnable(releasedChild, targetState));
 			} else {
 				setStateInternal(targetState);
@@ -821,7 +824,7 @@ public class ViewPagerBottomSheetBehavior<V extends View> extends CoordinatorLay
 		@Override
 		public void run() {
 			if (mViewDragHelper != null && mViewDragHelper.continueSettling(true)) {
-				ViewCompat.postOnAnimation(mView, this);
+				mView.postOnAnimation(this);
 			} else {
 				setStateInternal(mTargetState);
 			}

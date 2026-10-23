@@ -4,6 +4,7 @@ import android.content.Context
 import android.graphics.Color
 import android.os.Bundle
 import android.os.Parcelable
+import androidx.core.os.BundleCompat
 import android.util.TypedValue
 import android.view.Gravity
 import android.view.View
@@ -194,7 +195,7 @@ class SlipPalette(context: Context) : RelativeLayout(context) {
 		if (state is Bundle) {
 			visibility = state.getInt(VISIBILITY_KEY)
 			maxSlip = state.getDouble(MAX_SLIP_KEY)
-			superState = state.getParcelable(SUPER_STATE_KEY)
+			superState = BundleCompat.getParcelable(state, SUPER_STATE_KEY, Parcelable::class.java)
 		}
 		super.onRestoreInstanceState(superState)
 	}

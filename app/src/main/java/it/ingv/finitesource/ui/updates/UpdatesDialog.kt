@@ -7,7 +7,6 @@ import android.view.LayoutInflater
 import android.view.View
 import android.widget.TextView
 import androidx.appcompat.app.AlertDialog
-import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat.getString
 import it.ingv.finitesource.R
 import it.ingv.finitesource.data.local.EarthquakeUpdates
@@ -94,11 +93,7 @@ class UpdatesDialog(
 				// put the updates in the intent
 				intent.putExtra(UPDATES_INTENT_EXTRA_KEY, updatesData)
 				// start the activity
-				ActivityCompat.startActivity(
-					context,
-					intent,
-					null
-				)
+				context.startActivity(intent)
 			}
 
 			// Set the negative button of the dialog

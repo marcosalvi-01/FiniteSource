@@ -50,11 +50,11 @@ class Converters {
 			while (reader.readNext().also { nextLine = it } != null) {
 				scenarios.add(
 					Scenario(
-						ScenarioType(nextLine!![0], nextLine!![1], nextLine!![2]),
-						nextLine!![3],
-						nextLine!![4],
-						nextLine!![5],
-						nextLine!![6]
+						ScenarioType(nextLine!![0], nextLine[1], nextLine[2]),
+						nextLine[3],
+						nextLine[4],
+						nextLine[5],
+						nextLine[6]
 					)
 				)
 			}

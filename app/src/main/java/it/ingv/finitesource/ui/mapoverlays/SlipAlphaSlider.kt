@@ -3,6 +3,7 @@ package it.ingv.finitesource.ui.mapoverlays
 import android.content.Context
 import android.os.Bundle
 import android.os.Parcelable
+import androidx.core.os.BundleCompat
 import android.util.AttributeSet
 import androidx.appcompat.widget.AppCompatSeekBar
 
@@ -29,7 +30,7 @@ class SlipAlphaSlider(context: Context, attributeSet: AttributeSet) :
 		var superState = state
 		if (state is Bundle) {
 			visibility = state.getInt(SLIP_ALPHA_SLIDER_VISIBILITY)
-			superState = state.getParcelable(SUPER_STATE_KEY)
+			superState = BundleCompat.getParcelable(state, SUPER_STATE_KEY, Parcelable::class.java)
 		}
 		super.onRestoreInstanceState(superState)
 	}

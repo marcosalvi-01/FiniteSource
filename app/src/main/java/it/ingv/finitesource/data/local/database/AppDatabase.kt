@@ -28,7 +28,7 @@ abstract class AppDatabase : RoomDatabase() {
 				context,
 				AppDatabase::class.java,
 				"earthquake_database"
-			).fallbackToDestructiveMigration()
+			).fallbackToDestructiveMigration(dropAllTables = false)
 				.build().also { instance = it }
 		}
 	}

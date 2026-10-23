@@ -7,7 +7,6 @@ import android.widget.ImageButton;
 import android.graphics.drawable.LayerDrawable
 import android.net.Uri
 import android.os.Bundle
-import android.preference.PreferenceManager
 import android.text.Editable
 import android.text.Spannable
 import android.text.SpannableString
@@ -74,7 +73,7 @@ class MainActivity : AppCompatActivity() {
         Configuration.getInstance()
             .load(
                 applicationContext,
-                PreferenceManager.getDefaultSharedPreferences(applicationContext)
+                applicationContext.getSharedPreferences("${applicationContext.packageName}_preferences", MODE_PRIVATE)
             )
         // inflate the layout and set it as the content view
         setContentView(binding.root)
@@ -666,4 +665,3 @@ class MainActivity : AppCompatActivity() {
 const val BOTTOM_SHEET_MAXIMIZED_SLIDE_OFFSET = 0.93f
 const val TOOL_BAR_SHOWN_TAG = "toolbarShown"
 const val COMPASS_BUTTON_ROTATION_TAG = "compassButtonRotation"
-

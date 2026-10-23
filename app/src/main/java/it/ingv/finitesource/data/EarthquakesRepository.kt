@@ -87,14 +87,14 @@ class EarthquakesRepository @Inject constructor(
                 .build()
         ).execute().let {
             if (it.isSuccessful) {
-                it.body?.string()
+                it.body.string()
             } else {
                 throw Exception("Error getting")
             }
         }
         val moshi = Moshi.Builder().build()
         val adapterConfig = moshi.adapter(Config::class.java)
-        val serverConfig: Config? = adapterConfig.fromJson(generalConfigResponse!!)
+        val serverConfig: Config? = adapterConfig.fromJson(generalConfigResponse)
 
         val providersResponse = okHttpClient.newCall(
             Request.Builder()
@@ -102,7 +102,7 @@ class EarthquakesRepository @Inject constructor(
                 .build()
         ).execute().let {
             if (it.isSuccessful) {
-                it.body?.string()
+                it.body.string()
             } else {
                 throw Exception("Error getting")
             }
@@ -110,7 +110,7 @@ class EarthquakesRepository @Inject constructor(
         val listTypeParameters = Types.newParameterizedType(List::class.java, Provider::class.java)
         val adapterParameters = moshi.adapter<List<Provider>>(listTypeParameters)
 
-        val providers = adapterParameters.fromJson(providersResponse!!)
+        val providers = adapterParameters.fromJson(providersResponse)
 
         // update the ScenarioType table
         val scenarioTypes = providers?.map {
@@ -132,7 +132,7 @@ class EarthquakesRepository @Inject constructor(
                     .build()
             ).execute().let {
                 if (it.isSuccessful) {
-                    it.body?.string()
+                    it.body.string()
                 } else {
                     throw Exception("Error getting")
                 }
@@ -140,7 +140,7 @@ class EarthquakesRepository @Inject constructor(
             val listType = Types.newParameterizedType(List::class.java, String::class.java)
             val adapter = moshi.adapter<List<String>>(listType)
             // update the general configs, if for some reason it doesn't work, it will use the old values
-            CatalogConfig.updateSlipColorPalette(adapter.fromJson(paletteResponse!!)!!)
+            CatalogConfig.updateSlipColorPalette(adapter.fromJson(paletteResponse)!!)
         }
     }
 

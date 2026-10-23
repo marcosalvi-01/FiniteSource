@@ -10,9 +10,7 @@ import android.view.LayoutInflater
 import android.widget.FrameLayout
 import android.widget.ImageView
 import androidx.appcompat.widget.PopupMenu
-import androidx.core.app.ActivityCompat
 import androidx.core.app.ActivityOptionsCompat
-import androidx.core.view.ViewCompat
 import com.bumptech.glide.Glide
 import com.bumptech.glide.request.target.CustomTarget
 import com.bumptech.glide.request.target.Target
@@ -95,10 +93,10 @@ class ImageTextView(
                 context as Activity,
                 // @string/full_screen_image_transition_name
                 // is the transition name of the ImageView
-                binding.imageView, ViewCompat.getTransitionName(binding.imageView)!!
+                binding.imageView, binding.imageView.transitionName!!
             )
             // Start the activity with the transition
-            ActivityCompat.startActivity(context, intent, options.toBundle())
+            context.startActivity(intent, options.toBundle())
         }
     }
 

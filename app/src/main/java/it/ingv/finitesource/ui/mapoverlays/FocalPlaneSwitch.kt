@@ -3,6 +3,7 @@ package it.ingv.finitesource.ui.mapoverlays
 import android.content.Context
 import android.os.Bundle
 import android.os.Parcelable
+import androidx.core.os.BundleCompat
 import android.util.AttributeSet
 import android.view.View
 import androidx.coordinatorlayout.widget.CoordinatorLayout
@@ -56,7 +57,7 @@ class FocalPlaneSwitch(context: Context, attributeSet: AttributeSet) :
 		if (state is Bundle) {
 			visibility = state.getInt(SWITCH_VISIBILITY_KEY)
 			isChecked = state.getBoolean(SWITCH_CHECKED_KEY)
-			superState = state.getParcelable(SUPER_STATE_KEY)
+			superState = BundleCompat.getParcelable(state, SUPER_STATE_KEY, Parcelable::class.java)
 		}
 		super.onRestoreInstanceState(superState)
 	}

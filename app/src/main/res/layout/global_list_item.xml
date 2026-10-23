@@ -1,110 +1,102 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_marginHorizontal="8dp"
-    android:layout_marginTop="@dimen/global_list_item_vertical_margin"
-    android:background="@drawable/global_list_item_background"
-    android:padding="8dp">
+    android:layout_marginTop="8dp"
+    android:clickable="true"
+    android:focusable="true"
+    android:theme="@style/ThemeOverlay.FiniteSource.EventSurface"
+    app:cardBackgroundColor="@color/event_card_surface"
+    app:cardCornerRadius="12dp"
+    app:cardElevation="2dp"
+    app:rippleColor="@color/event_card_magnitude_container"
+    app:strokeColor="@color/event_card_outline"
+    app:strokeWidth="2dp">
 
-    <TextView
-        android:id="@+id/event_name"
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_alignParentStart="true"
-        android:layout_alignParentTop="true"
-        android:paddingTop="3dp"
-        android:textColor="@color/on_primary"
-        android:textAppearance="?android:attr/textAppearanceMedium"
-        android:textStyle="bold" />
-
-    <View
-        android:id="@+id/title_line"
-        android:layout_width="wrap_content"
-        android:layout_height="1dp"
-        android:layout_below="@id/event_name"
-        android:layout_alignParentStart="true"
-        android:layout_alignParentEnd="true"
-        android:layout_marginVertical="5dp"
-        android:background="?attr/backgroundColor" />
-
-
-    <RelativeLayout
-        android:id="@id/event_date_layout"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/title_line"
-        android:layout_marginVertical="4dp">
-
-        <ImageView
-            android:id="@+id/clock_icon"
-            android:layout_width="@dimen/global_list_icon_size"
-            android:layout_height="@dimen/global_list_icon_size"
-            android:layout_alignParentStart="true"
-            android:layout_centerVertical="true"
-            android:background="@drawable/clock_icon"
-            android:backgroundTint="@color/on_primary" />
+        android:padding="16dp">
 
         <TextView
-            android:id="@+id/event_date"
-            android:layout_width="wrap_content"
+            android:id="@+id/event_name"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_toEndOf="@+id/clock_icon"
-            android:paddingHorizontal="4dp"
-            android:textColor="@color/on_primary"
-            android:textAppearance="?android:attr/textAppearanceMedium" />
-    </RelativeLayout>
-
-    <RelativeLayout
-        android:id="@+id/event_depth_layout"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/event_date_layout"
-        android:layout_marginVertical="4dp">
-
-        <ImageView
-            android:id="@+id/depth_icon"
-            android:layout_width="@dimen/global_list_icon_size"
-            android:layout_height="@dimen/global_list_icon_size"
-            android:layout_alignParentStart="true"
-            android:layout_centerVertical="true"
-            android:background="@drawable/depth_icon"
-            android:backgroundTint="@color/on_primary" />
-
-        <TextView
-            android:id="@+id/event_depth"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_toEndOf="@+id/depth_icon"
-            android:paddingHorizontal="4dp"
-            android:textColor="@color/on_primary"
-            android:textAppearance="?android:attr/textAppearanceMedium" />
-    </RelativeLayout>
-
-    <RelativeLayout
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignBottom="@id/event_depth_layout"
-        android:layout_alignParentEnd="true">
-
-        <ImageView
-            android:id="@+id/magnitude_icon"
-            android:layout_width="25dp"
-            android:layout_height="25dp"
-            android:layout_centerVertical="true"
-            android:background="@drawable/magnitude_icon"
-            android:backgroundTint="@color/on_primary" />
+            android:layout_marginEnd="12dp"
+            android:textAppearance="@style/TextAppearance.Material3.TitleMedium"
+            android:textColor="@color/event_card_on_surface"
+            android:textStyle="bold"
+            app:layout_constraintEnd_toStartOf="@id/event_magnitude"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
 
         <TextView
             android:id="@+id/event_magnitude"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_toEndOf="@id/magnitude_icon"
-            android:paddingStart="2dp"
-            android:paddingEnd="3dp"
-            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:background="@drawable/event_magnitude_background"
+            android:paddingHorizontal="12dp"
+            android:paddingVertical="6dp"
+            android:textAppearance="@style/TextAppearance.Material3.TitleMedium"
+            android:textColor="@color/event_card_on_magnitude_container"
             android:textSize="@dimen/global_list_item_magnitude_text_size"
-            android:textColor="@color/on_primary"
-            android:textStyle="bold" />
-    </RelativeLayout>
-</RelativeLayout>
+            android:textStyle="bold"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <androidx.constraintlayout.widget.Barrier
+            android:id="@+id/header_bottom"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:barrierDirection="bottom"
+            app:constraint_referenced_ids="event_name,event_magnitude" />
+
+        <ImageView
+            android:id="@+id/clock_icon"
+            android:layout_width="@dimen/global_list_icon_size"
+            android:layout_height="@dimen/global_list_icon_size"
+            android:importantForAccessibility="no"
+            android:src="@drawable/clock_icon"
+            app:layout_constraintBottom_toBottomOf="@id/event_date"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="@id/event_date"
+            app:tint="@color/event_card_on_surface_variant" />
+
+        <TextView
+            android:id="@+id/event_date"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:layout_marginTop="12dp"
+            android:textAppearance="@style/TextAppearance.Material3.BodyMedium"
+            android:textColor="@color/event_card_on_surface_variant"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@id/clock_icon"
+            app:layout_constraintTop_toBottomOf="@id/header_bottom" />
+
+        <ImageView
+            android:id="@+id/depth_icon"
+            android:layout_width="@dimen/global_list_icon_size"
+            android:layout_height="@dimen/global_list_icon_size"
+            android:importantForAccessibility="no"
+            android:src="@drawable/depth_icon"
+            app:layout_constraintBottom_toBottomOf="@id/event_depth"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="@id/event_depth"
+            app:tint="@color/event_card_on_surface_variant" />
+
+        <TextView
+            android:id="@+id/event_depth"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:layout_marginTop="8dp"
+            android:textAppearance="@style/TextAppearance.Material3.BodyMedium"
+            android:textColor="@color/event_card_on_surface_variant"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@id/depth_icon"
+            app:layout_constraintTop_toBottomOf="@id/event_date" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</com.google.android.material.card.MaterialCardView>

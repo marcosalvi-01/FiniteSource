@@ -6,6 +6,12 @@
     <color name="no_finite_source">#9CA3AF</color>
     <color name="transparent">#00000000</color>
     <color name="primary">#C95F11</color>
+    <color name="event_card_surface">@color/background</color>
+    <color name="event_card_on_surface">@color/on_background</color>
+    <color name="event_card_on_surface_variant">@color/color_subtitle_text</color>
+    <color name="event_card_outline">#99C95F11</color>
+    <color name="event_card_magnitude_container">@color/primary</color>
+    <color name="event_card_on_magnitude_container">@color/on_primary</color>
     <color name="on_primary">@color/white</color>
     <color name="secondary">#0091EA</color>
     <color name="background">#FFFFFF</color>

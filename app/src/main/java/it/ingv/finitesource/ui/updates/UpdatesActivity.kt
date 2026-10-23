@@ -2,6 +2,7 @@ package it.ingv.finitesource.ui.updates
 
 import android.graphics.Color
 import android.os.Bundle
+import androidx.core.content.IntentCompat
 import android.view.View // For SYSTEM_UI_FLAG constants
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -50,7 +51,7 @@ class UpdatesActivity : AppCompatActivity() {
 
 
 		// get the updates from the intent
-		val updates: EarthquakeUpdatesData? = intent.getParcelableExtra(UPDATES_INTENT_EXTRA_KEY)
+		val updates = IntentCompat.getParcelableExtra(intent, UPDATES_INTENT_EXTRA_KEY, EarthquakeUpdatesData::class.java)
 		if (updates != null && updates.hasUpdates()) {
 			// hide the no updates text and show the scroll view
 			binding.noUpdatesText.visibility = View.GONE

@@ -1,8 +1,8 @@
 package it.ingv.finitesource.data.local
 
-import android.os.Build
 import android.os.Bundle
 import android.os.Parcelable
+import androidx.core.os.BundleCompat
 import androidx.fragment.app.Fragment
 import it.ingv.finitesource.R
 import it.ingv.finitesource.ui.persistentbottomsheet.tabs.finitesource.FiniteSourceFragment
@@ -76,14 +76,10 @@ abstract class ProductFragment : Fragment() {
 	override fun onCreate(savedInstanceState: Bundle?) {
 		super.onCreate(savedInstanceState)
 		// get the product from the arguments
-		product = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-			arguments?.getParcelable(PRODUCT_TAG, Products::class.java)
-				?: throw Exception("Product not found")
-		} else
-			arguments?.getParcelable(PRODUCT_TAG) ?: throw Exception("Product not found")
+		product = arguments?.let { BundleCompat.getParcelable(it, PRODUCT_TAG, Products::class.java) }
+			?: throw Exception("Product not found")
 	}
 }
 
 private const val PRODUCT_TAG = "product"
-
 

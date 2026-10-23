@@ -1,12 +1,17 @@
 package it.ingv.finitesource
 
-import android.app.Activity
+import android.Manifest
+import android.content.ContentValues
 import android.content.Context
+import android.content.ContextWrapper
+import android.content.pm.PackageManager
 import android.content.res.Resources
 import android.graphics.Bitmap
 import android.graphics.drawable.Drawable
 import android.net.Uri
+import android.os.Build
 import android.provider.MediaStore
+import android.util.Log
 import android.util.TypedValue
 import android.view.View
 import android.view.ViewGroup
@@ -14,19 +19,27 @@ import android.view.Window
 import android.view.animation.Animation
 import android.view.animation.Transformation
 import android.widget.Toast
+import androidx.activity.ComponentActivity
+import androidx.activity.result.ActivityResultLauncher
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.core.content.ContextCompat
 import androidx.core.view.WindowCompat
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleEventObserver
 import com.bumptech.glide.Glide
 import com.bumptech.glide.request.target.CustomTarget
 import com.bumptech.glide.request.transition.Transition
 import it.ingv.finitesource.R
 import it.ingv.finitesource.ui.imagetextview.ImageTextView
-import java.io.ByteArrayOutputStream
+import java.io.IOException
 import java.text.DateFormat
 import java.time.OffsetDateTime
 import java.util.Calendar
+import java.util.Collections
 import java.util.Date
 import java.util.Locale
 import java.util.UUID
+import java.util.WeakHashMap
 
 fun offsetDateTimeToCalendar(offsetDateTime: OffsetDateTime?): Calendar? {
 	if (offsetDateTime == null)
@@ -96,8 +109,7 @@ fun formatMagnitude(context: Context, magnitude: Double) =
  * See [Android: Expand/collapse animation](https://stackoverflow.com/questions/4946295/android-expand-collapse-animation)
  */
 fun View.expand() {
-	// TODO fix the view flickering at the start of the animation
-	visibility = View.VISIBLE
+	layoutParams.height = ViewGroup.LayoutParams.WRAP_CONTENT
 
 	val matchParentMeasureSpec =
 		View.MeasureSpec.makeMeasureSpec((parent as View).width, View.MeasureSpec.EXACTLY)
@@ -105,13 +117,18 @@ fun View.expand() {
 	measure(matchParentMeasureSpec, wrapContentMeasureSpec)
 	val targetHeight = measuredHeight
 
+	// Establish the collapsed height before the first visible layout pass.
+	layoutParams.height = 1
+	visibility = View.VISIBLE
+
 	// Create a custom animation for height expansion
 	val animation = object : Animation() {
 		override fun applyTransformation(interpolatedTime: Float, t: Transformation) {
 			layoutParams.height = if (interpolatedTime == 1f) {
 				ViewGroup.LayoutParams.WRAP_CONTENT
 			} else
-				(targetHeight * interpolatedTime).toInt()
+				// Zero means MATCH_CONSTRAINT for children of ConstraintLayout.
+				(targetHeight * interpolatedTime).toInt().coerceAtLeast(1)
 			requestLayout()
 		}
 
@@ -185,26 +202,54 @@ fun getBitmap(context: Context, url: String, function: (Bitmap) -> (Unit)) {
 /**
  * Saves the image in the gallery and returns the Uri.
  */
-fun getImageUri(context: Context, bitmap: Bitmap): Uri {
-	val path = saveImage(context, bitmap)
-	return Uri.parse(path)
+fun getImageUri(context: Context, bitmap: Bitmap): Uri? {
+	return saveImage(context, bitmap)?.let(Uri::parse)
 }
 
 /**
  * Saves the image in the gallery and returns the path. It also shows a toast.
  */
-fun saveImage(context: Context, bitmap: Bitmap, showToast: Boolean = false): String {
-	val bytes = ByteArrayOutputStream()
-	bitmap.compress(Bitmap.CompressFormat.JPEG, 100, bytes)
-	val path = MediaStore.Images.Media.insertImage(
-		(context as Activity).contentResolver,
-		bitmap,
-		UUID.randomUUID().toString() + ".jpg",
-		"image"
-	)
-	if (showToast)
-		Toast.makeText(context, R.string.image_saved, Toast.LENGTH_SHORT).show()
-	return path
+fun saveImage(context: Context, bitmap: Bitmap, showToast: Boolean = false): String? {
+	val resolver = context.contentResolver
+	var uri: Uri? = null
+	return try {
+		val name = UUID.randomUUID().toString() + ".jpg"
+		val values = ContentValues().apply {
+			put(MediaStore.Images.Media.DISPLAY_NAME, name)
+			put(MediaStore.Images.Media.TITLE, name)
+			put(MediaStore.Images.Media.DESCRIPTION, "image")
+			put(MediaStore.Images.Media.MIME_TYPE, "image/jpeg")
+			if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q)
+				put(MediaStore.Images.Media.IS_PENDING, 1)
+		}
+		val imageUri = resolver.insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, values)
+			?: throw IOException("Could not create gallery image")
+		uri = imageUri
+		val stream = resolver.openOutputStream(imageUri)
+			?: throw IOException("Could not open gallery image")
+		stream.use {
+			// Match the JPEG quality used by the former MediaStore.insertImage implementation.
+			if (!bitmap.compress(Bitmap.CompressFormat.JPEG, 50, it))
+				throw IOException("Could not encode gallery image")
+		}
+		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+			val published = resolver.update(imageUri, ContentValues().apply {
+				put(MediaStore.Images.Media.IS_PENDING, 0)
+			}, null, null)
+			if (published == 0) throw IOException("Could not publish gallery image")
+		}
+		if (showToast)
+			Toast.makeText(context, R.string.image_saved, Toast.LENGTH_SHORT).show()
+		imageUri.toString()
+	} catch (e: Exception) {
+		Log.e("FiniteSource", "Could not save image", e)
+		uri?.let {
+			runCatching { resolver.delete(it, null, null) }
+				.onFailure { error -> Log.e("FiniteSource", "Could not remove incomplete image", error) }
+		}
+		Toast.makeText(context, R.string.image_save_failed, Toast.LENGTH_SHORT).show()
+		null
+	}
 }
 
 /**
@@ -213,12 +258,14 @@ fun saveImage(context: Context, bitmap: Bitmap, showToast: Boolean = false): Str
  */
 fun shareImage(context: Context, bitmap: Bitmap) {
 	// get the uri of the image
-	val uri = getImageUri(context, bitmap)
+	val uri = getImageUri(context, bitmap) ?: return
 	// create the intent
 	val intent = android.content.Intent().apply {
 		action = android.content.Intent.ACTION_SEND
 		putExtra(android.content.Intent.EXTRA_STREAM, uri)
 		type = "image/*"
+		addFlags(android.content.Intent.FLAG_GRANT_READ_URI_PERMISSION)
+		clipData = android.content.ClipData.newRawUri("image", uri)
 	}
 	// start the activity
 	context.startActivity(
@@ -233,8 +280,10 @@ fun shareImage(context: Context, bitmap: Bitmap) {
  * Gets the image from the url, saves it in the gallery and shows a toast.
  */
 fun saveImage(context: Context, url: String, showToast: Boolean = false) {
-	getBitmap(context, url) {
-		saveImage(context, it, showToast)
+	withGalleryPermission(context) {
+		getBitmap(context, url) {
+			saveImage(context, it, showToast)
+		}
 	}
 }
 
@@ -242,8 +291,55 @@ fun saveImage(context: Context, url: String, showToast: Boolean = false) {
  * Gets the image from the url and starts an intent to share it.
  */
 fun shareImage(context: Context, url: String) {
-	getBitmap(context, url) {
-		shareImage(context, it)
+	withGalleryPermission(context) {
+		getBitmap(context, url) {
+			shareImage(context, it)
+		}
+	}
+}
+
+private val pendingGalleryPermissions = Collections.newSetFromMap(WeakHashMap<ComponentActivity, Boolean>())
+
+internal fun withGalleryPermission(context: Context, action: () -> Unit) {
+	if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q || ContextCompat.checkSelfPermission(
+			context, Manifest.permission.WRITE_EXTERNAL_STORAGE
+		) == PackageManager.PERMISSION_GRANTED) {
+		action()
+		return
+	}
+	val activity = generateSequence(context) { (it as? ContextWrapper)?.baseContext }
+		.filterIsInstance<ComponentActivity>().firstOrNull()
+	if (activity == null || activity.isDestroyed) {
+		Toast.makeText(context, R.string.image_save_failed, Toast.LENGTH_SHORT).show()
+		return
+	}
+	if (!pendingGalleryPermissions.add(activity)) return
+	val key = "gallery_permission_${UUID.randomUUID()}"
+	lateinit var launcher: ActivityResultLauncher<String>
+	val observer = LifecycleEventObserver { _, event ->
+		if (event == Lifecycle.Event.ON_DESTROY) {
+			pendingGalleryPermissions.remove(activity)
+			launcher.unregister()
+		}
+	}
+	activity.lifecycle.addObserver(observer)
+	launcher = activity.activityResultRegistry.register(key, ActivityResultContracts.RequestPermission()) { granted ->
+		pendingGalleryPermissions.remove(activity)
+		launcher.unregister()
+		activity.lifecycle.removeObserver(observer)
+		if (!activity.isDestroyed) {
+			if (granted) action()
+			else Toast.makeText(context, R.string.image_save_failed, Toast.LENGTH_SHORT).show()
+		}
+	}
+	try {
+		launcher.launch(Manifest.permission.WRITE_EXTERNAL_STORAGE)
+	} catch (e: RuntimeException) {
+		pendingGalleryPermissions.remove(activity)
+		launcher.unregister()
+		activity.lifecycle.removeObserver(observer)
+		Log.e("FiniteSource", "Could not request gallery permission", e)
+		Toast.makeText(context, R.string.image_save_failed, Toast.LENGTH_SHORT).show()
 	}
 }
 

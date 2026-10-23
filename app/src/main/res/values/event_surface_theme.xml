@@ -1,0 +1,5 @@
+<resources>
+    <style name="ThemeOverlay.FiniteSource.EventSurface" parent="">
+        <item name="elevationOverlayEnabled">false</item>
+    </style>
+</resources>

@@ -2,9 +2,7 @@ package it.ingv.finitesource.ui.updates
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
-import androidx.appcompat.content.res.AppCompatResources
 import androidx.recyclerview.widget.RecyclerView
-import it.ingv.finitesource.R
 import it.ingv.finitesource.databinding.GlobalListItemBinding
 import it.ingv.finitesource.formatDateTime
 import it.ingv.finitesource.formatDepth
@@ -47,10 +45,6 @@ class UpdatesItemAdapter(
 			binding.eventDate.text = formatDateTime(item.date.time)
 			binding.eventDepth.text = formatDepth(binding.root.context, item.depth)
 			binding.eventMagnitude.text = formatMagnitude(binding.root.context, item.magnitude)
-			binding.root.background = AppCompatResources.getDrawable(
-				binding.root.context,
-				R.drawable.updates_list_item_background
-			)
 		}
 	}
 }

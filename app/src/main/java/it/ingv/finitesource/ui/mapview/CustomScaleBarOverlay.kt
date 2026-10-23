@@ -7,7 +7,8 @@ import android.graphics.Paint
 import android.graphics.Path
 import android.graphics.Rect
 import android.os.Build
-import android.view.WindowManager
+import android.hardware.display.DisplayManager
+import android.view.Display
 import org.osmdroid.library.R
 import org.osmdroid.util.GeoPoint
 import org.osmdroid.util.constants.GeoConstants
@@ -133,9 +134,9 @@ open class CustomScaleBarOverlay private constructor(
 		if ("motorola" == manufacturer && "DROIDX" == Build.MODEL) {
 
 			// If the screen is rotated, flip the x and y dpi values
-			val windowManager = context!!
-				.getSystemService(Context.WINDOW_SERVICE) as WindowManager
-			if (windowManager.defaultDisplay.orientation > 0) {
+			val displayManager = context!!
+				.getSystemService(Context.DISPLAY_SERVICE) as DisplayManager
+			if (displayManager.getDisplay(Display.DEFAULT_DISPLAY).rotation > 0) {
 				xdpi = (screenWidth / 3.75).toFloat()
 				ydpi = (screenHeight / 2.1).toFloat()
 			} else {

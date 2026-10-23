@@ -55,7 +55,7 @@ data class EarthquakeDetails(
 		if (ingvId == null)
 			return null
 		return with("http://terremoti.ingv.it/event/$ingvId") {
-			if (Locale.getDefault().language != Locale("it").language)
+			if (Locale.getDefault().language != Locale.ITALIAN.language)
 			// If the default language is not Italian, change the URL to the English version
 				replace("/event", "/en/event")
 			else
